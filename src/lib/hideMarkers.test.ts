@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isMarkerNode, markEnd } from "./hideMarkers";
+import { isMarkerNode, markEnd, isHidden } from "./hideMarkers";
 
 describe("which nodes are punctuation", () => {
   it("treats every marker the format bar can produce as punctuation", () => {
@@ -32,5 +32,34 @@ describe("swallowing the space after a marker", () => {
 
   it("copes with no space at all", () => {
     expect(markEnd("Chapter", "HeaderMark", 1)).toBe(1);
+  });
+});
+
+describe("links", () => {
+  it("hides the address inside a link", () => {
+    // Hiding only the brackets left the address jammed against the words:
+    // "the docshttps://example.com".
+    expect(isHidden("URL", "Link")).toBe(true);
+    expect(isHidden("LinkTitle", "Link")).toBe(true);
+  });
+
+  it("hides the address inside an image too", () => {
+    expect(isHidden("URL", "Image")).toBe(true);
+  });
+
+  it("leaves a bare autolink alone", () => {
+    // <https://example.com> is nothing but its address; hiding it would
+    // leave an empty gap.
+    expect(isHidden("URL", "Autolink")).toBe(false);
+    expect(isHidden("URL", null)).toBe(false);
+  });
+
+  it("still hides the brackets themselves", () => {
+    expect(isHidden("LinkMark", "Link")).toBe(true);
+  });
+
+  it("never hides the words being linked", () => {
+    expect(isHidden("Paragraph", "Document")).toBe(false);
+    expect(isHidden("Link", "Paragraph")).toBe(false);
   });
 });

@@ -31,6 +31,25 @@ export function isMarkerNode(name: string): boolean {
   return MARKS.has(name);
 }
 
+/**
+ * Parts of a link that aren't the words you read: the address and the
+ * optional title. Hiding the brackets alone left `[the docs](https://...)`
+ * showing as `the docshttps://...`, with the address jammed against the text.
+ */
+const LINK_INNARDS = new Set(["URL", "LinkTitle"]);
+
+/**
+ * Whether this node is punctuation or plumbing rather than prose.
+ *
+ * The address is only hidden inside a real link. A bare `<https://example.com>`
+ * autolink is nothing but its address, so hiding that would leave an empty
+ * space where the link was.
+ */
+export function isHidden(name: string, parentName: string | null): boolean {
+  if (MARKS.has(name)) return true;
+  return LINK_INNARDS.has(name) && (parentName === "Link" || parentName === "Image");
+}
+
 /** How far the hidden run should reach, swallowing the space after `#` or `>`. */
 export function markEnd(following: string, name: string, to: number): number {
   if (name !== "HeaderMark" && name !== "QuoteMark") return to;
@@ -68,7 +87,7 @@ function buildDecorations(state: EditorState, view: EditorView): Built {
           }
           return;
         }
-        if (!isMarkerNode(node.name)) return;
+        if (!isHidden(node.name, node.node.parent?.name ?? null)) return;
         // `#` and `>` are their own node, but the space after them isn't.
         // Leaving it draws every heading and quote one space indented.
         const end = markEnd(state.doc.sliceString(node.to, node.to + 4), node.name, node.to);
