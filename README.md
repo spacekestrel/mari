@@ -58,9 +58,7 @@ A `.mari` file holds the lot:
 | 🧭 **Synopsis and plan** | what the chapter is about, and what it still has to do |
 | 🗄️ **Drawer** | passages you cut but couldn't bring yourself to delete |
 
-Move the file and all of it moves with it. Email a chapter to someone and they
-get your highlights and notes too. Open it again next year and your reasons are
-still sitting on the paragraphs they belong to.
+Send the file to someone and they get the highlights and notes with it.
 
 ### Nothing is locked in
 
