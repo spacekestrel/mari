@@ -4,10 +4,10 @@
   <img src="docs/mari-idle.gif" width="160" alt="Mari the cat, blinking and licking her paw">
 </p>
 
-**Mari is a cat.** 🐈‍⬛
+**Marí is a cat.** 🐈‍⬛
 
-Mari is also a powerful, free app for writers. ✍️ (Mari is a Georgian name,
-with the stress on the last syllable.)
+Marí is also a powerful, free app for writers. ✍️ (It is also a Georgian
+name, with the stress on the last syllable.)
 
 It's where you write the whole thing: draft it, keep the chapters in order,
 and work it into shape. It goes furthest on the part most tools ignore, which
@@ -42,8 +42,8 @@ Mari puts them on the text itself, and gives you tools to act on them.
 
 ## 📦 The .mari file
 
-**`.mari` is a powerful file extension.** Every chapter you write is one
-`.mari` file, and it carries far more than your text:
+**Mari works with its own file type.** Every chapter you write is one `.mari`
+file, and it carries far more than your text:
 
 | | |
 |---|---|
@@ -53,9 +53,6 @@ Mari puts them on the text itself, and gives you tools to act on them.
 | 🔀 **Drafts** | every alternative wording you tried, including the ones you replaced |
 | 🧭 **Synopsis and plan** | what the chapter is about, and what it still has to do |
 | 🗄️ **Drawer** | passages you cut but couldn't bring yourself to delete |
-
-A `.docx` or a `.txt` saves the words and nothing else, so all of the above
-would have to live in a separate document that goes out of date within a week.
 
 Send someone a `.mari` file and they get every bit of it, not just the prose.
 
