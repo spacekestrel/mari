@@ -60,15 +60,11 @@ Send someone a `.mari` file and they get every bit of it, not just the prose.
 
 ### Nothing is locked in
 
-A `.mari` file is an ordinary zip. Rename it to `.zip`, open it, and your
-writing is sitting there as a plain text file you can read in anything. No
-encryption, no proprietary encoding, no account required to open your own work.
-**If Mari vanished tomorrow, your manuscript is one rename away.**
+A `.mari` file is just a zip. Rename it to `.zip`, open it, and your text is in
+there as a plain file. No account, no proprietary format.
 
-Mari opens `.docx`, `.md` and `.txt` as well, and writes them back out, so a
-chapter can go to an editor and come back. Those formats can only carry the
-words, so the highlights and notes stay in the `.mari` file. Mari tells you
-that when you save one, rather than letting the work disappear quietly.
+Mari opens and saves `.docx`, `.md` and `.txt` too. Those only hold the words,
+so highlights and notes stay behind, and Mari tells you when you save one.
 
 ---
 
