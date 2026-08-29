@@ -5,7 +5,9 @@
   import { defaultKeymap, history, historyKeymap, redo, selectAll, undo } from "@codemirror/commands";
   import { markdown } from "@codemirror/lang-markdown";
   import { syntaxHighlighting, HighlightStyle } from "@codemirror/language";
+  import { hideMarkers } from "$lib/hideMarkers";
   import { tags } from "@lezer/highlight";
+  import { Strikethrough } from "@lezer/markdown";
   import ContextMenu, { type ContextMenuItem } from "./ContextMenu.svelte";
   import FormatBar from "./FormatBar.svelte";
   import DraftPanel from "./DraftPanel.svelte";
@@ -101,6 +103,11 @@
   // Subtle, prose-first styling: markup characters recede, emphasis reads naturally.
   const proseHighlightStyle = HighlightStyle.define([
     { tag: tags.heading, fontWeight: "600" },
+    // Once the `#` characters are hidden, nothing but size separates a
+    // chapter title from a scene heading.
+    { tag: tags.heading1, fontWeight: "700", fontSize: "1.5em", lineHeight: "1.3" },
+    { tag: tags.heading2, fontWeight: "700", fontSize: "1.25em", lineHeight: "1.35" },
+    { tag: tags.heading3, fontWeight: "600", fontSize: "1.1em" },
     { tag: tags.strong, fontWeight: "700" },
     { tag: tags.emphasis, fontStyle: "italic" },
     { tag: tags.strikethrough, textDecoration: "line-through" },
@@ -283,7 +290,9 @@
           // line of dialogue, a scene break — and watching the paragraph above
           // silently go bold is astonishing. `#` headings still work.
           markdown({
-            extensions: [{ remove: ["SetextHeading"] }],
+            // Strikethrough is GFM, not commonmark, so the parser needs it
+            // added explicitly or `~~cut~~` stays as literal tildes.
+            extensions: [{ remove: ["SetextHeading"] }, Strikethrough],
             // No list continuation on Enter. In a novel a line starting with a
             // dash is dialogue, not a bullet, and having Mari add another "- "
             // every time you break the line is worse than typing the odd list
@@ -291,6 +300,9 @@
             addKeymap: false,
           }),
           syntaxHighlighting(proseHighlightStyle),
+          // Only in a `.mari` chapter. A `.md` file is Markdown the writer
+          // opened as Markdown, so its syntax stays visible.
+          ...(plain ? [] : [hideMarkers()]),
         ];
   }
 
