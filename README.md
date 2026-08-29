@@ -1,7 +1,7 @@
 # Mari
 
 <p align="center">
-  <img src="docs/mari-washing.gif" width="160" alt="Mari the cat, blinking and licking her paw">
+  <img src="docs/mari-idle.gif" width="160" alt="Mari the cat, blinking and licking her paw">
 </p>
 
 **Mari is a cat.** 🐈‍⬛
