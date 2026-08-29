@@ -158,6 +158,17 @@ Mari opens plain `.md` and `.txt` files too, and saves them as exactly that —
 plain text, with none of the extras, because a `.txt` file has nowhere to keep
 them.
 
+## 📄 Word documents
+
+Mari opens **`.docx`** files and writes them back out. Paragraphs, headings,
+bold and italic cross over intact in both directions, so a manuscript can come
+in from an editor and go back out to one.
+
+A Word file can't hold highlights, notes or the drawer — nothing outside
+`.mari` can. Open a `.docx`, and Mari says so when you save rather than
+letting that work disappear quietly. Keep the chapter you're revising as
+`.mari`, and export to Word when someone needs it that way.
+
 ---
 
 ## ⬇️ Install

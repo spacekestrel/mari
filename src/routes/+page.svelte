@@ -29,6 +29,7 @@
     type MariCut,
     type MariSynopsis,
   } from "$lib/mariBundle";
+  import { docxToMarkdown, markdownToDocx, isDocxFile, DOCX_EXTENSION } from "$lib/docx";
 
   let file = $state<OpenedFile | null>(null);
   // $state because the editor is now conditionally rendered — this reference
@@ -191,6 +192,19 @@
       adoptBundle(unpackMariBundle(bytes), entry.name, entry.handle);
       activePath = entry.path;
       if (waiting) dirty = true;
+      return;
+    }
+    // Word files are zips too, so they're read as bytes and converted to the
+    // Markdown the editor works in. Saving converts back the same way.
+    if (isDocxFile(entry.name)) {
+      const bytes = await adapter.readBinaryFile(entry);
+      const prose = docxToMarkdown(bytes);
+      file = { name: entry.name, content: prose, handle: entry.handle };
+      text = prose;
+      documentOpen = true;
+      dirty = false;
+      activePath = entry.path;
+      resetDocumentExtras();
       return;
     }
     const opened = await adapter.readFile(entry);
@@ -487,6 +501,9 @@
       if (isMariFile(name)) {
         const empty = packMariBundle({ text: "", highlights: [], notes: {}, history: {} });
         await adapter.saveBinary({ name, content: "", handle: created.handle }, empty);
+      } else if (isDocxFile(name)) {
+        // Same reasoning: an empty `.docx` still has to be a valid Word file.
+        await adapter.saveBinary({ name, content: "", handle: created.handle }, markdownToDocx(""));
       }
     } catch (error) {
       reportFailure("Couldn't create file", error);
@@ -644,6 +661,43 @@
     }
   }
 
+  async function handleOpenDocx() {
+    if (!(await confirmDiscardIfDirty("open another file"))) return;
+    const adapter = await getFileSystemAdapter();
+    const picked = await adapter.openBinary(["docx"]);
+    if (!picked) return;
+    try {
+      const prose = docxToMarkdown(picked.data);
+      file = { name: picked.name, content: prose, handle: picked.handle };
+      text = prose;
+      documentOpen = true;
+      dirty = false;
+      activePath = typeof picked.handle === "string" ? picked.handle : null;
+      resetDocumentExtras();
+      if (typeof picked.handle === "string") updateLastSession({ filePath: picked.handle });
+    } catch (error) {
+      reportFailure("Couldn't open that Word file", error);
+    }
+  }
+
+  /**
+   * Writes the prose out as a Word document. Highlights, notes and the drawer
+   * don't come along — a `.docx` has nowhere to keep them — so this is an
+   * export, not a second home for the chapter.
+   */
+  async function handleExportDocx() {
+    text = editorRef?.getValue() ?? text;
+    try {
+      const adapter = await getFileSystemAdapter();
+      const saved = await adapter.saveBinaryAs(markdownToDocx(text), `${baseName}${DOCX_EXTENSION}`);
+      if (!saved) return;
+      flash("Exported to Word");
+      sidebarRefreshKey++;
+    } catch (error) {
+      reportFailure("Couldn't export to Word", error);
+    }
+  }
+
   async function handleSaveAsMari(): Promise<boolean> {
     text = editorRef?.getValue() ?? text;
     try {
@@ -702,6 +756,17 @@
         return true;
       }
 
+      // A Word file saves back as Word. Like plain text it can only hold the
+      // prose, so say so rather than letting the highlights quietly vanish.
+      if (isDocxFile(file.name)) {
+        const kept = editorRef?.flushHighlights() ?? [];
+        await adapter.saveBinary(file, markdownToDocx(text));
+        file = { ...file, content: text };
+        dirty = false;
+        flash(kept.length > 0 ? "Saved — highlights need a .mari file" : "Saved");
+        return true;
+      }
+
       // Plain text file: the prose is saved, the extras aren't — say so rather
       // than letting marks quietly vanish when the document is reopened.
       const marks = editorRef?.flushHighlights() ?? [];
@@ -722,7 +787,10 @@
   async function handleSaveAs() {
     text = editorRef?.getValue() ?? text;
     const adapter = await getFileSystemAdapter();
-    const suggested = isMariFile(displayName) ? `${baseName}.md` : displayName;
+    // Exporting writes plain text, so a `.mari` or `.docx` name must not be
+    // reused — it would put text under an extension that promises a zip.
+    const suggested =
+      isMariFile(displayName) || isDocxFile(displayName) ? `${baseName}.md` : displayName;
     const saved = await adapter.saveAs(text, suggested);
     if (!saved) return;
     flash("Exported");
@@ -779,6 +847,8 @@
       onExportAs={handleSaveAs}
       onOpenMari={handleOpenMari}
       onSaveAsMari={handleSaveAsMari}
+      onOpenDocx={handleOpenDocx}
+      onExportDocx={handleExportDocx}
       {canUseTerminal}
       onToggleTerminal={() => {
         terminalMounted = true;
@@ -798,6 +868,8 @@
           onExportAs={handleSaveAs}
           onOpenMari={handleOpenMari}
           onSaveAsMari={handleSaveAsMari}
+      onOpenDocx={handleOpenDocx}
+      onExportDocx={handleExportDocx}
           {canUseTerminal}
           onToggleTerminal={() => {
             terminalMounted = true;

@@ -7,7 +7,14 @@ import { getLastDirectory, setLastDirectory } from "./lastDirectory";
 // The plain-text pickers must not offer `.mari` — those are zips and would be
 // mangled by being read as text. Bundles go through the binary pickers below.
 const FILTERS = [{ name: "Text", extensions: ["md", "markdown", "txt"] }];
-const MARI_FILTERS = [{ name: "Mari", extensions: ["mari"] }];
+
+/** Binary formats that go through the byte pickers, and what to call them. */
+const BINARY_NAMES: Record<string, string> = { mari: "Mari", docx: "Word document" };
+
+function binaryFilters(extensions: string[]) {
+  const name = extensions.map((e) => BINARY_NAMES[e] ?? e.toUpperCase()).join(" / ");
+  return [{ name, extensions }];
+}
 
 export const tauriAdapter: FileSystemAdapter = {
   kind: "tauri",
@@ -92,7 +99,10 @@ export const tauriAdapter: FileSystemAdapter = {
   },
 
   async saveBinaryAs(data, suggestedName) {
-    const path = await saveDialog({ defaultPath: suggestedName, filters: MARI_FILTERS });
+    // The filter follows whatever is being written, so exporting a Word file
+    // doesn't offer to save it as `.mari`.
+    const extension = suggestedName.split(".").pop()?.toLowerCase() ?? "mari";
+    const path = await saveDialog({ defaultPath: suggestedName, filters: binaryFilters([extension]) });
     if (!path) return null;
     setLastDirectory(await dirname(path));
     await writeFile(path, data);
@@ -102,7 +112,7 @@ export const tauriAdapter: FileSystemAdapter = {
   async openBinary(extensions) {
     const path = await openDialog({
       multiple: false,
-      filters: [{ name: "Mari", extensions }],
+      filters: binaryFilters(extensions),
       defaultPath: getLastDirectory(),
     });
     if (!path || Array.isArray(path)) return null;

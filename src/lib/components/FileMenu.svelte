@@ -11,6 +11,8 @@
     onExportAs: () => void;
     onOpenMari: () => void;
     onSaveAsMari: () => void;
+    onOpenDocx: () => void;
+    onExportDocx: () => void;
     canUseTerminal: boolean;
     onToggleTerminal: () => void;
   }
@@ -23,6 +25,8 @@
     onExportAs,
     onOpenMari,
     onSaveAsMari,
+    onOpenDocx,
+    onExportDocx,
     canUseTerminal,
     onToggleTerminal,
   }: Props = $props();
@@ -73,6 +77,10 @@
         <Icon name="file" size={16} />
         Open .mari&hellip;
       </button>
+      <button class="row" onclick={() => run(onOpenDocx)}>
+        <Icon name="file" size={16} />
+        Open Word file&hellip;
+      </button>
       <button class="row" onclick={() => run(onOpenFolder)}>
         <Icon name="folder" size={16} />
         Open folder
@@ -91,6 +99,10 @@
         <Icon name="save" size={16} />
         Export as&hellip;
         <span class="shortcut">Ctrl+Shift+S</span>
+      </button>
+      <button class="row" onclick={() => run(onExportDocx)}>
+        <Icon name="save" size={16} />
+        Export to Word&hellip;
       </button>
       {#if canUseTerminal}
         <div class="divider"></div>
