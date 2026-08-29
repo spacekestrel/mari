@@ -6,6 +6,7 @@
   import { markdown } from "@codemirror/lang-markdown";
   import { syntaxHighlighting, HighlightStyle } from "@codemirror/language";
   import { hideMarkers } from "$lib/hideMarkers";
+  import { richCopy } from "$lib/richCopy";
   import { tags } from "@lezer/highlight";
   import { Strikethrough } from "@lezer/markdown";
   import ContextMenu, { type ContextMenuItem } from "./ContextMenu.svelte";
@@ -307,6 +308,9 @@
           // Only in a `.mari` chapter. A `.md` file is Markdown the writer
           // opened as Markdown, so its syntax stays visible.
           ...(plain ? [] : [hideMarkers()]),
+          // Applies everywhere: the plain-text flavour is unchanged, so this
+          // only ever adds a formatted version for apps that want one.
+          richCopy(),
         ];
   }
 
