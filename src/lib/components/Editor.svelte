@@ -7,12 +7,21 @@
   import { syntaxHighlighting, HighlightStyle } from "@codemirror/language";
   import { tags } from "@lezer/highlight";
   import ContextMenu, { type ContextMenuItem } from "./ContextMenu.svelte";
+  import FormatBar from "./FormatBar.svelte";
   import DraftPanel from "./DraftPanel.svelte";
   import DrawerPanel from "./DrawerPanel.svelte";
   import Icon from "./Icon.svelte";
   import ChapterHeader from "./ChapterHeader.svelte";
   import { emptySynopsis, type MariCut, type MariPlanBeat, type MariSynopsis } from "$lib/mariBundle";
   import { describeCut, findPutBackPosition } from "$lib/cuts";
+  import {
+    toggleInline,
+    toggleBlock,
+    isInlineActive,
+    isBlockActive,
+    type Inline,
+    type Block,
+  } from "$lib/markdownFormat";
   import { copyText } from "$lib/clipboard";
   import {
     clearHighlightById,
@@ -174,6 +183,89 @@
   let container: HTMLDivElement;
   let view: EditorView | undefined;
   let highlightMenu = $state<{ x: number; y: number; from: number; to: number } | null>(null);
+
+  /**
+   * The formatting bar over a selection. Screen coordinates rather than
+   * document offsets, because it's positioned against the selection's
+   * rectangle on screen, which no document position can give directly.
+   */
+  let formatBar = $state<{ x: number; y: number } | null>(null);
+  // Set while a formatting edit is dispatching, so the doc-change handler
+  // below doesn't read our own edit as the writer typing and close the bar.
+  let formatting = false;
+
+  /** Which buttons should read as applied, recomputed whenever the bar shows. */
+  let formatActive = $state<{ inline: Inline[]; block: Block | null }>({ inline: [], block: null });
+
+  function refreshFormatState() {
+    if (!view) return;
+    const sel = view.state.selection.main;
+    const text = view.state.doc.toString();
+    const inline = (["bold", "italic", "strike"] as Inline[]).filter((k) =>
+      isInlineActive(text, sel.from, sel.to, k),
+    );
+    const block = (["heading1", "heading2", "quote"] as Block[]).find((k) =>
+      isBlockActive(text, sel.head, k),
+    );
+    formatActive = { inline, block: block ?? null };
+  }
+
+  /**
+   * Puts the bar over the middle of the selection's top edge. Uses the live
+   * DOM selection rather than CodeMirror coordinates, so a selection spanning
+   * several wrapped lines is measured as the reader sees it.
+   */
+  function showFormatBar() {
+    if (!view) return;
+    const sel = view.state.selection.main;
+    if (sel.empty) {
+      formatBar = null;
+      return;
+    }
+    const range = window.getSelection()?.rangeCount ? window.getSelection()!.getRangeAt(0) : null;
+    const box = range?.getBoundingClientRect();
+    if (!box || (box.width === 0 && box.height === 0)) {
+      formatBar = null;
+      return;
+    }
+    refreshFormatState();
+    formatBar = { x: box.left + box.width / 2, y: box.top };
+  }
+
+  function applyInline(kind: Inline) {
+    if (!view) return;
+    const sel = view.state.selection.main;
+    const edit = toggleInline(view.state.doc.toString(), sel.from, sel.to, kind);
+    if (!edit) return;
+    formatting = true;
+    view.dispatch({
+      changes: { from: edit.from, to: edit.to, insert: edit.insert },
+      selection: { anchor: edit.selectFrom, head: edit.selectTo },
+    });
+    view.focus();
+    formatting = false;
+    // Synchronously, not in an animation frame: frames stop when the window
+    // isn't drawing, and then the buttons would keep showing the state the
+    // text had before the edit.
+    refreshFormatState();
+    // Position is only cosmetic, so that part can wait for a frame.
+    requestAnimationFrame(showFormatBar);
+  }
+
+  function applyBlock(kind: Block) {
+    if (!view) return;
+    const edit = toggleBlock(view.state.doc.toString(), view.state.selection.main.head, kind);
+    formatting = true;
+    view.dispatch({
+      changes: { from: edit.from, to: edit.to, insert: edit.insert },
+      selection: { anchor: edit.selectFrom, head: edit.selectTo },
+    });
+    view.focus();
+    formatting = false;
+    // A heading or quote collapses the selection to a caret, so there is
+    // nothing left to hang the bar on.
+    formatBar = null;
+  }
 
   // Lezer's markdown grammar re-verifies surrounding context on every edit (list
   // markers, headings, blockquotes etc. all hinge on word boundaries), and that
@@ -1256,6 +1348,17 @@
           EditorView.contentAttributes.of({ spellcheck: "false", autocorrect: "off", autocapitalize: "off" }),
           highlightField,
           EditorView.domEventHandlers({
+            // On mouseup rather than on every selection change: extending a
+            // selection with Shift+arrow would otherwise make the bar jump
+            // about mid-keystroke. Deferred a tick because the DOM selection
+            // isn't settled yet while the event is being handled.
+            mouseup: () => {
+              // Not gated on `plain`: that flag means "no highlights here",
+              // but bold and italic are just Markdown, and `.md` and `.docx`
+              // documents carry them perfectly well.
+              setTimeout(showFormatBar, 0);
+              return false;
+            },
             contextmenu: (event, editorView) => {
               if (plain) return false; // no marking in a plain text document
               const sel = editorView.state.selection.main;
@@ -1335,6 +1438,10 @@
           }),
           EditorView.updateListener.of((update) => {
             if (update.docChanged || update.selectionSet) updateActiveChunk();
+            if (formatBar && !formatting) {
+              if (update.docChanged) formatBar = null;
+              else if (update.selectionSet && update.state.selection.main.empty) formatBar = null;
+            }
             if (update.docChanged || update.geometryChanged) updateCopyDocPos();
             if (!update.docChanged) return;
             // A real edit while placement mode is armed reads as "the user moved
@@ -1420,6 +1527,7 @@
         updateMinimapViewport();
         updateChunkIconPos();
         updateCopyDocPos();
+        if (formatBar) showFormatBar();
       });
     }
     view.scrollDOM.addEventListener("scroll", handleScroll, { passive: true });
@@ -1587,6 +1695,16 @@
   >
     <Icon name={copiedDocument ? "check" : "copy"} size={13} />
   </button>
+{/if}
+
+{#if formatBar && !placementMode && !draftPanel}
+  <FormatBar
+    x={formatBar.x}
+    y={formatBar.y}
+    active={formatActive}
+    onInline={applyInline}
+    onBlock={applyBlock}
+  />
 {/if}
 
 {#if highlightMenu}
