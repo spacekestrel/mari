@@ -6,7 +6,8 @@
 
 **Mari is a cat.** 🐈‍⬛
 
-Mari is also a powerful, free app for writers. ✍️
+Mari is also a powerful, free app for writers. ✍️ (Mari is a Georgian name,
+with the stress on the last syllable.)
 
 It's where you write the whole thing: draft it, keep the chapters in order,
 and work it into shape. It goes furthest on the part most tools ignore, which
