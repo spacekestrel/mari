@@ -1,0 +1,73 @@
+/* Design tokens -------------------------------------------------------- */
+
+:root {
+  --color-bg: #fbfaf7;
+  --color-surface: #ffffff;
+  --color-text: #232220;
+  --color-text-muted: #86816f;
+  --color-border: #e7e3da;
+  --color-hover: #f0ede5;
+  --color-accent: #bd5b2c;
+  --color-selection: rgba(189, 91, 44, 0.14);
+  /* Primary action buttons in the draft panel. A syntax-highlighting style
+     pink-red, kept distinct from the accent so the orange still means status
+     (the unsaved-file dot) and nothing else. */
+  --color-action: #d2355f;
+  --color-action-hover: #b82a50;
+
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+  --font-prose: "Literata", Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+  --font-prose-weight: 300;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+
+  --radius: 8px;
+}
+
+:root[data-theme="dark"] {
+  --color-bg: #181815;
+  --color-surface: #1f1e1a;
+  --color-text: #eae7e0;
+  --color-text-muted: #948e7f;
+  --color-border: #332f27;
+  --color-hover: #2a2823;
+  --color-accent: #e08a52;
+  --color-selection: rgba(224, 138, 82, 0.18);
+  /* Brighter against the dark background, but held back from the very light
+     editor-theme pinks so white button text stays readable. */
+  --color-action: #e0486e;
+  --color-action-hover: #ec5c80;
+}
+
+/* Reset ------------------------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+#svelte {
+  height: 100%;
+}
+
+button {
+  font-family: inherit;
+}

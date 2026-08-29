@@ -1,0 +1,35 @@
+# Runs on every push so a broken change is caught here rather than the next
+# time someone opens the app. Deliberately does not build the Tauri binary:
+# that needs a Rust toolchain and system libraries, and would turn a
+# thirty-second answer into a ten-minute one.
+name: Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # Catches a .mari file losing prose, marks, notes, history, the plan or
+      # the drawer — the things that can't be got back.
+      - name: Tests
+        run: npm test
+
+      # Types and Svelte templates. Catches a renamed prop or a missing field
+      # before it becomes a blank panel at runtime.
+      - name: Types
+        run: npm run check
