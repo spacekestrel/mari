@@ -12,9 +12,8 @@ It's where you write the whole thing: draft it, keep the chapters in order,
 and work it into shape. It goes furthest on the part most tools ignore, which
 is revising.
 
-> 🧪 **Beta.** Mari is young, so you'll meet the odd rough edge. Your writing
-> is plain text in a file you own, so nothing ever gets locked in.
-> [Tell me what breaks](../../issues), it's how this gets better.
+> **Status:** beta. Usable daily, but expect rough edges and occasional
+> breaking changes before 1.0. [Report bugs here](../../issues).
 
 ---
 
