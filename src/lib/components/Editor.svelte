@@ -226,7 +226,9 @@
    * several wrapped lines is measured as the reader sees it.
    */
   function showFormatBar() {
-    if (!view) return;
+    // Focus mode clears the toolbar, chapter list, word count and even the
+    // highlights. A bar appearing on every selection would undo the point of it.
+    if (!view || focusMode) return;
     const sel = view.state.selection.main;
     if (sel.empty) {
       formatBar = null;
@@ -1717,7 +1719,7 @@
   </button>
 {/if}
 
-{#if formatBar && !placementMode && !draftPanel}
+{#if formatBar && !focusMode && !placementMode && !draftPanel}
   <FormatBar
     x={formatBar.x}
     y={formatBar.y}
