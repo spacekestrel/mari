@@ -1,0 +1,103 @@
+# Builds the installers people actually download, on the three operating
+# systems they run. Pushing a `v*` tag is the whole trigger: each platform
+# builds its own bundles and attaches them to one release under that tag.
+#
+# Windows and macOS installers cannot be cross-compiled from Linux, which is
+# why this runs a matrix rather than a single job.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  # Lets a failed release be re-run without inventing a new tag.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to build (e.g. v0.1.0)"
+        required: true
+
+jobs:
+  release:
+    permissions:
+      # tauri-action creates the release and uploads to it.
+      contents: write
+
+    strategy:
+      # One platform failing shouldn't throw away installers that did build.
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            args: "--target aarch64-apple-darwin"
+            name: macOS (Apple silicon)
+          - platform: macos-latest
+            args: "--target x86_64-apple-darwin"
+            name: macOS (Intel)
+          # Deliberately not ubuntu-latest: the AppImage and .deb link against
+          # the glibc of whatever built them, so building on the oldest
+          # supported runner is what lets them run on older distributions.
+          - platform: ubuntu-22.04
+            args: ""
+            name: Linux
+          - platform: windows-latest
+            args: ""
+            name: Windows
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      # Rust builds are slow from cold; this is the difference between a
+      # ten-minute release and a forty-minute one.
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+          key: ${{ matrix.platform }}-${{ matrix.args }}
+
+      - name: System libraries (Linux only)
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev \
+            patchelf build-essential curl wget file libssl-dev libgtk-3-dev
+
+      - name: Install
+        run: npm ci
+
+      # The same checks as every push. A release that fails its own tests
+      # should not reach anyone's downloads folder.
+      - name: Tests
+        run: npm test
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.event.inputs.tag || github.ref_name }}
+          releaseName: "Mari ${{ github.event.inputs.tag || github.ref_name }}"
+          releaseBody: |
+            Download the installer for your system below.
+
+            - **Windows** — `.exe` (installer) or `.msi`
+            - **macOS** — `.dmg`; take the `aarch64` one for Apple silicon
+              (M1 and later), the `x64` one for Intel Macs
+            - **Linux** — `.AppImage` runs anywhere, or `.deb` / `.rpm`
+
+            Mari isn't code-signed yet, so Windows SmartScreen and macOS
+            Gatekeeper will both warn the first time. On macOS: right-click the
+            app and choose Open.
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.args }}

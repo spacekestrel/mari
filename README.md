@@ -173,14 +173,30 @@ letting that work disappear quietly. Keep the chapter you're revising as
 
 ## ⬇️ Install
 
-Prebuilt installers are attached to [Releases](../../releases) — `.deb`,
-`.rpm` and `.AppImage` for Linux, with Windows and macOS to follow.
+Grab the installer for your computer from
+[Releases](../../releases/latest).
+
+| | What to download |
+|---|---|
+| 🪟 **Windows** | `.exe` — the ordinary installer. `.msi` if your workplace prefers it. |
+| 🍎 **macOS** | `.dmg` — take **aarch64** for Apple silicon (M1 and later), **x64** for older Intel Macs. |
+| 🐧 **Linux** | `.AppImage` runs anywhere without installing. Or `.deb` for Debian/Ubuntu, `.rpm` for Fedora. |
+
+Mari isn't code-signed yet, so the first launch shows a warning:
+
+- **Windows** — SmartScreen says "unrecognised app". Click *More info* → *Run
+  anyway*.
+- **macOS** — right-click the app and choose *Open* rather than double-clicking.
+
+Signing certificates cost money yearly; this will be sorted out before 1.0.
 
 <details>
 <summary>Building it yourself</summary>
 
 Requires [Node.js](https://nodejs.org) 18+ and
-[Rust](https://www.rust-lang.org/tools/install). On Linux:
+[Rust](https://www.rust-lang.org/tools/install).
+
+On Linux you also need:
 
 ```bash
 sudo apt install libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev \
@@ -188,7 +204,8 @@ sudo apt install libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev \
 ```
 
 Other distributions: see
-[Tauri's prerequisites](https://tauri.app/start/prerequisites/#linux).
+[Tauri's prerequisites](https://tauri.app/start/prerequisites/). Windows needs
+Microsoft's C++ Build Tools; macOS needs Xcode Command Line Tools.
 
 ```bash
 npm install
