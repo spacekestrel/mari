@@ -39,15 +39,10 @@ Mari puts them on the text itself, and gives you tools to act on them.
 
 ---
 
-## 📦 What a chapter actually is
+## 📦 The .mari file
 
-Each chapter is saved as a single **`.mari`** file.
-
-A `.docx` saves your words and nothing else. Everything else you want to keep,
-like which paragraphs need work and why, goes in some other document that's out
-of date within a week.
-
-A `.mari` file holds the lot:
+**`.mari` is a powerful file extension.** Every chapter you write is one
+`.mari` file, and it carries far more than your text:
 
 | | |
 |---|---|
@@ -58,7 +53,10 @@ A `.mari` file holds the lot:
 | 🧭 **Synopsis and plan** | what the chapter is about, and what it still has to do |
 | 🗄️ **Drawer** | passages you cut but couldn't bring yourself to delete |
 
-Send the file to someone and they get the highlights and notes with it.
+A `.docx` or a `.txt` saves the words and nothing else, so all of the above
+would have to live in a separate document that goes out of date within a week.
+
+Send someone a `.mari` file and they get every bit of it, not just the prose.
 
 ### Nothing is locked in
 
