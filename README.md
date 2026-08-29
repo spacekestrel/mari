@@ -1,10 +1,16 @@
 # Mari
 
-**A free writing app for writers.** ✍️
+<p align="center">
+  <img src="docs/mari-idle.gif" width="170" alt="Mari the cat, sitting and blinking">
+</p>
 
-Mari is where you write the whole thing: draft it, keep the chapters in
-order, and work it into shape. It goes furthest on the part most tools ignore,
-which is revising.
+**Mari is a cat.** 🐈‍⬛
+
+Mari is also a free writing app for writers. ✍️
+
+It's where you write the whole thing: draft it, keep the chapters in order,
+and work it into shape. It goes furthest on the part most tools ignore, which
+is revising.
 
 > **Status:** early. Usable daily, but expect rough edges and occasional
 > breaking changes before 1.0.
