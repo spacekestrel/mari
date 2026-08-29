@@ -283,10 +283,16 @@
 
   // Lezer's markdown grammar re-verifies surrounding context on every edit (list
   // markers, headings, blockquotes etc. all hinge on word boundaries), and that
-  // cost scales with document size — fine at chapter length, but a couple hundred
-  // KB makes every keystroke (space especially, since it completes/changes tokens)
-  // noticeably laggy. Past this size, trade syntax highlighting for responsiveness.
-  const LARGE_DOC_THRESHOLD = 100_000;
+  // cost scales with document size. Measured on 2026-08-29: at 300,000
+  // characters with the parser running, a keystroke costs 0.2ms median and
+  // 0.6ms at worst, the same as with it switched off. At a million the editor
+  // stops responding. The old 100,000 limit was set from a guess that turned
+  // out to be pessimistic, and it had a visible cost: past it the Markdown
+  // markers stopped being hidden, so a long chapter suddenly showed asterisks.
+  //
+  // 500,000 characters is roughly 85,000 words, far longer than any chapter,
+  // and half the size at which trouble actually starts.
+  const LARGE_DOC_THRESHOLD = 500_000;
   const languageCompartment = new Compartment();
   function languageExtensions(size: number) {
     return size > LARGE_DOC_THRESHOLD
@@ -310,9 +316,6 @@
           // Only in a `.mari` chapter. A `.md` file is Markdown the writer
           // opened as Markdown, so its syntax stays visible.
           ...(plain ? [] : [hideMarkers()]),
-          // Applies everywhere: the plain-text flavour is unchanged, so this
-          // only ever adds a formatted version for apps that want one.
-          richCopy(),
         ];
   }
 
@@ -1362,6 +1365,9 @@
           history(),
           keymap.of([...defaultKeymap, ...historyKeymap]),
           languageCompartment.of(languageExtensions(value.length)),
+          // Outside the compartment above: copying formatted text doesn't need
+          // the parser, so it shouldn't switch off with it in a long document.
+          richCopy(),
           EditorView.lineWrapping,
           placeholderExt("Start writing..."),
           // WebKitGTK's spellcheck engine (enchant/hunspell) does expensive

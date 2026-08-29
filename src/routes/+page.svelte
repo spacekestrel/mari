@@ -684,18 +684,6 @@
     }
   }
 
-  /** Writes the prose out as plain text, leaving marks and notes behind. */
-  async function handleExportText(extension: "md" | "txt") {
-    text = editorRef?.getValue() ?? text;
-    try {
-      const adapter = await getFileSystemAdapter();
-      const saved = await adapter.saveAs(text, `${baseName}.${extension}`);
-      if (saved) flash(`Exported as .${extension}`);
-    } catch (error) {
-      reportFailure("Couldn't export", error);
-    }
-  }
-
   /** True if the document reached disk. Reports its own failure either way. */
   async function handleSave(): Promise<boolean> {
     // Editor debounces its content sync for typing performance, so `text` can lag

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { markdownToHtml } from "./richCopy";
+import { markdownToHtml } from "./markdownHtml";
 
 describe("what other apps receive", () => {
   it("turns emphasis into real tags", () => {

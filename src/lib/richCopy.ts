@@ -1,5 +1,4 @@
-import { marked } from "marked";
-import DOMPurify from "dompurify";
+import { renderMarkdown } from "./markdownHtml";
 import { EditorView } from "@codemirror/view";
 import type { Extension } from "@codemirror/state";
 
@@ -19,21 +18,6 @@ import type { Extension } from "@codemirror/state";
  * formatted prose.
  */
 
-/**
- * Markdown to HTML. Separate from the sanitising below so it can be tested
- * without a browser: DOMPurify needs a real document to work against.
- */
-export function markdownToHtml(markdown: string): string {
-  if (!markdown.trim()) return "";
-  return (marked.parse(markdown, { async: false }) as string).trim();
-}
-
-/** What actually goes on the clipboard, with anything executable removed. */
-export function renderForClipboard(markdown: string): string {
-  const html = markdownToHtml(markdown);
-  return html ? DOMPurify.sanitize(html).trim() : "";
-}
-
 /** The Markdown currently selected, ranges joined the way the editor joins them. */
 function selectedMarkdown(view: EditorView): string {
   return view.state.selection.ranges
@@ -46,7 +30,7 @@ function writeBothFlavours(event: ClipboardEvent, view: EditorView): boolean {
   const markdown = selectedMarkdown(view);
   if (!markdown || !event.clipboardData) return false;
 
-  const html = renderForClipboard(markdown);
+  const html = renderMarkdown(markdown);
   if (!html) return false;
 
   // Only now: up to this point the default copy would still have been correct,
