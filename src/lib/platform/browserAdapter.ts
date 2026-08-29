@@ -125,7 +125,7 @@ const fsAccessAdapter: FileSystemAdapter = {
     const picked = await ignoringCancellation(() =>
       window.showOpenFilePicker!({
         multiple: false,
-        types: [{ description: "Mari", accept }],
+        types: [{ description: "Documents", accept }],
         id: REMEMBERED_LOCATION_ID,
       }),
     );
@@ -133,6 +133,21 @@ const fsAccessAdapter: FileSystemAdapter = {
     const [handle] = picked;
     const file = await handle.getFile();
     return { name: file.name, data: new Uint8Array(await file.arrayBuffer()), handle };
+  },
+
+  async chooseSaveTarget(extensions, suggestedName) {
+    const accept: Record<string, string[]> = {
+      "application/octet-stream": extensions.map((e) => `.${e}`),
+    };
+    const handle = await ignoringCancellation(() =>
+      window.showSaveFilePicker!({
+        suggestedName,
+        types: [{ description: "Documents", accept }],
+        id: REMEMBERED_LOCATION_ID,
+      }),
+    );
+    if (!handle) return null;
+    return { name: handle.name, handle };
   },
 };
 
@@ -239,6 +254,12 @@ const downloadFallbackAdapter: FileSystemAdapter = {
       };
       input.click();
     });
+  },
+
+  // This fallback has no save picker at all — every write is a download, so
+  // the suggested name is the destination and the format follows from it.
+  async chooseSaveTarget(_extensions, suggestedName) {
+    return { name: suggestedName, handle: suggestedName };
   },
 };
 

@@ -441,19 +441,36 @@
     updateLastSession({ filePath: undefined });
   }
 
+  /** Every format Mari can open, in the order a writer is likely to want them. */
+  const OPENABLE = ["mari", "docx", "md", "markdown", "txt"];
+
+  /**
+   * Opens any file Mari understands. Everything is read as bytes and decided
+   * by extension: `.mari` and `.docx` are zips, the rest is text. One picker
+   * rather than one per format — the writer knows which file they want, not
+   * which of Mari's internal shapes it happens to be.
+   */
   async function handleOpen() {
     if (!(await confirmDiscardIfDirty("open another file"))) return;
     try {
       const adapter = await getFileSystemAdapter();
-      const opened = await adapter.open();
-      if (!opened) return;
-      const path = typeof opened.handle === "string" ? opened.handle : null;
-      file = opened;
-      text = opened.content;
-      documentOpen = true;
-      dirty = false;
+      const picked = await adapter.openBinary(OPENABLE);
+      if (!picked) return;
+      const path = typeof picked.handle === "string" ? picked.handle : null;
+
+      if (isMariFile(picked.name)) {
+        adoptBundle(unpackMariBundle(picked.data), picked.name, picked.handle);
+      } else {
+        const prose = isDocxFile(picked.name)
+          ? docxToMarkdown(picked.data)
+          : new TextDecoder().decode(picked.data);
+        file = { name: picked.name, content: prose, handle: picked.handle };
+        text = prose;
+        documentOpen = true;
+        dirty = false;
+        resetDocumentExtras();
+      }
       activePath = path;
-      resetDocumentExtras();
       if (path) updateLastSession({ filePath: path });
     } catch (error) {
       reportFailure("Couldn't open file", error);
@@ -647,57 +664,6 @@
     dirty = false;
     activePath = typeof handle === "string" ? handle : null;
   }
-
-  async function handleOpenMari() {
-    if (!(await confirmDiscardIfDirty("open another file"))) return;
-    const adapter = await getFileSystemAdapter();
-    const picked = await adapter.openBinary(["mari"]);
-    if (!picked) return;
-    try {
-      adoptBundle(unpackMariBundle(picked.data), picked.name, picked.handle);
-      if (typeof picked.handle === "string") updateLastSession({ filePath: picked.handle });
-    } catch (error) {
-      reportFailure("That file isn't a readable .mari", error);
-    }
-  }
-
-  async function handleOpenDocx() {
-    if (!(await confirmDiscardIfDirty("open another file"))) return;
-    const adapter = await getFileSystemAdapter();
-    const picked = await adapter.openBinary(["docx"]);
-    if (!picked) return;
-    try {
-      const prose = docxToMarkdown(picked.data);
-      file = { name: picked.name, content: prose, handle: picked.handle };
-      text = prose;
-      documentOpen = true;
-      dirty = false;
-      activePath = typeof picked.handle === "string" ? picked.handle : null;
-      resetDocumentExtras();
-      if (typeof picked.handle === "string") updateLastSession({ filePath: picked.handle });
-    } catch (error) {
-      reportFailure("Couldn't open that Word file", error);
-    }
-  }
-
-  /**
-   * Writes the prose out as a Word document. Highlights, notes and the drawer
-   * don't come along — a `.docx` has nowhere to keep them — so this is an
-   * export, not a second home for the chapter.
-   */
-  async function handleExportDocx() {
-    text = editorRef?.getValue() ?? text;
-    try {
-      const adapter = await getFileSystemAdapter();
-      const saved = await adapter.saveBinaryAs(markdownToDocx(text), `${baseName}${DOCX_EXTENSION}`);
-      if (!saved) return;
-      flash("Exported to Word");
-      sidebarRefreshKey++;
-    } catch (error) {
-      reportFailure("Couldn't export to Word", error);
-    }
-  }
-
   async function handleSaveAsMari(): Promise<boolean> {
     text = editorRef?.getValue() ?? text;
     try {
@@ -784,17 +750,36 @@
   }
 
   /** Plain-text export; the marks and notes stay behind. */
+  /**
+   * Writes a copy in whichever format was chosen in the dialog. The open
+   * document is left alone — this is a copy going somewhere, not a move.
+   *
+   * Only `.mari` carries the highlights, notes, plan and drawer, so exporting
+   * to anything else says what stayed behind rather than losing it quietly.
+   */
   async function handleSaveAs() {
     text = editorRef?.getValue() ?? text;
-    const adapter = await getFileSystemAdapter();
-    // Exporting writes plain text, so a `.mari` or `.docx` name must not be
-    // reused — it would put text under an extension that promises a zip.
-    const suggested =
-      isMariFile(displayName) || isDocxFile(displayName) ? `${baseName}.md` : displayName;
-    const saved = await adapter.saveAs(text, suggested);
-    if (!saved) return;
-    flash("Exported");
-    sidebarRefreshKey++;
+    try {
+      const adapter = await getFileSystemAdapter();
+      const target = await adapter.chooseSaveTarget(OPENABLE, `${baseName}${MARI_EXTENSION}`);
+      if (!target) return; // dialog dismissed, not a failure
+
+      let data: Uint8Array;
+      if (isMariFile(target.name)) {
+        data = buildBundle();
+      } else if (isDocxFile(target.name)) {
+        data = markdownToDocx(text);
+      } else {
+        data = new TextEncoder().encode(text);
+      }
+
+      await adapter.saveBinary({ name: target.name, content: text, handle: target.handle }, data);
+      const kept = isMariFile(target.name) || (editorRef?.flushHighlights() ?? []).length === 0;
+      flash(kept ? "Exported" : "Exported — highlights stay in the .mari");
+      sidebarRefreshKey++;
+    } catch (error) {
+      reportFailure("Couldn't export", error);
+    }
   }
 
   function onKeydown(e: KeyboardEvent) {
@@ -845,10 +830,6 @@
       onOpenFolder={handleOpenFolder}
       onSave={handleSave}
       onExportAs={handleSaveAs}
-      onOpenMari={handleOpenMari}
-      onSaveAsMari={handleSaveAsMari}
-      onOpenDocx={handleOpenDocx}
-      onExportDocx={handleExportDocx}
       {canUseTerminal}
       onToggleTerminal={() => {
         terminalMounted = true;
@@ -866,11 +847,7 @@
           onOpenFolder={handleOpenFolder}
           onSave={handleSave}
           onExportAs={handleSaveAs}
-          onOpenMari={handleOpenMari}
-          onSaveAsMari={handleSaveAsMari}
-      onOpenDocx={handleOpenDocx}
-      onExportDocx={handleExportDocx}
-          {canUseTerminal}
+                  {canUseTerminal}
           onToggleTerminal={() => {
             terminalMounted = true;
             terminalOpen = !terminalOpen;

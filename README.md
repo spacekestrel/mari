@@ -206,10 +206,10 @@ npm run tauri build     # installer for your OS, in src-tauri/target/release/bun
 | `Alt+1` … `Alt+8` | Highlight the selection, or the paragraph |
 | `Alt+0` | Clear the highlight |
 | `Ctrl+N` | New chapter |
-| `Ctrl+O` | Open a file |
+| `Ctrl+O` | Open a file — `.mari`, `.docx`, `.md` or `.txt` |
 | `Ctrl+Shift+O` | Open a project folder |
 | `Ctrl+S` | Save |
-| `Ctrl+Shift+S` | Save as |
+| `Ctrl+Shift+S` | Export a copy |
 | `Ctrl+Shift+V` | Reading view |
 | `Esc` | Leave focus mode |
 

@@ -66,6 +66,17 @@ export interface FileSystemAdapter {
 
   /** Prompt the user to pick any file and read its raw bytes. Null if cancelled. */
   openBinary(extensions: string[]): Promise<{ name: string; data: Uint8Array; handle: unknown } | null>;
+
+  /**
+   * Prompt for a save destination without writing anything, so the caller can
+   * see which format was chosen before encoding. Exporting offers several at
+   * once — `.mari`, `.docx`, plain text — and they are different bytes.
+   * Null if cancelled.
+   */
+  chooseSaveTarget(
+    extensions: string[],
+    suggestedName: string,
+  ): Promise<{ name: string; handle: unknown } | null>;
 }
 
 export function sortFsEntries(entries: FsEntry[]): FsEntry[] {

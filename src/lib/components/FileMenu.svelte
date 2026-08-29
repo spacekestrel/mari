@@ -9,10 +9,6 @@
     onOpenFolder: () => void;
     onSave: () => void;
     onExportAs: () => void;
-    onOpenMari: () => void;
-    onSaveAsMari: () => void;
-    onOpenDocx: () => void;
-    onExportDocx: () => void;
     canUseTerminal: boolean;
     onToggleTerminal: () => void;
   }
@@ -23,10 +19,6 @@
     onOpenFolder,
     onSave,
     onExportAs,
-    onOpenMari,
-    onSaveAsMari,
-    onOpenDocx,
-    onExportDocx,
     canUseTerminal,
     onToggleTerminal,
   }: Props = $props();
@@ -73,14 +65,6 @@
         Open file
         <span class="shortcut">Ctrl+O</span>
       </button>
-      <button class="row" onclick={() => run(onOpenMari)}>
-        <Icon name="file" size={16} />
-        Open .mari&hellip;
-      </button>
-      <button class="row" onclick={() => run(onOpenDocx)}>
-        <Icon name="file" size={16} />
-        Open Word file&hellip;
-      </button>
       <button class="row" onclick={() => run(onOpenFolder)}>
         <Icon name="folder" size={16} />
         Open folder
@@ -91,24 +75,16 @@
         Save
         <span class="shortcut">Ctrl+S</span>
       </button>
-      <button class="row" onclick={() => run(onSaveAsMari)}>
-        <Icon name="save" size={16} />
-        Save as .mari&hellip;
-      </button>
       <button class="row" onclick={() => run(onExportAs)}>
         <Icon name="save" size={16} />
         Export as&hellip;
         <span class="shortcut">Ctrl+Shift+S</span>
       </button>
-      <button class="row" onclick={() => run(onExportDocx)}>
-        <Icon name="save" size={16} />
-        Export to Word&hellip;
-      </button>
       {#if canUseTerminal}
         <div class="divider"></div>
         <button class="row" onclick={() => run(onToggleTerminal)}>
           <Icon name="terminal" size={16} />
-          Toggle terminal
+          Terminal
         </button>
       {/if}
       <div class="divider"></div>

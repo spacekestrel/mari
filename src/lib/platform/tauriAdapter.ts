@@ -8,12 +8,23 @@ import { getLastDirectory, setLastDirectory } from "./lastDirectory";
 // mangled by being read as text. Bundles go through the binary pickers below.
 const FILTERS = [{ name: "Text", extensions: ["md", "markdown", "txt"] }];
 
-/** Binary formats that go through the byte pickers, and what to call them. */
-const BINARY_NAMES: Record<string, string> = { mari: "Mari", docx: "Word document" };
+/** Every format the byte pickers handle, and what to call it in a dialog. */
+const FORMAT_NAMES: Record<string, string> = {
+  mari: "Mari chapter",
+  docx: "Word document",
+  md: "Markdown",
+  markdown: "Markdown",
+  txt: "Plain text",
+};
 
+/**
+ * One entry per format so the dialog offers a real choice — saving picks the
+ * format this way. A combined entry leads when there's more than one, so
+ * opening still shows everything at once.
+ */
 function binaryFilters(extensions: string[]) {
-  const name = extensions.map((e) => BINARY_NAMES[e] ?? e.toUpperCase()).join(" / ");
-  return [{ name, extensions }];
+  const named = extensions.map((e) => ({ name: FORMAT_NAMES[e] ?? e.toUpperCase(), extensions: [e] }));
+  return extensions.length > 1 ? [{ name: "All supported", extensions }, ...named] : named;
 }
 
 export const tauriAdapter: FileSystemAdapter = {
@@ -118,5 +129,14 @@ export const tauriAdapter: FileSystemAdapter = {
     if (!path || Array.isArray(path)) return null;
     setLastDirectory(await dirname(path));
     return { name: basename(path), data: await readFile(path), handle: path };
+  },
+
+  async chooseSaveTarget(extensions, suggestedName) {
+    const lastDir = getLastDirectory();
+    const defaultPath = lastDir ? await join(lastDir, suggestedName) : suggestedName;
+    const path = await saveDialog({ defaultPath, filters: binaryFilters(extensions) });
+    if (!path) return null;
+    setLastDirectory(await dirname(path));
+    return { name: basename(path), handle: path };
   },
 };
