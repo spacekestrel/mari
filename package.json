@@ -1,6 +1,6 @@
 {
   "name": "mari",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A free writing app for novelists.",
   "type": "module",
   "scripts": {

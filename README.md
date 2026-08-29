@@ -12,8 +12,18 @@ It's where you write the whole thing: draft it, keep the chapters in order,
 and work it into shape. It goes furthest on the part most tools ignore, which
 is revising.
 
-> **Status:** early. Usable daily, but expect rough edges and occasional
-> breaking changes before 1.0.
+> ## ⚠️ This is a beta
+>
+> Mari is early software. It's good enough to write with every day, and it is
+> what I write with, but things will be glitchy. Expect the odd bug, features
+> that behave oddly in corners, and things that change shape before 1.0.
+>
+> **Your writing is safe even when Mari isn't.** Every chapter is a plain file
+> on your own computer, and your prose sits inside it as ordinary text. If
+> something breaks, you can always get your words out with no special tools.
+> Back up your manuscript anyway, as you would with anything you care about.
+>
+> Found a bug? [Open an issue](../../issues). It genuinely helps.
 
 ---
 
