@@ -6,7 +6,7 @@
 
 **Mari is a cat.** 🐈‍⬛
 
-Mari is also a free writing app for writers. ✍️
+Mari is also a powerful, free app for writers. ✍️
 
 It's where you write the whole thing: draft it, keep the chapters in order,
 and work it into shape. It goes furthest on the part most tools ignore, which
@@ -41,16 +41,13 @@ Mari puts them on the text itself, and gives you tools to act on them.
 
 ## 📦 What a chapter actually is
 
-Every chapter you write is one **`.mari`** file. Not a folder, not a database,
-not an account somewhere. One file you can move, back up, rename, or email to
-someone.
+Each chapter is saved as a single **`.mari`** file.
 
-What makes it different is what it holds. A `.docx` or a `.txt` can only store
-the words. Everything you *think* about those words has to live somewhere else:
-a notes document, comments that get stripped on the way out, a separate file
-that drifts out of date the moment you rewrite a paragraph.
+A `.docx` saves your words and nothing else. Everything else you want to keep,
+like which paragraphs need work and why, goes in some other document that's out
+of date within a week.
 
-A `.mari` file keeps them together. Inside one file:
+A `.mari` file holds the lot:
 
 | | |
 |---|---|
@@ -61,10 +58,9 @@ A `.mari` file keeps them together. Inside one file:
 | 🧭 **Synopsis and plan** | what the chapter is about, and what it still has to do |
 | 🗄️ **Drawer** | passages you cut but couldn't bring yourself to delete |
 
-So the chapter travels with its own revision history. Copy it to a memory
-stick and the highlights come too. Come back in six months and the reason you
-flagged that paragraph is still attached to that paragraph, not lost in a
-notes file you no longer remember writing.
+Move the file and all of it moves with it. Email a chapter to someone and they
+get your highlights and notes too. Open it again next year and your reasons are
+still sitting on the paragraphs they belong to.
 
 ### Nothing is locked in
 
