@@ -149,13 +149,24 @@ export function isBlockActive(text: string, at: number, kind: Block): boolean {
 }
 
 /**
+ * Keeps an offset on the same character after a line's prefix grew or shrank.
+ *
+ * The prefix is inserted at the start of the line, so an offset sitting there
+ * moves along with the text rather than staying put in front of the new
+ * marker. Clamped so removing a prefix can't push it onto the line above.
+ */
+function shifted(at: number, lineFrom: number, by: number): number {
+  return Math.max(lineFrom, at + by);
+}
+
+/**
  * Puts a heading or quote marker on the line, takes it off when it's already
  * that, or swaps it when the line is currently something else.
  *
  * Works on the line rather than the selection because that's what these are
  * in Markdown: you cannot make half a line a heading.
  */
-export function toggleBlock(text: string, at: number, kind: Block): Edit {
+export function toggleBlock(text: string, at: number, kind: Block, until = at): Edit {
   const { from, to } = lineAt(text, at);
   const line = text.slice(from, to);
   const existing = prefixOf(line);
@@ -167,8 +178,11 @@ export function toggleBlock(text: string, at: number, kind: Block): Edit {
     from,
     to,
     insert,
-    // Keep the caret where the words are, not where the marker was.
-    selectFrom: Math.max(from, at + shift),
-    selectTo: Math.max(from, at + shift),
+    // The same words stay selected, moved along by however much the prefix
+    // grew or shrank. Collapsing to a caret here would close the toolbar the
+    // writer just used, so pressing the button a second time would be
+    // impossible without reselecting.
+    selectFrom: shifted(at, from, shift),
+    selectTo: shifted(until, from, shift),
   };
 }

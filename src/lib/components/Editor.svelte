@@ -261,7 +261,8 @@
 
   function applyBlock(kind: Block) {
     if (!view) return;
-    const edit = toggleBlock(view.state.doc.toString(), view.state.selection.main.head, kind);
+    const sel = view.state.selection.main;
+    const edit = toggleBlock(view.state.doc.toString(), sel.from, kind, sel.to);
     formatting = true;
     view.dispatch({
       changes: { from: edit.from, to: edit.to, insert: edit.insert },
@@ -269,9 +270,10 @@
     });
     view.focus();
     formatting = false;
-    // A heading or quote collapses the selection to a caret, so there is
-    // nothing left to hang the bar on.
-    formatBar = null;
+    // The bar stays up with the same words selected, so a heading can be
+    // taken off by pressing the same button again.
+    refreshFormatState();
+    requestAnimationFrame(showFormatBar);
   }
 
   // Lezer's markdown grammar re-verifies surrounding context on every edit (list

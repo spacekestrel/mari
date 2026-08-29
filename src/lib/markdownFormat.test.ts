@@ -223,3 +223,45 @@ describe("bold and italic stacked together", () => {
     expect(t).toBe("she was very tired");
   });
 });
+
+describe("keeping the selection through a block change", () => {
+  const run = (text: string, phrase: string, kind: Block) => {
+    const from = text.indexOf(phrase);
+    const e = toggleBlock(text, from, kind, from + phrase.length);
+    const next = text.slice(0, e.from) + e.insert + text.slice(e.to);
+    return { text: next, selected: next.slice(e.selectFrom, e.selectTo) };
+  };
+
+  it("keeps the same words selected when a marker is added", () => {
+    // Collapsing here closed the toolbar, so the button could never be
+    // pressed a second time to take the heading off again.
+    const r = run("Chapter One is here", "Chapter One", "heading1");
+    expect(r.text).toBe("# Chapter One is here");
+    expect(r.selected).toBe("Chapter One");
+  });
+
+  it("keeps the same words selected when a marker is removed", () => {
+    const r = run("# Chapter One is here", "Chapter One", "heading1");
+    expect(r.text).toBe("Chapter One is here");
+    expect(r.selected).toBe("Chapter One");
+  });
+
+  it("keeps the selection when one marker is swapped for another", () => {
+    const r = run("# Chapter One is here", "Chapter One", "heading2");
+    expect(r.text).toBe("## Chapter One is here");
+    expect(r.selected).toBe("Chapter One");
+  });
+
+  it("survives a selection that starts at the very beginning of the line", () => {
+    const r = run("Chapter One is here", "Chapter", "quote");
+    expect(r.text).toBe("> Chapter One is here");
+    expect(r.selected).toBe("Chapter");
+  });
+
+  it("pressing the same button twice returns the line to plain", () => {
+    let t = "Chapter One is here";
+    t = run(t, "Chapter One", "heading1").text;
+    t = run(t, "Chapter One", "heading1").text;
+    expect(t).toBe("Chapter One is here");
+  });
+});
