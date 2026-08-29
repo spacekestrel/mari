@@ -114,7 +114,9 @@
     { tag: tags.link, color: "var(--color-accent)", textDecoration: "underline" },
     { tag: tags.url, color: "var(--color-accent)" },
     { tag: tags.monospace, fontFamily: "ui-monospace, monospace", color: "var(--color-text-muted)" },
-    { tag: tags.quote, color: "var(--color-text-muted)", fontStyle: "italic" },
+    // Full-strength text: the rule down the left already says it's a quote,
+    // and greying it makes quoted prose harder to read than the rest.
+    { tag: tags.quote, fontStyle: "italic" },
     { tag: tags.processingInstruction, color: "var(--color-text-muted)" },
     { tag: tags.contentSeparator, color: "var(--color-text-muted)" },
   ]);
