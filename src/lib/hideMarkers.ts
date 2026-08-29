@@ -1,6 +1,6 @@
 import { Decoration, ViewPlugin, EditorView, type DecorationSet } from "@codemirror/view";
 import { syntaxTree } from "@codemirror/language";
-import { RangeSetBuilder, type EditorState, type Extension } from "@codemirror/state";
+import type { EditorState, Extension } from "@codemirror/state";
 
 /**
  * Hides Markdown's punctuation so prose reads as prose.
@@ -38,23 +38,51 @@ export function markEnd(following: string, name: string, to: number): number {
   return to + spaces;
 }
 
-function buildDecorations(state: EditorState, view: EditorView): DecorationSet {
-  const builder = new RangeSetBuilder<Decoration>();
+/** A rule down the left of a quoted passage, the way a quote is usually set. */
+const quoteLine = Decoration.line({ class: "cm-quoted" });
+
+interface Built {
+  /** Hidden punctuation. Also what the cursor treats as atomic. */
+  markers: DecorationSet;
+  /** Everything drawn, including the quote rule. */
+  all: DecorationSet;
+}
+
+function buildDecorations(state: EditorState, view: EditorView): Built {
+  const hidden: { from: number; to: number; value: Decoration }[] = [];
+  const lines: { from: number; to: number; value: Decoration }[] = [];
 
   for (const { from, to } of view.visibleRanges) {
     syntaxTree(state).iterate({
       from,
       to,
       enter: (node) => {
+        if (node.name === "Blockquote") {
+          // Marked line by line: a quote can run over several lines, and the
+          // rule has to reach down all of them.
+          for (let pos = node.from; pos <= node.to; ) {
+            const line = state.doc.lineAt(pos);
+            lines.push({ from: line.from, to: line.from, value: quoteLine });
+            if (line.to >= node.to) break;
+            pos = line.to + 1;
+          }
+          return;
+        }
         if (!isMarkerNode(node.name)) return;
         // `#` and `>` are their own node, but the space after them isn't.
         // Leaving it draws every heading and quote one space indented.
         const end = markEnd(state.doc.sliceString(node.to, node.to + 4), node.name, node.to);
-        if (end > node.from) builder.add(node.from, end, Decoration.replace({}));
+        if (end > node.from) hidden.push({ from: node.from, to: end, value: Decoration.replace({}) });
       },
     });
   }
-  return builder.finish();
+
+  // Sorted rather than built in order: line decorations and replacements are
+  // discovered as the tree is walked, not left to right.
+  return {
+    markers: Decoration.set(hidden, true),
+    all: Decoration.set([...hidden, ...lines], true),
+  };
 }
 
 /**
@@ -66,10 +94,10 @@ function buildDecorations(state: EditorState, view: EditorView): DecorationSet {
 export function hideMarkers(): Extension {
   const plugin = ViewPlugin.fromClass(
     class {
-      decorations: DecorationSet;
+      built: Built;
 
       constructor(view: EditorView) {
-        this.decorations = buildDecorations(view.state, view);
+        this.built = buildDecorations(view.state, view);
       }
 
       update(update: {
@@ -79,17 +107,26 @@ export function hideMarkers(): Extension {
         state: EditorState;
       }) {
         if (update.docChanged || update.viewportChanged) {
-          this.decorations = buildDecorations(update.state, update.view);
+          this.built = buildDecorations(update.state, update.view);
         }
       }
     },
-    { decorations: (v) => v.decorations },
+    { decorations: (v) => v.built.all },
   );
 
   return [
     plugin,
     // Makes each hidden marker a single obstacle to the cursor rather than a
-    // run of invisible characters to walk through one at a time.
-    EditorView.atomicRanges.of((view) => view.plugin(plugin)?.decorations ?? Decoration.none),
+    // run of invisible characters to walk through one at a time. Only the
+    // markers: the quote rule is a whole line, and making lines atomic would
+    // stop the cursor entering them at all.
+    EditorView.atomicRanges.of((view) => view.plugin(plugin)?.built.markers ?? Decoration.none),
+    EditorView.theme({
+      ".cm-quoted": {
+        borderLeft: "3px solid var(--color-border)",
+        paddingLeft: "0.85em",
+        marginLeft: "1px",
+      },
+    }),
   ];
 }
