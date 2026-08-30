@@ -8,6 +8,7 @@
   import { hideMarkers } from "$lib/hideMarkers";
   import { richCopy } from "$lib/richCopy";
   import { bookParagraphs } from "$lib/paragraphLayout";
+  import { findInChapter } from "$lib/searchPanel";
   import { paragraphStyle } from "$lib/paragraphStyle.svelte";
   import { tags } from "@lezer/highlight";
   import { Strikethrough } from "@lezer/markdown";
@@ -1379,6 +1380,7 @@
           // Outside the compartment above: copying formatted text doesn't need
           // the parser, so it shouldn't switch off with it in a long document.
           richCopy(),
+          findInChapter(),
           EditorView.lineWrapping,
           placeholderExt("Start writing..."),
           // WebKitGTK's spellcheck engine (enchant/hunspell) does expensive
