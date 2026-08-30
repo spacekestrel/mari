@@ -1,4 +1,5 @@
 import { renderMarkdown } from "./markdownHtml";
+import { htmlToMarkdown } from "./htmlToMarkdown";
 import { EditorView } from "@codemirror/view";
 import type { Extension } from "@codemirror/state";
 
@@ -41,6 +42,32 @@ function writeBothFlavours(event: ClipboardEvent, view: EditorView): boolean {
   return true;
 }
 
+/**
+ * Takes the formatted version of what was pasted, when there is one.
+ *
+ * Word, Google Docs and web pages all put HTML on the clipboard next to the
+ * plain text. Letting the default paste happen takes the plain version and
+ * throws the formatting away, so a bold sentence from Word arrives flat.
+ */
+function pasteAsMarkdown(event: ClipboardEvent, view: EditorView): boolean {
+  const html = event.clipboardData?.getData("text/html");
+  if (!html) return false;
+
+  const markdown = htmlToMarkdown(html);
+  if (!markdown) return false;
+
+  // Text copied from Mari itself already carries its Markdown in the plain
+  // flavour. Converting our own HTML back would work, but going through the
+  // original is exact, so prefer it when the two agree on the words.
+  const plain = event.clipboardData?.getData("text/plain") ?? "";
+  const sameWords = (a: string) => a.replace(/[^\p{L}\p{N}]+/gu, "").toLowerCase();
+  const insert = plain && sameWords(plain) === sameWords(markdown) ? plain : markdown;
+
+  event.preventDefault();
+  view.dispatch(view.state.replaceSelection(insert));
+  return true;
+}
+
 export function richCopy(): Extension {
   return EditorView.domEventHandlers({
     copy: (event, view) => writeBothFlavours(event, view),
@@ -51,5 +78,6 @@ export function richCopy(): Extension {
       view.dispatch(view.state.replaceSelection(""));
       return true;
     },
+    paste: (event, view) => pasteAsMarkdown(event, view),
   });
 }
