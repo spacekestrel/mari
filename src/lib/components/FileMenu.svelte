@@ -189,9 +189,13 @@
     margin: 4px 4px;
   }
 
+  /* Deliberately no opacity here. A menu that fades in from nothing is
+     invisible until the animation runs, and if it never advances — the
+     window not compositing, animations switched off, a throttled webview —
+     it stays invisible and the menu looks broken. The slide is decoration;
+     being visible isn't. */
   @keyframes pop-in {
     from {
-      opacity: 0;
       transform: translateY(-4px);
     }
     to {
