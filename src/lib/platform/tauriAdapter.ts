@@ -1,5 +1,5 @@
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
-import { mkdir, readDir, readFile, readTextFile, remove, writeFile, writeTextFile } from "@tauri-apps/plugin-fs";
+import { mkdir, readDir, readFile, readTextFile, remove, rename, writeFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import { dirname, join } from "@tauri-apps/api/path";
 import { basename, sortFsEntries, type FileSystemAdapter, type FsEntry } from "./types";
 import { getLastDirectory, setLastDirectory } from "./lastDirectory";
@@ -129,6 +129,14 @@ export const tauriAdapter: FileSystemAdapter = {
     if (!path || Array.isArray(path)) return null;
     setLastDirectory(await dirname(path));
     return { name: basename(path), data: await readFile(path), handle: path };
+  },
+
+  async moveEntry(entry, targetDir) {
+    const from = entry.handle as string;
+    const to = await join(targetDir.handle as string, entry.name);
+    if (from === to) return entry;
+    await rename(from, to);
+    return { name: entry.name, path: to, kind: entry.kind, handle: to };
   },
 
   async chooseSaveTarget(extensions, suggestedName) {

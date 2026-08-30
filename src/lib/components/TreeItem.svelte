@@ -4,6 +4,7 @@
   import Self from "./TreeItem.svelte";
   import type { FsEntry } from "$lib/platform";
   import { expandedFolders } from "$lib/expandedFolders.svelte";
+  import { canDrop } from "$lib/treeMove";
 
   interface Props {
     entry: FsEntry;
@@ -15,11 +16,28 @@
     onCreateFile: (dir: FsEntry, name: string) => void;
     onCreateFolder: (dir: FsEntry, name: string) => void;
     onContextMenu: (entry: FsEntry, parent: FsEntry, x: number, y: number) => void;
+    onMove: (source: FsEntry, targetDir: FsEntry, sourceParent: FsEntry) => void;
+    /** The row being dragged right now, so every row can judge its own drop. */
+    dragging: { entry: FsEntry; parent: FsEntry } | null;
+    onDragStateChange: (dragged: { entry: FsEntry; parent: FsEntry } | null) => void;
     refreshKey: number;
   }
 
-  let { entry, parent, depth, activePath, loadChildren, onSelectFile, onCreateFile, onCreateFolder, onContextMenu, refreshKey }: Props =
-    $props();
+  let {
+    entry,
+    parent,
+    depth,
+    activePath,
+    loadChildren,
+    onSelectFile,
+    onCreateFile,
+    onCreateFolder,
+    onContextMenu,
+    onMove,
+    dragging,
+    onDragStateChange,
+    refreshKey,
+  }: Props = $props();
 
   // Remembered across restarts rather than held here: a row only exists while
   // it's on screen, so it can't remember whether it was open.
@@ -48,6 +66,42 @@
     creating = null;
     if (kind === "file") onCreateFile(entry, name);
     else if (kind === "folder") onCreateFolder(entry, name);
+  }
+
+  // True while something is being dragged that this row would accept.
+  const isDropTarget = $derived(!!dragging && canDrop(dragging.entry, entry));
+  let dragOver = $state(false);
+
+  // Expanding on hover, the way a file manager does: dropping into a closed
+  // folder otherwise means letting go, opening it, and dragging again.
+  let hoverExpand: ReturnType<typeof setTimeout> | null = null;
+
+  function handleDragOver(e: DragEvent) {
+    if (!isDropTarget) return;
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
+    if (dragOver) return;
+    dragOver = true;
+    if (!expanded) {
+      hoverExpand = setTimeout(() => expandedFolders.set(entry.path, true), 600);
+    }
+  }
+
+  function clearDragOver() {
+    dragOver = false;
+    if (hoverExpand) {
+      clearTimeout(hoverExpand);
+      hoverExpand = null;
+    }
+  }
+
+  function handleDrop(e: DragEvent) {
+    if (!isDropTarget || !dragging) return;
+    e.preventDefault();
+    // Otherwise every folder up the tree handles the same drop.
+    e.stopPropagation();
+    clearDragOver();
+    onMove(dragging.entry, entry, dragging.parent);
   }
 
   function handleContextMenu(e: MouseEvent) {
@@ -79,7 +133,25 @@
 <div
   class="row"
   class:active={entry.kind === "file" && entry.path === activePath}
+  class:drop-target={dragOver && isDropTarget}
+  class:being-dragged={dragging?.entry.path === entry.path}
   style="padding-left: {depth * 14 + 8}px"
+  draggable="true"
+  ondragstart={(e) => {
+    e.stopPropagation();
+    // Some payload is required or the drag never starts; the row itself is
+    // tracked in state, since a path string can't carry the entry's handle.
+    e.dataTransfer?.setData("text/plain", entry.path);
+    if (e.dataTransfer) e.dataTransfer.effectAllowed = "move";
+    onDragStateChange({ entry, parent });
+  }}
+  ondragend={() => {
+    clearDragOver();
+    onDragStateChange(null);
+  }}
+  ondragover={handleDragOver}
+  ondragleave={clearDragOver}
+  ondrop={handleDrop}
   onclick={handleActivate}
   onkeydown={(e) => e.key === "Enter" && handleActivate()}
   onmouseenter={() => (hovering = true)}
@@ -127,6 +199,9 @@
         parent={entry}
         depth={depth + 1}
         {activePath}
+        {onMove}
+        {dragging}
+        {onDragStateChange}
         {loadChildren}
         {onSelectFile}
         {onCreateFile}
@@ -153,6 +228,18 @@
     cursor: pointer;
     user-select: none;
     white-space: nowrap;
+  }
+
+  /* A clear line where it will land, rather than a vague tint: the difference
+     between "inside this folder" and "somewhere near it" matters. */
+  .row.drop-target {
+    background: var(--color-hover);
+    box-shadow: inset 0 0 0 1px var(--color-accent);
+    border-radius: 4px;
+  }
+
+  .row.being-dragged {
+    opacity: 0.45;
   }
 
   .row:hover {

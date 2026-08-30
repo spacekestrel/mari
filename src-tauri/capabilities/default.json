@@ -2,7 +2,9 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": ["main"],
+  "windows": [
+    "main"
+  ],
   "permissions": [
     "core:default",
     "opener:default",
@@ -15,6 +17,7 @@
     "fs:allow-read-dir",
     "fs:allow-mkdir",
     "fs:allow-remove",
+    "fs:allow-rename",
     "fs:allow-exists",
     "os:default",
     "core:window:allow-close",
@@ -25,7 +28,17 @@
     "core:window:allow-set-fullscreen",
     {
       "identifier": "fs:scope",
-      "allow": [{ "path": "**" }, { "path": "**/.mari" }, { "path": "**/.mari/**" }],
+      "allow": [
+        {
+          "path": "**"
+        },
+        {
+          "path": "**/.mari"
+        },
+        {
+          "path": "**/.mari/**"
+        }
+      ],
       "requireLiteralLeadingDot": false
     }
   ]
