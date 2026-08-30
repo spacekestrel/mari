@@ -41,6 +41,18 @@ class ExpandedFolders {
     this.set(path, !this.isExpanded(path));
   }
 
+  /**
+   * Re-files a moved folder and everything under it, so a tree that was open
+   * before a drag is still open after it.
+   */
+  rename(from: string, to: string) {
+    const prefix = from.endsWith("/") ? from : `${from}/`;
+    this.paths = this.paths.map((p) =>
+      p === from || p.startsWith(prefix) ? to + p.slice(from.length) : p,
+    );
+    this.persist();
+  }
+
   private persist() {
     if (typeof localStorage === "undefined") return;
     localStorage.setItem(KEY, JSON.stringify(this.paths));

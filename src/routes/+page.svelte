@@ -17,6 +17,8 @@
   import { countChars, countWords } from "$lib/wordcount";
   import { deletePreference } from "$lib/deletePreference.svelte";
   import { paragraphStyle } from "$lib/paragraphStyle.svelte";
+  import { canDrop, pathAfterMove, isWithin } from "$lib/treeMove";
+  import { expandedFolders } from "$lib/expandedFolders.svelte";
   import { enterFullscreen, exitFullscreen } from "$lib/platform/fullscreen";
   import type { ChunkVersion } from "$lib/chunkHistory";
   import {
@@ -380,6 +382,10 @@
     const where = editorRef?.getViewPosition();
     if (!where) return;
     places.set(activePath, where);
+    persistPlaces();
+  }
+
+  function persistPlaces() {
     try {
       localStorage.setItem(PLACES_KEY, JSON.stringify(Object.fromEntries(places)));
     } catch {
@@ -535,6 +541,57 @@
       updateLastSession({ filePath: created.path });
     } catch (error) {
       reportFailure("Couldn't open file", error);
+    }
+  }
+
+  /**
+   * Moves a file or folder into another folder, dragged in the tree.
+   *
+   * The move itself is one call. The work is everything filed *by path*: the
+   * open document, the unsaved chapters put by for later, the reading places,
+   * and which folders were expanded. None of those follow a rename on their
+   * own, and a missed one strands unsaved work under a name nothing points at.
+   */
+  async function handleMoveEntry(source: FsEntry, targetDir: FsEntry, sourceParent: FsEntry) {
+    if (!canDrop(source, targetDir)) return;
+
+    const adapter = await getFileSystemAdapter();
+    const from = source.path;
+    try {
+      const moved = await adapter.moveEntry(source, targetDir, sourceParent);
+      const to = moved.path;
+
+      // Unsaved chapters and reading places are keyed by path; re-file them
+      // before anything can look them up under the old name.
+      remapPaths(setAside, from, to);
+      persistSetAside();
+      remapPaths(places, from, to);
+      persistPlaces();
+      expandedFolders.rename(from, to);
+
+      // The open document keeps its identity: same text, same unsaved state,
+      // just a different address on disk.
+      if (activePath && isWithin(activePath, from)) {
+        const next = pathAfterMove(activePath, from, to);
+        activePath = next;
+        if (file) file = { ...file, handle: next };
+        updateLastSession({ filePath: next });
+      }
+
+      sidebarRefreshKey++;
+      flash(`Moved to ${targetDir.name}`);
+    } catch (error) {
+      reportFailure(`Couldn't move ${source.name}`, error);
+    }
+  }
+
+  /** Re-files every key under a moved path, in place. */
+  function remapPaths<T>(store: Map<string, T>, from: string, to: string) {
+    for (const key of [...store.keys()]) {
+      if (!isWithin(key, from)) continue;
+      const value = store.get(key)!;
+      store.delete(key);
+      store.set(pathAfterMove(key, from, to), value);
     }
   }
 
@@ -903,6 +960,7 @@
         onCreateFile={handleCreateFile}
         onCreateFolder={handleCreateFolder}
         onContextMenu={handleTreeContextMenu}
+        onMove={handleMoveEntry}
         refreshKey={sidebarRefreshKey}
       />
     {/if}

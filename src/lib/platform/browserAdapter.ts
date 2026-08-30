@@ -135,6 +135,32 @@ const fsAccessAdapter: FileSystemAdapter = {
     return { name: file.name, data: new Uint8Array(await file.arrayBuffer()), handle };
   },
 
+  /**
+   * The File System Access API has no move, so this copies and then deletes.
+   * Deliberately only for files: copying a folder tree by hand risks losing
+   * part of it half-way, and there is no way to make that atomic here.
+   */
+  async moveEntry(entry, targetDir, parent) {
+    if (entry.kind !== "file") {
+      throw new Error("Moving folders isn't supported in the browser. Use the desktop app.");
+    }
+    const source = entry.handle as FileSystemFileHandle;
+    const dir = targetDir.handle as FileSystemDirectoryHandle;
+    const bytes = await (await source.getFile()).arrayBuffer();
+
+    const created = await dir.getFileHandle(entry.name, { create: true });
+    const writable = await created.createWritable();
+    await writable.write(bytes);
+    await writable.close();
+
+    // Only once the copy is safely written. A failure above leaves the
+    // original where it was rather than losing it, and this order can never
+    // produce nothing — at worst a duplicate, which is recoverable.
+    await (parent.handle as FileSystemDirectoryHandle).removeEntry(entry.name);
+
+    return { name: entry.name, path: `${targetDir.path}/${entry.name}`, kind: "file", handle: created };
+  },
+
   async chooseSaveTarget(extensions, suggestedName) {
     const accept: Record<string, string[]> = {
       "application/octet-stream": extensions.map((e) => `.${e}`),
@@ -254,6 +280,10 @@ const downloadFallbackAdapter: FileSystemAdapter = {
       };
       input.click();
     });
+  },
+
+  async moveEntry(entry) {
+    throw new Error(`Cannot move "${entry.name}": folder browsing is unsupported in this browser.`);
   },
 
   // This fallback has no save picker at all — every write is a download, so

@@ -68,6 +68,14 @@ export interface FileSystemAdapter {
   openBinary(extensions: string[]): Promise<{ name: string; data: Uint8Array; handle: unknown } | null>;
 
   /**
+   * Move a file or folder into another folder, keeping its name.
+   *
+   * A move rather than a copy-and-delete: the file keeps its identity, and a
+   * failure part-way can't leave two copies or none.
+   */
+  moveEntry(entry: FsEntry, targetDir: FsEntry, parent: FsEntry): Promise<FsEntry>;
+
+  /**
    * Prompt for a save destination without writing anything, so the caller can
    * see which format was chosen before encoding. Exporting offers several at
    * once — `.mari`, `.docx`, plain text — and they are different bytes.

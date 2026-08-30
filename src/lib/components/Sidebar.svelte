@@ -6,6 +6,7 @@
   import TreeItem from "./TreeItem.svelte";
   import type { FsEntry } from "$lib/platform";
   import { sidebarWidth } from "$lib/sidebarWidth.svelte";
+  import { canDrop } from "$lib/treeMove";
 
   interface Props {
     folder: FsEntry;
@@ -15,11 +16,21 @@
     onCreateFile: (dir: FsEntry, name: string) => void;
     onCreateFolder: (dir: FsEntry, name: string) => void;
     onContextMenu: (entry: FsEntry, parent: FsEntry, x: number, y: number) => void;
+    onMove: (source: FsEntry, targetDir: FsEntry, sourceParent: FsEntry) => void;
     refreshKey: number;
   }
 
-  let { folder, activePath, loadChildren, onSelectFile, onCreateFile, onCreateFolder, onContextMenu, refreshKey }: Props =
-    $props();
+  let {
+    folder,
+    activePath,
+    loadChildren,
+    onSelectFile,
+    onCreateFile,
+    onCreateFolder,
+    onContextMenu,
+    onMove,
+    refreshKey,
+  }: Props = $props();
 
   let rootChildren = $state<FsEntry[] | null>(null);
   let loading = $state(false);
@@ -72,6 +83,34 @@
   // the header buttons. Right-clicking a tree item is handled by TreeItem
   // itself, which stops propagation so this never fires for those.
   let rootMenu = $state<{ x: number; y: number } | null>(null);
+
+  /**
+   * What is being dragged, held once for the whole tree.
+   *
+   * A drag's own dataTransfer can only carry strings, and a path string can't
+   * be turned back into an entry with its handle. Keeping the entry itself
+   * here means each row can judge whether it would accept the drop.
+   */
+  let dragging = $state<{ entry: FsEntry; parent: FsEntry } | null>(null);
+  let rootDragOver = $state(false);
+
+  // The empty space below the tree drops into the project root, which is the
+  // only way to get something back out of a folder.
+  const rootAccepts = $derived(!!dragging && canDrop(dragging.entry, folder));
+
+  function handleRootDragOver(e: DragEvent) {
+    if (!rootAccepts) return;
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
+    rootDragOver = true;
+  }
+
+  function handleRootDrop(e: DragEvent) {
+    if (!rootAccepts || !dragging) return;
+    e.preventDefault();
+    rootDragOver = false;
+    onMove(dragging.entry, folder, dragging.parent);
+  }
 
   const rootMenuItems: ContextMenuItem[] = [
     { label: "New file", icon: "file-plus", onClick: () => (creatingRoot = "file") },
@@ -128,7 +167,15 @@
       </button>
     </div>
   </div>
-  <div class="tree">
+  <div
+    class="tree"
+    class:root-drop={rootDragOver && rootAccepts}
+    ondragover={handleRootDragOver}
+    ondragleave={() => (rootDragOver = false)}
+    ondrop={handleRootDrop}
+    role="tree"
+    tabindex="-1"
+  >
     {#if creatingRoot}
       <InlineNameInput
         depth={0}
@@ -155,6 +202,9 @@
           {onCreateFile}
           {onCreateFolder}
           {onContextMenu}
+          {onMove}
+          {dragging}
+          onDragStateChange={(e) => (dragging = e)}
           {refreshKey}
         />
       {/each}
