@@ -1,6 +1,6 @@
 [package]
 name = "mari"
-version = "0.1.1"
+version = "0.2.0"
 description = "Mari - a free writing app for novelists"
 authors = ["Kestrel <spacekestrel72@gmail.com>"]
 edition = "2021"
