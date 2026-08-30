@@ -16,6 +16,7 @@
   import { getLastSession, updateLastSession } from "$lib/platform/lastSession";
   import { countChars, countWords } from "$lib/wordcount";
   import { deletePreference } from "$lib/deletePreference.svelte";
+  import { paragraphStyle } from "$lib/paragraphStyle.svelte";
   import { enterFullscreen, exitFullscreen } from "$lib/platform/fullscreen";
   import type { ChunkVersion } from "$lib/chunkHistory";
   import {
@@ -863,6 +864,20 @@
 
     <div class="toolbar-group">
       <span class="status">{statusMessage}</span>
+      {#if documentOpen}
+        <button
+          class="icon-btn"
+          class:active={paragraphStyle.current === "book"}
+          onclick={() => paragraphStyle.toggle()}
+          title={paragraphStyle.current === "book"
+            ? "Book layout: indented, no gaps. Click for spaced paragraphs."
+            : "Spaced paragraphs. Click for book layout."}
+          aria-label="Paragraph layout"
+          aria-pressed={paragraphStyle.current === "book"}
+        >
+          <Icon name={paragraphStyle.current === "book" ? "paragraph-book" : "paragraph-spaced"} />
+        </button>
+      {/if}
       {#if canPreview}
         <button
           class="icon-btn"

@@ -7,6 +7,8 @@
   import { syntaxHighlighting, HighlightStyle } from "@codemirror/language";
   import { hideMarkers } from "$lib/hideMarkers";
   import { richCopy } from "$lib/richCopy";
+  import { bookParagraphs } from "$lib/paragraphLayout";
+  import { paragraphStyle } from "$lib/paragraphStyle.svelte";
   import { tags } from "@lezer/highlight";
   import { Strikethrough } from "@lezer/markdown";
   import ContextMenu, { type ContextMenuItem } from "./ContextMenu.svelte";
@@ -317,6 +319,14 @@
           // opened as Markdown, so its syntax stays visible.
           ...(plain ? [] : [hideMarkers()]),
         ];
+  }
+
+  // Paragraph layout has its own compartment so switching between web and
+  // book style reconfigures in place rather than rebuilding the editor, which
+  // would lose the scroll position and the undo history.
+  const paragraphCompartment = new Compartment();
+  function paragraphExtensions(style: string) {
+    return style === "book" ? bookParagraphs() : [];
   }
 
   // Highlight colours live in their own compartment so focus mode can drop
@@ -1365,6 +1375,7 @@
           history(),
           keymap.of([...defaultKeymap, ...historyKeymap]),
           languageCompartment.of(languageExtensions(value.length)),
+          paragraphCompartment.of(paragraphExtensions(untrack(() => paragraphStyle.current))),
           // Outside the compartment above: copying formatted text doesn't need
           // the parser, so it shouldn't switch off with it in a long document.
           richCopy(),
@@ -1667,6 +1678,14 @@
     const hidden = focusMode;
     if (!view) return;
     view.dispatch({ effects: highlightThemeCompartment.reconfigure(highlightThemeFor(hidden)) });
+  });
+
+  // Same for the paragraph layout, so the toolbar toggle takes effect without
+  // touching the document or losing where the writer was.
+  $effect(() => {
+    const style = paragraphStyle.current;
+    if (!view) return;
+    view.dispatch({ effects: paragraphCompartment.reconfigure(paragraphExtensions(style)) });
   });
 </script>
 

@@ -25,7 +25,9 @@
     | "history"
     | "note"
     | "archive"
-    | "copy";
+    | "copy"
+    | "paragraph-spaced"
+    | "paragraph-book";
 
   interface Props {
     name: IconName;
@@ -86,6 +88,17 @@
   {:else if name === "sidebar"}
     <rect x="3" y="3" width="18" height="18" rx="2" />
     <line x1="9" y1="3" x2="9" y2="21" />
+  {:else if name === "paragraph-spaced"}
+    <line x1="4" y1="5" x2="20" y2="5" />
+    <line x1="4" y1="8" x2="16" y2="8" />
+    <line x1="4" y1="14" x2="20" y2="14" />
+    <line x1="4" y1="17" x2="16" y2="17" />
+  {:else if name === "paragraph-book"}
+    <line x1="9" y1="5" x2="20" y2="5" />
+    <line x1="4" y1="8.5" x2="20" y2="8.5" />
+    <line x1="4" y1="12" x2="16" y2="12" />
+    <line x1="9" y1="15.5" x2="20" y2="15.5" />
+    <line x1="4" y1="19" x2="20" y2="19" />
   {:else if name === "article"}
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
     <path d="M14 2v6h6" />
