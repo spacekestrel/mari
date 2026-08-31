@@ -834,6 +834,15 @@
       return;
     }
 
+    // F11 is what fullscreen is everywhere else, so it toggles focus mode
+    // both ways. Prevented because the webview would otherwise take the key
+    // and go fullscreen on its own, leaving the toolbar showing.
+    if (e.code === "F11" && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
+      e.preventDefault();
+      setFocusMode(!distractionFree);
+      return;
+    }
+
     const mod = e.ctrlKey || e.metaKey;
     if (!mod) return;
 
