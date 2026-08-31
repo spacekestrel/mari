@@ -17,6 +17,7 @@
   import { countChars, countWords } from "$lib/wordcount";
   import { deletePreference } from "$lib/deletePreference.svelte";
   import { paragraphStyle } from "$lib/paragraphStyle.svelte";
+  import { sidebarWidth } from "$lib/sidebarWidth.svelte";
   import { canDrop, pathAfterMove, isWithin } from "$lib/treeMove";
   import { expandedFolders } from "$lib/expandedFolders.svelte";
   import { enterFullscreen, exitFullscreen } from "$lib/platform/fullscreen";
@@ -272,6 +273,23 @@
   const wordCount = $derived(countWords(text));
   const charCount = $derived(countChars(text));
   const showSidebar = $derived(openedFolder !== null && sidebarVisible && !distractionFree);
+
+  /**
+   * How far right the prose sits in focus mode.
+   *
+   * Focus mode drops the chapter list, so the text is suddenly centred in the
+   * whole window rather than in the space beside the sidebar — and it visibly
+   * jumps left by half the sidebar's width on the way in. Shifting it back by
+   * exactly that much means entering focus mode takes the chrome away and
+   * leaves the writing where it was.
+   *
+   * Zero when there was no sidebar to lose, because then nothing moved.
+   */
+  const focusNudge = $derived(
+    distractionFree && openedFolder !== null && sidebarVisible
+      ? Math.round(sidebarWidth.current / 2)
+      : 0,
+  );
   // Preview renders Markdown as formatted text. That's a Markdown editor's
   // feature, not a writing one — a `.mari` chapter is prose, so it doesn't
   // offer it even though its content is stored as Markdown.
@@ -892,7 +910,11 @@
       }}
     />
   {/if}
-  <div class="app" class:distraction-free={distractionFree}>
+  <div
+    class="app"
+    class:distraction-free={distractionFree}
+    style="--focus-nudge: {focusNudge}px"
+  >
   <header class="toolbar">
     <div class="toolbar-group">
       {#if !runningInTauri}
@@ -1244,6 +1266,16 @@
   /* Focus mode is meant to read like the browser's own F11: real fullscreen,
      nothing on screen but the prose. The focus button goes too — Esc is the
      way back out, same as F11 fullscreen anywhere else. */
+  /* Padding rather than a transform: CodeMirror works out where a click
+     landed from real layout, and moving the content with a transform would
+     put the cursor somewhere other than where the pointer was.
+
+     Twice the nudge, because the prose is centred in whatever room is left:
+     adding 2n on the left moves the middle by n. */
+  .distraction-free :global(.cm-scroller) {
+    padding-left: calc(var(--prose-gutter, 1rem) + var(--focus-nudge, 0px) * 2);
+  }
+
   .distraction-free .toolbar,
   .distraction-free .status-bar,
   .distraction-free .terminal-wrap,
