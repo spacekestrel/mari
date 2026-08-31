@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { markdownToHtml } from "./markdownHtml";
+import { markdownToHtml, sanitiserAllowList } from "./markdownHtml";
 
 describe("what other apps receive", () => {
   it("turns emphasis into real tags", () => {
@@ -25,5 +25,38 @@ describe("what other apps receive", () => {
 
   it("returns nothing for empty input, so the clipboard is left alone", () => {
     expect(markdownToHtml("")).toBe("");
+  });
+});
+
+describe("what the cleaner will allow through", () => {
+  it("covers everything Markdown itself produces", () => {
+    // Collected by running the parser over a document using every piece of
+    // Markdown syntax, so the list can't drift behind the parser.
+    const produced = [
+      "a", "blockquote", "br", "code", "del", "em",
+      "h1", "h2", "h3", "h4", "h5", "h6",
+      "hr", "img", "li", "ol", "p", "pre", "strong",
+      "table", "tbody", "td", "th", "thead", "tr", "ul",
+    ];
+    for (const tag of produced) {
+      expect(sanitiserAllowList.tags).toContain(tag);
+    }
+  });
+
+  it("leaves out the corners where sanitiser flaws have lived", () => {
+    // Drawings and maths notation especially: Markdown never makes them, and
+    // they are where the known bypasses have been found.
+    for (const tag of ["svg", "math", "iframe", "object", "embed", "form", "script", "style", "template"]) {
+      expect(sanitiserAllowList.tags).not.toContain(tag);
+    }
+  });
+
+  it("allows no attribute that can carry code", () => {
+    for (const attr of sanitiserAllowList.attributes) {
+      expect(attr.startsWith("on")).toBe(false);
+    }
+    for (const attr of ["onerror", "onload", "onclick", "style", "srcdoc", "formaction"]) {
+      expect(sanitiserAllowList.attributes).not.toContain(attr);
+    }
   });
 });
