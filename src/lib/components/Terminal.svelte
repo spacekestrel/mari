@@ -11,12 +11,17 @@
   interface Props {
     onClose: () => void;
     cwd?: string;
+    /** Whether the panel is on screen. Hidden with CSS, so the component
+        stays mounted and the shell keeps running between toggles. */
+    visible?: boolean;
   }
 
-  let { onClose, cwd }: Props = $props();
+  let { onClose, cwd, visible = true }: Props = $props();
 
   let container: HTMLDivElement;
-  let term: XTerm | undefined;
+  // $state, not a plain let: the effect below waits for this to exist before
+  // focusing, and a plain variable never tells it that it has.
+  let term = $state<XTerm | undefined>();
   let fitAddon: FitAddon | undefined;
   let unlistenOutput: UnlistenFn | undefined;
   let resizeObserver: ResizeObserver | undefined;
@@ -77,9 +82,31 @@
     theme.current;
     term?.options && (term.options.theme = xtermTheme());
   });
+
+  /**
+   * Take the keyboard when the panel opens.
+   *
+   * Nothing focused it before, so opening the terminal and typing did nothing
+   * at all: the keystrokes went to the page. The layout also has to settle
+   * first — focusing a panel that is still display:none does nothing.
+   */
+  $effect(() => {
+    if (!visible || !term) return;
+    // A timer rather than an animation frame: frames stop when the window
+    // isn't drawing, and then the terminal would open without the keyboard.
+    // One tick is enough for the panel to come back from display:none and
+    // have a size to measure.
+    const settle = setTimeout(() => {
+      fitAndResizePty();
+      term?.focus();
+    }, 0);
+    return () => clearTimeout(settle);
+  });
 </script>
 
-<div class="terminal-panel">
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<div class="terminal-panel" onclick={() => term?.focus()}>
   <div class="terminal-header">
     <span class="terminal-title">Terminal</span>
     <div class="terminal-actions">

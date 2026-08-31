@@ -1011,7 +1011,7 @@
 
   {#if terminalMounted}
     <div class="terminal-wrap" class:hidden={!terminalOpen}>
-      <Terminal onClose={() => (terminalOpen = false)} cwd={openedFolder?.path} />
+      <Terminal onClose={() => (terminalOpen = false)} cwd={openedFolder?.path} visible={terminalOpen} />
     </div>
   {/if}
 
