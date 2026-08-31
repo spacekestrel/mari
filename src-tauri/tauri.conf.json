@@ -9,6 +9,7 @@
     "beforeBuildCommand": "npm run build",
     "frontendDist": "../build"
   },
+  "_securityNote": "The Content Security Policy lives in svelte.config.js, not here. It needs the hashes of the app's own inline scripts, which SvelteKit recomputes on every build; hashes written here by hand would go stale and the app would refuse to start. Setting app.security.csp as well would apply both policies at once, and the strictest wins, which would block the very scripts the hashes allow.",
   "app": {
     "windows": [
       {
