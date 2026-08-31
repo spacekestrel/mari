@@ -158,7 +158,7 @@ visible at a glance. Click anywhere to jump there.
 
 Your writing fills the screen and everything else gets out of the way:
 toolbar, chapter list, word count, minimap, even the highlights. Nothing left
-but the prose. `Esc` brings it back.
+but the prose. `F11` toggles it, `Esc` brings it back.
 
 ---
 
@@ -234,6 +234,7 @@ npm run tauri build     # installer for your OS, in src-tauri/target/release/bun
 | `Ctrl+S` | Save |
 | `Ctrl+Shift+S` | Export a copy |
 | `Ctrl+Shift+V` | Reading view |
+| `F11` | Focus mode, on and off |
 | `Esc` | Leave focus mode |
 
 ---
