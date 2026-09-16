@@ -41,6 +41,7 @@
   import { HIGHLIGHT_STATES } from "$lib/highlightStates";
   import type { ChunkVersion } from "$lib/chunkHistory";
   import { CHUNK_NOTE_MAX_LENGTH } from "$lib/chunkNotes";
+  import { i18n, highlightLabel } from "$lib/i18n.svelte";
 
   export interface HighlightRange {
     from: number;
@@ -326,6 +327,11 @@
   // book style reconfigures in place rather than rebuilding the editor, which
   // would lose the scroll position and the undo history.
   const paragraphCompartment = new Compartment();
+
+  // The empty-document prompt is the one piece of Mari's own text living
+  // inside CodeMirror, so it needs a compartment of its own to follow a
+  // language change without the editor being torn down and rebuilt.
+  const placeholderCompartment = new Compartment();
   function paragraphExtensions(style: string) {
     return style === "book" ? bookParagraphs() : [];
   }
@@ -1270,15 +1276,15 @@
     view.focus();
   }
 
-  const highlightMenuItems: ContextMenuItem[] = [
+  const highlightMenuItems = $derived<ContextMenuItem[]>([
     ...HIGHLIGHT_STATES.map((s, i) => ({
-      label: s.label,
+      label: highlightLabel(s.id, s.label),
       colorSwatch: s.solid,
       shortcut: `Alt+${i + 1}`,
       onClick: () => applyHighlight(s.id),
     })),
-    { label: "Clear highlight", danger: true, shortcut: "Alt+0", onClick: () => applyHighlight(null) },
-  ];
+    { label: i18n.t.editor.clearHighlight, danger: true, shortcut: "Alt+0", onClick: () => applyHighlight(null) },
+  ]);
 
   /**
    * Undo, redo and select-all, matched by where the key sits rather than the
@@ -1382,7 +1388,7 @@
           richCopy(),
           findInChapter(),
           EditorView.lineWrapping,
-          placeholderExt("Start writing..."),
+          placeholderCompartment.of(placeholderExt(untrack(() => i18n.t.editor.placeholder))),
           // WebKitGTK's spellcheck engine (enchant/hunspell) does expensive
           // dictionary/suggestion work on every edit inside contentEditable regions;
           // for a code-editor-style surface this is pure overhead, not a feature.
@@ -1689,6 +1695,14 @@
     if (!view) return;
     view.dispatch({ effects: paragraphCompartment.reconfigure(paragraphExtensions(style)) });
   });
+
+  // And for the language, so an empty chapter's prompt changes with the rest
+  // of the app rather than waiting for the next time the file is opened.
+  $effect(() => {
+    const text = i18n.t.editor.placeholder;
+    if (!view) return;
+    view.dispatch({ effects: placeholderCompartment.reconfigure(placeholderExt(text)) });
+  });
 </script>
 
 <div class="editor" bind:this={container}>
@@ -1739,8 +1753,8 @@
     class="copy-doc"
     style="left: {copyDocPos.left}px; top: {copyDocPos.top}px;"
     onclick={copyWholeDocument}
-    title={copiedDocument ? "Copied" : "Copy the whole chapter"}
-    aria-label="Copy the whole chapter"
+    title={copiedDocument ? i18n.t.editor.copied : i18n.t.editor.copyChapter}
+    aria-label={i18n.t.editor.copyChapter}
   >
     <Icon name={copiedDocument ? "check" : "copy"} size={13} />
   </button>
@@ -1768,12 +1782,12 @@
     onmouseleave={scheduleHoverClear}
     role="toolbar"
     tabindex="-1"
-    aria-label="Passage actions"
+    aria-label={i18n.t.editor.passageActions}
   >
     {#if activeChunkState}
       <span class="chunk-state">
         <span class="chunk-state-dot" style="background: {activeChunkState.solid}"></span>
-        {activeChunkState.label}
+        {highlightLabel(activeChunkState.id, activeChunkState.label)}
       </span>
     {/if}
     {#if !activeChunkNameOnly}
@@ -1781,10 +1795,10 @@
         class="chunk-icon"
         onclick={handleChunkIconClick}
         title={activeChunk.action === "reposition"
-          ? "Move this passage"
+          ? i18n.t.editor.movePassage
           : activeChunk.action === "terminal"
-            ? "View version history"
-            : "Draft a rewrite"}
+            ? i18n.t.editor.viewHistory
+            : i18n.t.editor.draftRewrite}
       >
         <Icon
           name={activeChunk.action === "reposition" ? "move" : activeChunk.action === "terminal" ? "history" : "pencil"}
@@ -1798,7 +1812,7 @@
       <button
         class="chunk-icon"
         onclick={() => activeChunk && cutToPanel(activeChunk.from, activeChunk.to)}
-        title="Move this passage to the drawer"
+        title={i18n.t.editor.moveToDrawer}
       >
         <Icon name="archive" size={13} />
       </button>
@@ -1809,7 +1823,7 @@
       class="chunk-icon"
       class:has-note={!!chunkNotes[activeChunk.id]}
       onclick={() => activeChunk && openNotePopover(activeChunk)}
-      title={chunkNotes[activeChunk.id] ? `Note: ${chunkNotes[activeChunk.id]}` : "Add a note"}
+      title={chunkNotes[activeChunk.id] ? i18n.t.editor.note(chunkNotes[activeChunk.id]) : i18n.t.editor.addNote}
     >
       <Icon name="note" size={13} />
     </button>
@@ -1825,7 +1839,7 @@
     style="left: {notePopover.left}px; top: {notePopover.top}px;"
     role="dialog"
     tabindex="-1"
-    aria-label="Passage note"
+    aria-label={i18n.t.editor.passageNote}
     onmouseenter={cancelHoverClear}
     onmouseleave={scheduleHoverClear}
   >
@@ -1833,7 +1847,7 @@
     <textarea
       autofocus
       maxlength={CHUNK_NOTE_MAX_LENGTH}
-      placeholder="What needs doing here?"
+      placeholder={i18n.t.editor.notePlaceholder}
       bind:value={notePopover.draft}
       onblur={commitNote}
       onkeydown={(e) => {
@@ -1850,7 +1864,7 @@
 {#if placementMode}
   <div class="placement-banner">
     <Icon name="move" size={14} />
-    <span>Repositioning: "{placementMode.preview}{placementMode.text.length > 60 ? '…' : ''}" — click where it should go, or press Esc to cancel.</span>
+    <span>{i18n.t.editor.repositioning(`${placementMode.preview}${placementMode.text.length > 60 ? "…" : ""}`)}</span>
   </div>
 {/if}
 

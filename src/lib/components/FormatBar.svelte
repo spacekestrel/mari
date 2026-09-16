@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Inline, Block } from "$lib/markdownFormat";
+  import { i18n } from "$lib/i18n.svelte";
 
   /**
    * The little bar that appears over a selection. Formatting only: highlights
@@ -49,31 +50,31 @@
   class="bar"
   style="left: {left}px; top: {top}px; visibility: {width ? 'visible' : 'hidden'}"
   role="toolbar"
-  aria-label="Formatting"
+  aria-label={i18n.t.format.label}
   tabindex="-1"
   onmousedown={(e) => e.preventDefault()}
 >
   <button
     class="btn"
     class:on={active.inline.includes("bold")}
-    title="Bold"
-    aria-label="Bold"
+    title={i18n.t.format.bold}
+    aria-label={i18n.t.format.bold}
     aria-pressed={active.inline.includes("bold")}
     onclick={() => onInline("bold")}><span class="bold">B</span></button
   >
   <button
     class="btn"
     class:on={active.inline.includes("italic")}
-    title="Italic"
-    aria-label="Italic"
+    title={i18n.t.format.italic}
+    aria-label={i18n.t.format.italic}
     aria-pressed={active.inline.includes("italic")}
     onclick={() => onInline("italic")}><span class="italic">I</span></button
   >
   <button
     class="btn"
     class:on={active.inline.includes("strike")}
-    title="Strikethrough"
-    aria-label="Strikethrough"
+    title={i18n.t.format.strikethrough}
+    aria-label={i18n.t.format.strikethrough}
     aria-pressed={active.inline.includes("strike")}
     onclick={() => onInline("strike")}><span class="strike">S</span></button
   >
@@ -83,24 +84,24 @@
   <button
     class="btn"
     class:on={active.block === "heading1"}
-    title="Heading"
-    aria-label="Heading"
+    title={i18n.t.format.heading}
+    aria-label={i18n.t.format.heading}
     aria-pressed={active.block === "heading1"}
     onclick={() => onBlock("heading1")}><span class="t-big">T</span></button
   >
   <button
     class="btn"
     class:on={active.block === "heading2"}
-    title="Subheading"
-    aria-label="Subheading"
+    title={i18n.t.format.subheading}
+    aria-label={i18n.t.format.subheading}
     aria-pressed={active.block === "heading2"}
     onclick={() => onBlock("heading2")}><span class="t-small">T</span></button
   >
   <button
     class="btn"
     class:on={active.block === "quote"}
-    title="Quote"
-    aria-label="Quote"
+    title={i18n.t.format.quote}
+    aria-label={i18n.t.format.quote}
     aria-pressed={active.block === "quote"}
     onclick={() => onBlock("quote")}
   >

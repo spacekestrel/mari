@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { i18n } from "$lib/i18n.svelte";
 
   interface Props {
     title: string;
@@ -19,7 +20,7 @@
   let {
     title,
     message,
-    confirmLabel = "Delete",
+    confirmLabel = i18n.t.dialog.delete,
     confirmTone = "danger",
     showDontAskAgain = true,
     altLabel,
@@ -59,11 +60,11 @@
     {#if showDontAskAgain}
       <label class="checkbox-row">
         <input type="checkbox" bind:checked={dontAskAgain} />
-        Don't ask again
+        {i18n.t.dialog.dontAskAgain}
       </label>
     {/if}
     <div class="actions" class:spaced={!showDontAskAgain}>
-      <button class="btn" onclick={onCancel}>Cancel</button>
+      <button class="btn" onclick={onCancel}>{i18n.t.dialog.cancel}</button>
       {#if altLabel}
         <button class="btn" onclick={() => onAlt?.()}>{altLabel}</button>
       {/if}

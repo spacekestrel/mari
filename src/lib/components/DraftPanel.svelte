@@ -5,6 +5,7 @@
   import type { ChunkVersion } from "$lib/chunkHistory";
   import { draftPanelWidth } from "$lib/draftPanelWidth.svelte";
   import { HIGHLIGHT_STATES } from "$lib/highlightStates";
+  import { i18n, highlightLabel } from "$lib/i18n.svelte";
 
   interface Props {
     originalText: string; // the chunk's current live text
@@ -80,7 +81,7 @@
 
   function formatTimestamp(iso: string): string {
     try {
-      return new Date(iso).toLocaleString(undefined, {
+      return new Date(iso).toLocaleString(i18n.tag, {
         month: "short",
         day: "numeric",
         hour: "numeric",
@@ -128,40 +129,40 @@
     ondblclick={() => draftPanelWidth.reset()}
     role="separator"
     aria-orientation="vertical"
-    aria-label="Resize panel"
-    title="Drag to resize — double-click to reset"
+    aria-label={i18n.t.draft.resize}
+    title={i18n.t.draft.dragToResize}
   ></div>
   <div class="panel-header">
     <span class="title">
       {#if mode === "write"}
-        Draft a rewrite
+        {i18n.t.draft.write}
       {:else if mode === "compare"}
-        Compare
+        {i18n.t.draft.compare}
       {:else}
-        Version history
+        {i18n.t.draft.history}
       {/if}
     </span>
-    <button class="icon-btn" onclick={onClose} aria-label="Close" title="Close">
+    <button class="icon-btn" onclick={onClose} aria-label={i18n.t.draft.close} title={i18n.t.draft.close}>
       <Icon name="x" size={16} />
     </button>
   </div>
 
   <div class="panel-body">
     {#if mode === "write"}
-      <textarea class="draft-area" bind:value={draftText} placeholder="Write your rewrite here..."></textarea>
+      <textarea class="draft-area" bind:value={draftText} placeholder={i18n.t.draft.placeholder}></textarea>
       <div class="actions">
-        <button class="btn primary" onclick={handleSaveDraft}>Compare</button>
+        <button class="btn primary" onclick={handleSaveDraft}>{i18n.t.draft.compare}</button>
       </div>
       {#if history.length > 0}
         <button class="history-link" onclick={() => (mode = "history")}>
           <Icon name="history" size={14} />
-          {history.length} earlier version{history.length === 1 ? "" : "s"}
+          {i18n.t.draft.earlierVersions(history.length)}
         </button>
       {/if}
     {:else if mode === "compare" && compareDiff}
       <div class="compare-columns">
         <div class="column">
-          <div class="column-label">Original</div>
+          <div class="column-label">{i18n.t.draft.original}</div>
           <div class="column-text">
             {#each compareDiff.left as run, i (i)}
               <span class:removed={run.changed}>{run.text}</span>
@@ -169,7 +170,7 @@
           </div>
         </div>
         <div class="column">
-          <div class="column-label">Draft</div>
+          <div class="column-label">{i18n.t.draft.draft}</div>
           <div class="column-text">
             {#each compareDiff.right as run, i (i)}
               <span class:added={run.changed}>{run.text}</span>
@@ -178,35 +179,35 @@
         </div>
       </div>
       <div class="after-replace">
-        <span class="after-label">Afterwards</span>
+        <span class="after-label">{i18n.t.draft.afterwards}</span>
         <div class="state-choices">
           <button class="state-choice" class:chosen={keepState === null} onclick={() => (keepState = null)}>
-            No mark
+            {i18n.t.draft.noMark}
           </button>
           {#each HIGHLIGHT_STATES.filter((state) => state.id !== "cut") as state (state.id)}
             <button
               class="state-choice"
               class:chosen={keepState === state.id}
               onclick={() => (keepState = state.id)}
-              title={`Leave this passage marked ${state.label}`}
+              title={i18n.t.draft.leaveMarked(highlightLabel(state.id, state.label))}
             >
               <span class="state-dot" style="background: {state.solid}"></span>
-              {state.label}
+              {highlightLabel(state.id, state.label)}
             </button>
           {/each}
         </div>
       </div>
       <div class="actions">
-        <button class="btn" onclick={handleKeepTweaking}>Keep tweaking</button>
-        <button class="btn primary" onclick={handleReplace}>Replace</button>
+        <button class="btn" onclick={handleKeepTweaking}>{i18n.t.draft.keepTweaking}</button>
+        <button class="btn primary" onclick={handleReplace}>{i18n.t.draft.replace}</button>
       </div>
     {:else if mode === "history"}
       {#if viewingVersion && historyDiff}
-        <button class="back-link" onclick={() => (viewingVersion = null)}>&larr; Back to list</button>
+        <button class="back-link" onclick={() => (viewingVersion = null)}>&larr; {i18n.t.draft.backToList}</button>
         <div class="compare-columns">
           <div class="column">
             <div class="column-label">
-              {viewingVersion.kind === "moved" ? "Before move" : "Selected version"} · {formatTimestamp(
+              {viewingVersion.kind === "moved" ? i18n.t.draft.beforeMove : i18n.t.draft.selectedVersion} · {formatTimestamp(
                 viewingVersion.createdAt,
               )}
             </div>
@@ -217,7 +218,7 @@
             </div>
           </div>
           <div class="column">
-            <div class="column-label">Current</div>
+            <div class="column-label">{i18n.t.draft.current}</div>
             <div class="column-text">
               {#each historyDiff.right as run, i (i)}
                 <span class:added={run.changed}>{run.text}</span>
@@ -228,13 +229,13 @@
         {#if viewingVersion.kind === "draft"}
           <div class="actions">
             <button class="btn primary" onclick={() => viewingVersion && handleRestoreVersion(viewingVersion)}>
-              Restore this version
+              {i18n.t.draft.restoreVersion}
             </button>
           </div>
         {/if}
       {:else}
         {#if startMode === "write"}
-          <button class="back-link" onclick={() => (mode = "write")}>&larr; Back to draft</button>
+          <button class="back-link" onclick={() => (mode = "write")}>&larr; {i18n.t.draft.backToDraft}</button>
         {/if}
         <ul class="history-list">
           {#each historyDesc as version (version.id)}
@@ -242,7 +243,7 @@
               <button class="history-item" onclick={() => (viewingVersion = version)}>
                 <span class="history-item-meta">
                   <span class="badge" class:moved={version.kind === "moved"}>
-                    {version.kind === "moved" ? "Moved" : "Draft"}
+                    {version.kind === "moved" ? i18n.t.draft.movedBadge : i18n.t.draft.draftBadge}
                   </span>
                   <span class="history-item-date">{formatTimestamp(version.createdAt)}</span>
                 </span>
