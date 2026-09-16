@@ -7,6 +7,8 @@
   import type { FsEntry } from "$lib/platform";
   import { sidebarWidth } from "$lib/sidebarWidth.svelte";
   import { canDrop } from "$lib/treeMove";
+  import { i18n } from "$lib/i18n.svelte";
+  import { isMissing } from "$lib/failureReason";
 
   interface Props {
     folder: FsEntry;
@@ -34,7 +36,8 @@
 
   let rootChildren = $state<FsEntry[] | null>(null);
   let loading = $state(false);
-  let error = $state(false);
+  /** Why the folder wouldn't open, or null while nothing has failed. */
+  let error = $state<"gone" | "failed" | null>(null);
   let creatingRoot = $state<"file" | "folder" | null>(null);
 
   /** The folder currently on screen, so a reload can be told from a switch. */
@@ -54,7 +57,7 @@
     // Only show the spinner when there's nothing to look at yet; a reload
     // shouldn't blank out a tree the writer is working in.
     loading = untrack(() => rootChildren) === null;
-    error = false;
+    error = null;
 
     loadChildren(opened)
       .then((entries) => {
@@ -64,9 +67,13 @@
           loading = false;
         }
       })
-      .catch(() => {
+      // The system's own wording stays in the console. On screen it gets a
+      // sentence, and a project folder that has been moved or renamed says so
+      // plainly rather than reporting a fault.
+      .catch((reason) => {
+        console.error(`Couldn't read ${opened.path}`, reason);
         if (opened === folder) {
-          error = true;
+          error = isMissing(reason) ? "gone" : "failed";
           loading = false;
         }
       });
@@ -113,8 +120,8 @@
   }
 
   const rootMenuItems: ContextMenuItem[] = [
-    { label: "New file", icon: "file-plus", onClick: () => (creatingRoot = "file") },
-    { label: "New folder", icon: "folder-plus", onClick: () => (creatingRoot = "folder") },
+    { label: i18n.t.sidebar.newFile, icon: "file-plus", onClick: () => (creatingRoot = "file") },
+    { label: i18n.t.sidebar.newFolder, icon: "folder-plus", onClick: () => (creatingRoot = "folder") },
   ];
 
   // Drag-to-resize. Listeners go on window rather than the handle so the drag
@@ -159,10 +166,10 @@
   <div class="sidebar-header">
     <span class="sidebar-title">{folder.name}</span>
     <div class="sidebar-actions">
-      <button class="header-btn" onclick={() => (creatingRoot = "file")} title="New file" aria-label="New file">
+      <button class="header-btn" onclick={() => (creatingRoot = "file")} title={i18n.t.sidebar.newFile} aria-label={i18n.t.sidebar.newFile}>
         <Icon name="file-plus" size={14} />
       </button>
-      <button class="header-btn" onclick={() => (creatingRoot = "folder")} title="New folder" aria-label="New folder">
+      <button class="header-btn" onclick={() => (creatingRoot = "folder")} title={i18n.t.sidebar.newFolder} aria-label={i18n.t.sidebar.newFolder}>
         <Icon name="folder-plus" size={14} />
       </button>
     </div>
@@ -179,17 +186,19 @@
     {#if creatingRoot}
       <InlineNameInput
         depth={0}
-        placeholder={creatingRoot === "file" ? "chapter.mari" : "folder name"}
+        placeholder={creatingRoot === "file" ? i18n.t.sidebar.filePlaceholder : i18n.t.sidebar.folderPlaceholder}
         onConfirm={confirmCreateRoot}
         onCancel={() => (creatingRoot = null)}
       />
     {/if}
     {#if loading}
-      <div class="loading">Loading&hellip;</div>
-    {:else if error}
-      <div class="loading">Couldn't open this folder</div>
+      <div class="loading">{i18n.t.sidebar.loading}</div>
+    {:else if error !== null}
+      <div class="failed">
+        {error === "gone" ? i18n.t.sidebar.folderGone : i18n.t.sidebar.couldntOpenFolder}
+      </div>
     {:else if rootChildren && rootChildren.length === 0 && !creatingRoot}
-      <div class="loading">Empty folder</div>
+      <div class="loading">{i18n.t.sidebar.emptyFolder}</div>
     {:else if rootChildren}
       {#each rootChildren as entry (entry.path)}
         <TreeItem
@@ -218,8 +227,8 @@
     ondblclick={resetWidth}
     role="separator"
     aria-orientation="vertical"
-    aria-label="Resize sidebar"
-    title="Drag to resize — double-click to reset"
+    aria-label={i18n.t.sidebar.resize}
+    title={i18n.t.sidebar.dragToResize}
   ></div>
 </nav>
 
@@ -313,5 +322,15 @@
     font-size: 0.8rem;
     color: var(--color-text-muted);
     font-style: italic;
+  }
+
+  /* Wraps rather than truncating: the reason is the whole point of showing it,
+     and the sidebar is narrow enough that one line rarely holds it. */
+  .failed {
+    padding: var(--space-1) var(--space-3);
+    font-size: 0.8rem;
+    color: var(--color-danger, #eb5757);
+    line-height: 1.35;
+    overflow-wrap: anywhere;
   }
 </style>

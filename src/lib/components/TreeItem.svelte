@@ -5,6 +5,8 @@
   import type { FsEntry } from "$lib/platform";
   import { expandedFolders } from "$lib/expandedFolders.svelte";
   import { canDrop } from "$lib/treeMove";
+  import { i18n } from "$lib/i18n.svelte";
+  import { isMissing } from "$lib/failureReason";
 
   interface Props {
     entry: FsEntry;
@@ -44,6 +46,8 @@
   const expanded = $derived(expandedFolders.isExpanded(entry.path));
   let children = $state<FsEntry[] | null>(null);
   let loading = $state(false);
+  /** Why this folder wouldn't open, or null while nothing has failed. */
+  let failure = $state<"gone" | "failed" | null>(null);
   let hovering = $state(false);
   let creating = $state<"file" | "folder" | null>(null);
 
@@ -123,10 +127,22 @@
       return;
     }
     loading = true;
-    loadChildren(entry).then((result) => {
-      children = result;
-      loading = false;
-    });
+    failure = null;
+    loadChildren(entry)
+      .then((result) => {
+        children = result;
+      })
+      // Without this the spinner stayed up for good, so a folder that couldn't
+      // be read looked like one still being read. The system's own wording goes
+      // to the console; on screen it gets a sentence, and a folder that has
+      // simply been moved says so plainly rather than reporting a fault.
+      .catch((error) => {
+        console.error(`Couldn't read ${entry.path}`, error);
+        failure = isMissing(error) ? "gone" : "failed";
+      })
+      .finally(() => {
+        loading = false;
+      });
   });
 </script>
 
@@ -169,10 +185,10 @@
   <span class="name">{entry.name}</span>
   {#if hovering && entry.kind === "directory"}
     <span class="row-actions">
-      <button class="row-btn" onclick={(e) => startCreate("file", e)} title="New file" aria-label="New file">
+      <button class="row-btn" onclick={(e) => startCreate("file", e)} title={i18n.t.sidebar.newFile} aria-label={i18n.t.sidebar.newFile}>
         <Icon name="file-plus" size={12} />
       </button>
-      <button class="row-btn" onclick={(e) => startCreate("folder", e)} title="New folder" aria-label="New folder">
+      <button class="row-btn" onclick={(e) => startCreate("folder", e)} title={i18n.t.sidebar.newFolder} aria-label={i18n.t.sidebar.newFolder}>
         <Icon name="folder-plus" size={12} />
       </button>
     </span>
@@ -183,7 +199,7 @@
   {#if creating}
     <InlineNameInput
       depth={depth + 1}
-      placeholder={creating === "file" ? "chapter.mari" : "folder name"}
+      placeholder={creating === "file" ? i18n.t.sidebar.filePlaceholder : i18n.t.sidebar.folderPlaceholder}
       onConfirm={confirmCreate}
       onCancel={() => (creating = null)}
     />
@@ -211,7 +227,11 @@
       />
     {/each}
   {:else if loading}
-    <div class="loading" style="padding-left: {(depth + 1) * 14 + 8}px">Loading&hellip;</div>
+    <div class="loading" style="padding-left: {(depth + 1) * 14 + 8}px">{i18n.t.sidebar.loading}</div>
+  {:else if failure !== null}
+    <div class="failed" style="padding-left: {(depth + 1) * 14 + 8}px">
+      {failure === "gone" ? i18n.t.sidebar.folderGone : i18n.t.sidebar.couldntOpenFolder}
+    </div>
   {/if}
 {/if}
 
@@ -305,5 +325,15 @@
     font-style: italic;
     padding-top: 4px;
     padding-bottom: 4px;
+  }
+
+  /* Wraps rather than truncating: the reason is the whole point of showing it,
+     and the sidebar is narrow enough that one line rarely holds it. */
+  .failed {
+    font-size: 0.78rem;
+    color: var(--color-danger, #eb5757);
+    padding: 4px 8px 4px 0;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
   }
 </style>

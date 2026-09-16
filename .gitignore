@@ -8,3 +8,14 @@ node_modules
 !.env.example
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Installers, whether built here or downloaded to test one
+/*.deb
+/*.rpm
+/*.dmg
+/*.exe
+/*.msi
+/*.AppImage
+
+# Local editor tooling, not part of the app
+/.claude
