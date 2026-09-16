@@ -147,9 +147,9 @@
   }: Props = $props();
 
   // The header stays pinned in the document's top-left corner while the prose
-  // scrolls underneath it. It's overlaid rather than in flow because
-  // CodeMirror owns the scroller's children — the prose is pushed clear of it
-  // by an equal amount of top padding instead.
+  // scrolls past it. It's overlaid rather than in flow because CodeMirror owns
+  // the scroller's children — the prose is held clear of it by the side gutter
+  // below, which is why the two can share the top of the page.
   /** The prose's own breathing room at the edges, in px (CodeMirror's `0 1rem`). */
   const PROSE_GUTTER_MIN = 16;
 
@@ -162,35 +162,16 @@
   }
   const showHeader = $derived(!plain && !focusMode);
 
-  /**
-   * The header's height with nothing unfolded. Unfolding the synopsis or plan
-   * makes the header temporarily much taller, and if the prose reserved *that*
-   * it would get shoved down the page every time one opened. It reserves this
-   * instead, so an open panel simply lies over the writing.
-   */
-  let restingHeaderHeight = 0;
-
   function syncHeaderLayout() {
     if (!container) return;
-    let height = 0;
-    if (showHeader && headerEl) {
-      if (!headerEl.querySelector("[data-panel-open]")) restingHeaderHeight = headerEl.offsetHeight;
-      height = restingHeaderHeight;
-    }
-    container.style.setProperty("--chapter-header-height", `${height}px`);
 
-    // A document with no header needs real breathing room at the top or the
-    // first line sits against the window edge. One with a header does not: the
-    // header is already that space. Adding both left the prose stranded a long
-    // way down the page. The gap below the labels matches the gap above them.
-    container.style.setProperty("--prose-top-gap", height ? "1.5rem" : "4rem");
-
-    // The header is pinned, so prose scrolling past the top would otherwise
-    // run underneath it. Keep a gutter wide enough for the two words —
-    // measured off the labels themselves, not the whole header, so opening one
-    // doesn't shove the prose sideways. The same gutter goes on the right,
-    // which leaves the column centred; at comfortable window widths the column
-    // is narrower than the space available and nothing moves at all.
+    // The header sits in its own column down the left, pinned while the prose
+    // scrolls. Keeping a gutter wide enough for the three words is what holds
+    // the prose clear of it — measured off the labels themselves, not the
+    // whole header, so opening one doesn't shove the prose sideways. The same
+    // gutter goes on the right, which leaves the column centred; at
+    // comfortable window widths the column is narrower than the space
+    // available and nothing moves at all.
     let labelWidth = 0;
     if (showHeader && headerEl) {
       for (const label of headerEl.querySelectorAll<HTMLElement>("[data-chapter-label]")) {
@@ -1529,13 +1510,16 @@
               lineHeight: "1.75",
               padding: "0 var(--prose-gutter, 1rem)",
             },
-            // The chapter header overlays the top of the scroller, so the
-            // prose starts below it. Its measured height comes in as a custom
-            // property; zero when there's no header.
+            // The same top margin whatever the document. The chapter header
+            // overlays the scroller, but in its own column down the left: the
+            // gutter below keeps the prose clear of it at any width, so there
+            // is nothing to duck under and no reason to start further down.
+            // Reserving its height as well left a chapter's first line
+            // stranded a long way below the top of the window.
             ".cm-content": {
               maxWidth: "66ch",
               margin: "0 auto",
-              padding: "calc(var(--prose-top-gap, 4rem) + var(--chapter-header-height, 0px)) 0 4rem",
+              padding: "4rem 0",
               caretColor: "var(--color-accent)",
             },
             // CodeMirror defaults lines to `white-space: break-spaces` (for precise
