@@ -6,6 +6,7 @@
   import { markdown } from "@codemirror/lang-markdown";
   import { syntaxHighlighting, HighlightStyle } from "@codemirror/language";
   import { hideMarkers } from "$lib/hideMarkers";
+  import { spaceOutsideEmphasis } from "$lib/spaceOutsideEmphasis";
   import { richCopy } from "$lib/richCopy";
   import { bookParagraphs } from "$lib/paragraphLayout";
   import { findInChapter } from "$lib/searchPanel";
@@ -318,8 +319,9 @@
           }),
           syntaxHighlighting(proseHighlightStyle),
           // Only in a `.mari` chapter. A `.md` file is Markdown the writer
-          // opened as Markdown, so its syntax stays visible.
-          ...(plain ? [] : [hideMarkers()]),
+          // opened as Markdown, so its syntax stays visible — and where the
+          // markers can be seen, a space typed against one is deliberate.
+          ...(plain ? [] : [hideMarkers(), spaceOutsideEmphasis()]),
         ];
   }
 
