@@ -5,9 +5,10 @@
   import Editor, { type HighlightRange } from "$lib/components/Editor.svelte";
   import FileMenu from "$lib/components/FileMenu.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import { i18n } from "$lib/i18n.svelte";
+  import { failureReason } from "$lib/failureReason";
   import MarkdownHelp from "$lib/components/MarkdownHelp.svelte";
   import Preview from "$lib/components/Preview.svelte";
-  import Settings from "$lib/components/Settings.svelte";
   import Sidebar from "$lib/components/Sidebar.svelte";
   import Terminal from "$lib/components/Terminal.svelte";
   import TitleBar from "$lib/components/TitleBar.svelte";
@@ -263,13 +264,13 @@
         // Renamed, moved or deleted since last time. Starting empty is the
         // right outcome, but say so rather than looking like a lost document.
         console.warn("Couldn't reopen last file", error);
-        flash(`Couldn't reopen ${basename(last.filePath)}`, 4000);
+        flash(i18n.t.status.couldntReopen(basename(last.filePath)), 4000);
         updateLastSession({ filePath: undefined });
       }
     }
   }
 
-  const displayName = $derived(file?.name ?? "Untitled.mari");
+  const displayName = $derived(file?.name ?? i18n.t.document.untitled);
   const wordCount = $derived(countWords(text));
   const charCount = $derived(countChars(text));
   const showSidebar = $derived(openedFolder !== null && sidebarVisible && !distractionFree);
@@ -313,14 +314,10 @@
    * "Couldn't save" on its own leaves the writer with nowhere to go.
    */
   function reportFailure(what: string, error: unknown) {
-    const raw = error instanceof Error ? error.message : String(error ?? "");
-    // `String({})` gives "[object Object]", which tells the writer nothing —
-    // better to show no reason than a fake one.
-    const reason = raw.startsWith("[object ") ? "" : raw.trim();
     // The full thing goes to the console; the status bar gets one short line.
     console.error(what, error);
-    const short = reason.length > 90 ? `${reason.slice(0, 89)}…` : reason;
-    flash(short ? `${what} — ${short}` : what, 5000);
+    const short = failureReason(error);
+    flash(short ? i18n.t.status.failure(what, short) : what, 5000);
   }
 
   function onChange(next: string) {
@@ -424,7 +421,7 @@
     } catch (error) {
       // Out of room, most likely. The chapter is still held in memory for this
       // session; say so rather than let the writer assume it's safe.
-      reportFailure("Couldn't keep unsaved changes for next time", error);
+      reportFailure(i18n.t.status.couldntKeepUnsaved, error);
     }
   }
 
@@ -498,7 +495,7 @@
       activePath = path;
       if (path) updateLastSession({ filePath: path });
     } catch (error) {
-      reportFailure("Couldn't open file", error);
+      reportFailure(i18n.t.status.couldntOpenFile, error);
     }
   }
 
@@ -511,7 +508,7 @@
       sidebarVisible = true;
       updateLastSession({ folderPath: folder.path });
     } catch (error) {
-      reportFailure("Couldn't open folder", error);
+      reportFailure(i18n.t.status.couldntOpenFolder, error);
     }
   }
 
@@ -526,7 +523,7 @@
       await openEntry(entry);
       updateLastSession({ filePath: entry.path });
     } catch (error) {
-      reportFailure("Couldn't open file", error);
+      reportFailure(i18n.t.status.couldntOpenFile, error);
     }
   }
 
@@ -548,7 +545,7 @@
         await adapter.saveBinary({ name, content: "", handle: created.handle }, markdownToDocx(""));
       }
     } catch (error) {
-      reportFailure("Couldn't create file", error);
+      reportFailure(i18n.t.status.couldntCreateFile, error);
       return;
     }
     sidebarRefreshKey++;
@@ -558,7 +555,7 @@
       await openEntry(created);
       updateLastSession({ filePath: created.path });
     } catch (error) {
-      reportFailure("Couldn't open file", error);
+      reportFailure(i18n.t.status.couldntOpenFile, error);
     }
   }
 
@@ -597,9 +594,9 @@
       }
 
       sidebarRefreshKey++;
-      flash(`Moved to ${targetDir.name}`);
+      flash(i18n.t.status.movedTo(targetDir.name));
     } catch (error) {
-      reportFailure(`Couldn't move ${source.name}`, error);
+      reportFailure(i18n.t.status.couldntMove(source.name), error);
     }
   }
 
@@ -619,7 +616,7 @@
       await adapter.createFolder(dir, name);
       sidebarRefreshKey++;
     } catch (error) {
-      reportFailure("Couldn't create folder", error);
+      reportFailure(i18n.t.status.couldntCreateFolder, error);
     }
   }
 
@@ -640,7 +637,7 @@
         updateLastSession({ filePath: undefined });
       }
     } catch (error) {
-      reportFailure("Couldn't delete", error);
+      reportFailure(i18n.t.status.couldntDelete, error);
     }
   }
 
@@ -752,10 +749,10 @@
       if (typeof saved.handle === "string") updateLastSession({ filePath: saved.handle });
       dirty = false;
       sidebarRefreshKey++;
-      flash("Saved");
+      flash(i18n.t.status.saved);
       return true;
     } catch (error) {
-      reportFailure("Couldn't save", error);
+      reportFailure(i18n.t.status.couldntSave, error);
       return false;
     }
   }
@@ -782,7 +779,7 @@
           persistSetAside();
         }
         dirty = false;
-        flash("Saved");
+        flash(i18n.t.status.saved);
         return true;
       }
 
@@ -793,7 +790,7 @@
         await adapter.saveBinary(file, markdownToDocx(text));
         file = { ...file, content: text };
         dirty = false;
-        flash(kept.length > 0 ? "Saved — highlights need a .mari file" : "Saved");
+        flash(kept.length > 0 ? i18n.t.status.savedHighlightsNeedMari : i18n.t.status.saved);
         return true;
       }
 
@@ -803,12 +800,12 @@
       await adapter.save(file, text);
       file = { ...file, content: text };
       dirty = false;
-      flash(marks.length > 0 ? "Saved — marks need a .mari file" : "Saved");
+      flash(marks.length > 0 ? i18n.t.status.savedMarksNeedMari : i18n.t.status.saved);
       return true;
     } catch (error) {
       // The document stays dirty, so the unsaved dot remains and the close
       // guard still fires. Nothing here pretends the write happened.
-      reportFailure("Couldn't save", error);
+      reportFailure(i18n.t.status.couldntSave, error);
       return false;
     }
   }
@@ -839,10 +836,10 @@
 
       await adapter.saveBinary({ name: target.name, content: text, handle: target.handle }, data);
       const kept = isMariFile(target.name) || (editorRef?.flushHighlights() ?? []).length === 0;
-      flash(kept ? "Exported" : "Exported — highlights stay in the .mari");
+      flash(kept ? i18n.t.status.exported : i18n.t.status.exportedHighlightsStay);
       sidebarRefreshKey++;
     } catch (error) {
-      reportFailure("Couldn't export", error);
+      reportFailure(i18n.t.status.couldntExport, error);
     }
   }
 
@@ -935,8 +932,8 @@
         <button
           class="icon-btn"
           onclick={() => (sidebarVisible = !sidebarVisible)}
-          title="Toggle sidebar"
-          aria-label="Toggle sidebar"
+          title={i18n.t.toolbar.toggleSidebar}
+          aria-label={i18n.t.toolbar.toggleSidebar}
         >
           <Icon name="sidebar" />
         </button>
@@ -957,10 +954,8 @@
           class="icon-btn"
           class:active={paragraphStyle.current === "book"}
           onclick={() => paragraphStyle.toggle()}
-          title={paragraphStyle.current === "book"
-            ? "Book layout: indented, no gaps. Click for spaced paragraphs."
-            : "Spaced paragraphs. Click for book layout."}
-          aria-label="Paragraph layout"
+          title={paragraphStyle.current === "book" ? i18n.t.toolbar.bookLayout : i18n.t.toolbar.spacedLayout}
+          aria-label={i18n.t.toolbar.paragraphLayout}
           aria-pressed={paragraphStyle.current === "book"}
         >
           <Icon name={paragraphStyle.current === "book" ? "paragraph-book" : "paragraph-spaced"} />
@@ -970,14 +965,13 @@
         <button
           class="icon-btn"
           onclick={() => (previewMode = !previewMode)}
-          title={previewMode ? "Edit (Ctrl+Shift+V)" : "Preview (Ctrl+Shift+V)"}
-          aria-label="Toggle preview"
+          title={previewMode ? i18n.t.toolbar.edit : i18n.t.toolbar.preview}
+          aria-label={i18n.t.toolbar.togglePreview}
         >
           <Icon name={previewMode ? "pencil" : "article"} />
         </button>
         <MarkdownHelp />
       {/if}
-      <Settings />
     </div>
   </header>
 
@@ -998,8 +992,8 @@
     <main class="editor-wrap">
       {#if !documentOpen}
         <div class="nothing-open">
-          <p>Nothing open</p>
-          <p class="hint">Open a folder or a file to start.</p>
+          <p>{i18n.t.document.nothingOpen}</p>
+          <p class="hint">{i18n.t.document.nothingOpenHint}</p>
         </div>
       {:else}
       <div class="pane" class:hidden={showPreview}>
@@ -1032,8 +1026,8 @@
       <button
         class="focus-fab"
         onclick={() => setFocusMode(!distractionFree)}
-        title={distractionFree ? "Show toolbar (Esc)" : "Focus mode"}
-        aria-label="Toggle focus mode"
+        title={distractionFree ? i18n.t.toolbar.showToolbar : i18n.t.toolbar.focusMode}
+        aria-label={i18n.t.toolbar.toggleFocusMode}
       >
         <Icon name={distractionFree ? "minimize" : "maximize"} />
       </button>
@@ -1048,17 +1042,17 @@
 
   <footer class="status-bar">
     {#if documentOpen}
-      <span>{wordCount} words</span>
-      <span>{charCount} characters</span>
+      <span>{i18n.t.document.words(wordCount)}</span>
+      <span>{i18n.t.document.characters(charCount)}</span>
     {/if}
   </footer>
   </div>
 
   {#if discardPrompt}
     <ConfirmDialog
-      title="Discard unsaved changes?"
-      message={`Your changes to ${displayName} haven't been saved. Save first if you want to keep them.`}
-      confirmLabel="Discard"
+      title={i18n.t.dialog.discardTitle}
+      message={i18n.t.dialog.discardMessage(displayName)}
+      confirmLabel={i18n.t.dialog.discard}
       showDontAskAgain={false}
       onConfirm={() => answerDiscard(true)}
       onCancel={() => answerDiscard(false)}
@@ -1067,10 +1061,10 @@
 
   {#if pendingDelete}
     <ConfirmDialog
-      title={`Delete ${pendingDelete.entry.name}?`}
+      title={i18n.t.dialog.deleteTitle(pendingDelete.entry.name)}
       message={pendingDelete.entry.kind === "directory"
-        ? "This deletes the folder and everything inside it. This can't be undone."
-        : "This can't be undone."}
+        ? i18n.t.dialog.deleteFolderMessage
+        : i18n.t.dialog.deleteFileMessage}
       onConfirm={confirmPendingDelete}
       onCancel={() => (pendingDelete = null)}
     />
@@ -1082,7 +1076,7 @@
       y={treeContextMenu.y}
       items={[
         {
-          label: "Delete",
+          label: i18n.t.dialog.delete,
           icon: "trash",
           danger: true,
           onClick: () => handleDeleteEntry(treeContextMenu!.entry, treeContextMenu!.parent),
