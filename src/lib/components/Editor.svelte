@@ -179,6 +179,12 @@
     }
     container.style.setProperty("--chapter-header-height", `${height}px`);
 
+    // A document with no header needs real breathing room at the top or the
+    // first line sits against the window edge. One with a header does not: the
+    // header is already that space. Adding both left the prose stranded a long
+    // way down the page. The gap below the labels matches the gap above them.
+    container.style.setProperty("--prose-top-gap", height ? "1.5rem" : "4rem");
+
     // The header is pinned, so prose scrolling past the top would otherwise
     // run underneath it. Keep a gutter wide enough for the two words —
     // measured off the labels themselves, not the whole header, so opening one
@@ -1529,7 +1535,7 @@
             ".cm-content": {
               maxWidth: "66ch",
               margin: "0 auto",
-              padding: "calc(4rem + var(--chapter-header-height, 0px)) 0 4rem",
+              padding: "calc(var(--prose-top-gap, 4rem) + var(--chapter-header-height, 0px)) 0 4rem",
               caretColor: "var(--color-accent)",
             },
             // CodeMirror defaults lines to `white-space: break-spaces` (for precise
