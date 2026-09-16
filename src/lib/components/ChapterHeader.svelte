@@ -2,6 +2,7 @@
   import Icon from "./Icon.svelte";
   import type { MariPlanBeat } from "$lib/mariBundle";
   import { beatsToLines, mergePlanBeats, samePlan } from "$lib/plan";
+  import { i18n } from "$lib/i18n.svelte";
 
   /**
    * The chapter's header, tucked into the top-left corner of the document.
@@ -183,7 +184,7 @@
             <p>{summary}</p>
           {/if}
         </div>
-        <button class="pencil" onclick={startEditing} title="Edit">
+        <button class="pencil" onclick={startEditing} title={i18n.t.chapter.edit}>
           <Icon name="pencil" size={12} />
         </button>
       {/if}
@@ -192,8 +193,8 @@
 {/snippet}
 
 <div class="header" bind:this={root} data-panel-open={open ? "" : undefined}>
-  {@render field("synopsis", "Synopsis", "What happens in this chapter?")}
-  {@render field("plan", "Plan", "One step per line")}
+  {@render field("synopsis", i18n.t.chapter.synopsis, i18n.t.chapter.synopsisPlaceholder)}
+  {@render field("plan", i18n.t.chapter.plan, i18n.t.chapter.planPlaceholder)}
 
   <!-- Same category as the two above — things about the chapter that aren't
        the prose — so it sits with them rather than in the app's toolbar. This
@@ -207,7 +208,7 @@
       onOpenDrawer();
     }}
   >
-    Drawer{drawerCount ? ` (${drawerCount})` : ""}
+    {i18n.t.drawer.title}{drawerCount ? ` (${drawerCount})` : ""}
   </button>
 </div>
 

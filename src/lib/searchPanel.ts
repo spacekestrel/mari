@@ -13,6 +13,7 @@ import {
 } from "@codemirror/search";
 import { keymap } from "@codemirror/view";
 import type { EditorState, Extension } from "@codemirror/state";
+import { t } from "./i18n.svelte";
 
 /**
  * Finding a word in the chapter.
@@ -62,10 +63,11 @@ export function describeMatches(
   query: string,
   counts: { total: number; current: number; capped: boolean },
 ): string {
+  const words = t().search;
   if (!query) return "";
-  if (counts.total === 0) return "no matches";
+  if (counts.total === 0) return words.noMatches;
   const total = counts.capped ? `${counts.total}+` : `${counts.total}`;
-  return counts.current ? `${counts.current} of ${total}` : `${total} found`;
+  return counts.current ? words.position(counts.current, total) : words.found(total);
 }
 
 function button(label: string, title: string, onClick: () => void): HTMLButtonElement {
@@ -90,7 +92,7 @@ function createPanel(view: EditorView): Panel {
 
   const input = document.createElement("input");
   input.className = "mari-search-input";
-  input.placeholder = "Find in chapter";
+  input.placeholder = t().search.placeholder;
   input.setAttribute("main-field", "true");
   input.value = getSearchQuery(view.state).search;
 
@@ -130,15 +132,15 @@ function createPanel(view: EditorView): Panel {
   dom.append(
     input,
     count,
-    button("↑", "Previous match", () => {
+    button("↑", t().search.previous, () => {
       findPrevious(view);
       refresh();
     }),
-    button("↓", "Next match", () => {
+    button("↓", t().search.next, () => {
       findNext(view);
       refresh();
     }),
-    button("✕", "Close search", () => {
+    button("✕", t().search.close, () => {
       closeSearchPanel(view);
       view.focus();
     }),

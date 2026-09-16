@@ -6,6 +6,7 @@
   import { listen, type UnlistenFn } from "@tauri-apps/api/event";
   import Icon from "./Icon.svelte";
   import { theme } from "$lib/theme.svelte";
+  import { i18n } from "$lib/i18n.svelte";
   import "@xterm/xterm/css/xterm.css";
 
   interface Props {
@@ -108,10 +109,10 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div class="terminal-panel" onclick={() => term?.focus()}>
   <div class="terminal-header">
-    <span class="terminal-title">Terminal</span>
+    <span class="terminal-title">{i18n.t.terminal.title}</span>
     <div class="terminal-actions">
-      <button class="text-btn" onclick={() => term?.clear()}>Clear</button>
-      <button class="icon-btn" onclick={onClose} title="Close terminal" aria-label="Close terminal">
+      <button class="text-btn" onclick={() => term?.clear()}>{i18n.t.terminal.clear}</button>
+      <button class="icon-btn" onclick={onClose} title={i18n.t.terminal.close} aria-label={i18n.t.terminal.close}>
         <Icon name="x" size={14} />
       </button>
     </div>

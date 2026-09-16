@@ -1,19 +1,22 @@
 <script lang="ts">
   import Icon from "./Icon.svelte";
+  import { i18n } from "$lib/i18n.svelte";
 
   let open = $state(false);
   let container: HTMLDivElement;
 
-  const rows: [string, string][] = [
-    ["# text", "Heading"],
-    ["**text**", "Bold"],
-    ["*text*", "Italic"],
-    ["> text", "Quote"],
-    ["- text", "Bullet list"],
-    ["1. text", "Numbered list"],
-    ["[text](url)", "Link"],
-    ["---", "Scene break"],
-  ];
+  // Derived rather than fixed: the syntax is the same in every language, the
+  // names for it are not.
+  const rows = $derived<[string, string][]>([
+    ["# text", i18n.t.markdown.heading],
+    ["**text**", i18n.t.markdown.bold],
+    ["*text*", i18n.t.markdown.italic],
+    ["> text", i18n.t.markdown.quote],
+    ["- text", i18n.t.markdown.bulletList],
+    ["1. text", i18n.t.markdown.numberedList],
+    ["[text](url)", i18n.t.markdown.link],
+    ["---", i18n.t.markdown.sceneBreak],
+  ]);
 
   function handleWindowClick(e: MouseEvent) {
     if (open && !container?.contains(e.target as Node)) {
@@ -36,8 +39,8 @@
     class="icon-btn"
     class:active={open}
     onclick={() => (open = !open)}
-    title="Markdown cheat sheet"
-    aria-label="Markdown cheat sheet"
+    title={i18n.t.markdown.cheatSheet}
+    aria-label={i18n.t.markdown.cheatSheet}
   >
     <Icon name="help" />
   </button>
@@ -45,7 +48,7 @@
   {#if open}
     <div class="popover">
       <div class="popover-arrow"></div>
-      <div class="popover-header">Markdown</div>
+      <div class="popover-header">{i18n.t.markdown.title}</div>
       <div class="rows">
         {#each rows as [syntax, label] (syntax)}
           <div class="row">

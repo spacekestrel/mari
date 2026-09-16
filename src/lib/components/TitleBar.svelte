@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import FileMenu from "./FileMenu.svelte";
   import Icon from "./Icon.svelte";
+  import { i18n } from "$lib/i18n.svelte";
   import type { getCurrentWindow as GetCurrentWindow } from "@tauri-apps/api/window";
 
   interface Props {
@@ -30,13 +31,13 @@
   </div>
   <div class="titlebar-title" data-tauri-drag-region>Mari</div>
   <div class="titlebar-side titlebar-controls">
-    <button class="win-btn" onclick={() => appWindow?.minimize()} aria-label="Minimize">
+    <button class="win-btn" onclick={() => appWindow?.minimize()} aria-label={i18n.t.window.minimize}>
       <Icon name="win-minimize" size={14} />
     </button>
-    <button class="win-btn" onclick={() => appWindow?.toggleMaximize()} aria-label="Maximize">
+    <button class="win-btn" onclick={() => appWindow?.toggleMaximize()} aria-label={i18n.t.window.maximize}>
       <Icon name="win-maximize" size={12} />
     </button>
-    <button class="win-btn win-close" onclick={() => appWindow?.close()} aria-label="Close">
+    <button class="win-btn win-close" onclick={() => appWindow?.close()} aria-label={i18n.t.window.close}>
       <Icon name="x" size={14} />
     </button>
   </div>

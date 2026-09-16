@@ -2,6 +2,7 @@
   import Icon from "./Icon.svelte";
   import type { MariCut } from "$lib/mariBundle";
   import { copyText } from "$lib/clipboard";
+  import { i18n } from "$lib/i18n.svelte";
 
   /**
    * The chapter's drawer: everything cut out of it, kept against the file.
@@ -42,14 +43,14 @@
 
   function wordCount(text: string): string {
     const n = text.trim() ? text.trim().split(/\s+/).length : 0;
-    return `${n} ${n === 1 ? "word" : "words"}`;
+    return i18n.t.drawer.wordCount(n);
   }
 
   function when(iso: string): string {
     if (!iso) return "";
     const date = new Date(iso);
     if (Number.isNaN(date.getTime())) return "";
-    return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    return date.toLocaleDateString(i18n.tag, { month: "short", day: "numeric" });
   }
 
   function toggle(cut: MariCut) {
@@ -60,13 +61,13 @@
 
 <div class="panel">
   <header>
-    <button class="icon-btn" onclick={onClose} title="Close" aria-label="Close">
+    <button class="icon-btn" onclick={onClose} title={i18n.t.drawer.close} aria-label={i18n.t.drawer.close}>
       <Icon name="x" size={14} />
     </button>
   </header>
 
   {#if ordered.length === 0}
-    <p class="empty">The drawer is empty.</p>
+    <p class="empty">{i18n.t.drawer.empty}</p>
   {:else}
     <ul>
       {#each ordered as cut (cut.id)}
@@ -86,19 +87,19 @@
 
               <div class="actions">
                 {#if confirmingId === cut.id}
-                  <button class="btn btn-danger" onclick={() => onDelete(cut)}>Delete for good</button>
-                  <button class="btn push-right" onclick={() => (confirmingId = null)}>Keep it</button>
+                  <button class="btn btn-danger" onclick={() => onDelete(cut)}>{i18n.t.drawer.deleteForGood}</button>
+                  <button class="btn push-right" onclick={() => (confirmingId = null)}>{i18n.t.drawer.keepIt}</button>
                 {:else}
-                  <button class="btn btn-quiet" onclick={() => (confirmingId = cut.id)}>Delete</button>
+                  <button class="btn btn-quiet" onclick={() => (confirmingId = cut.id)}>{i18n.t.drawer.delete}</button>
                   <button
                     class="btn btn-icon push-right"
                     onclick={() => copy(cut)}
-                    title="Copy the text"
-                    aria-label="Copy the text"
+                    title={i18n.t.drawer.copyText}
+                    aria-label={i18n.t.drawer.copyText}
                   >
                     <Icon name={copiedId === cut.id ? "check" : "copy"} size={13} />
                   </button>
-                  <button class="btn" onclick={() => onPutBack(cut)}>Put back</button>
+                  <button class="btn" onclick={() => onPutBack(cut)}>{i18n.t.drawer.putBack}</button>
                 {/if}
               </div>
             </div>
