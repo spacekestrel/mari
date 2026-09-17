@@ -317,6 +317,15 @@
   // would lose the scroll position and the undo history.
   const paragraphCompartment = new Compartment();
 
+  /**
+   * Undo history, held in a compartment so loading another chapter can throw
+   * it away. One editor serves every document, and without this the history
+   * spanned all of them: pressing undo in a chapter could put back the text of
+   * the one opened before it, and saving after that would write the wrong
+   * chapter over the right one.
+   */
+  const historyCompartment = new Compartment();
+
   // The empty-document prompt is the one piece of Mari's own text living
   // inside CodeMirror, so it needs a compartment of its own to follow a
   // language change without the editor being torn down and rebuilt.
@@ -1368,7 +1377,7 @@
       state: EditorState.create({
         doc: value,
         extensions: [
-          history(),
+          historyCompartment.of(history()),
           keymap.of([...defaultKeymap, ...historyKeymap]),
           languageCompartment.of(languageExtensions(value.length)),
           paragraphCompartment.of(paragraphExtensions(untrack(() => paragraphStyle.current))),
@@ -1626,7 +1635,15 @@
         // Clamped: the file may have been edited elsewhere since, and a cursor
         // past the end would throw.
         selection: place ? { anchor: Math.min(place.cursor, value.length) } : undefined,
+        // Swapping one chapter for another is not an edit to either of them.
+        // Recorded, it made undo restore the previous chapter's text into this
+        // one's file.
+        annotations: notUndoable,
         effects: [
+          // And nothing recorded before this belongs to this document either,
+          // so the history starts empty rather than reaching back into the
+          // chapter that was open a moment ago.
+          historyCompartment.reconfigure(history()),
           // Highlight ranges are plain offsets with no notion of "which file" they
           // belong to — without this they'd silently reapply to whatever text now
           // occupies those same offsets in the newly-loaded document. Restoring
