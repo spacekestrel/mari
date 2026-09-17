@@ -79,6 +79,9 @@ export const en = {
     movedTo: (name: string) => `Moved to ${name}`,
     couldntMove: (name: string) => `Couldn't move ${name}`,
     /** How a failure and the reason the OS gave are joined into one line. */
+    /** A chapter that changed on disk while unsaved changes waited for it. */
+    fileChangedElsewhere: (name: string) =>
+      `${name} changed elsewhere — showing the saved file, unsaved copy dropped`,
     failure: (what: string, reason: string) => `${what} — ${reason}`,
   },
 
