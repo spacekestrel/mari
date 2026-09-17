@@ -7,6 +7,7 @@
   import Icon from "$lib/components/Icon.svelte";
   import { i18n } from "$lib/i18n.svelte";
   import { failureReason } from "$lib/failureReason";
+  import { fingerprint, resolveSetAside, type SetAsideWork } from "$lib/setAside";
   import MarkdownHelp from "$lib/components/MarkdownHelp.svelte";
   import Preview from "$lib/components/Preview.svelte";
   import Sidebar from "$lib/components/Sidebar.svelte";
@@ -131,7 +132,7 @@
         // Synchronous on purpose: the window closes as soon as this returns.
         rememberPlace();
         if (hasUnsavedWork() && activePath && isMariFile(displayName)) {
-          setAside.set(activePath, buildBundle());
+          setAside.set(activePath, { bytes: buildBundle(), base: activeBase });
         }
         persistSetAside();
       });
@@ -186,17 +187,27 @@
   async function openEntry(entry: FsEntry) {
     const adapter = await getFileSystemAdapter();
     if (isMariFile(entry.name)) {
-      // Changes left behind last time you were here come back as they were,
-      // still unsaved. Only if there are none is the file read from disk.
+      // The file is always read, even when there are changes waiting: whether
+      // those changes still apply depends on what the file says now.
+      const disk = await adapter.readBinaryFile(entry);
       const waiting = setAside.get(entry.path);
-      const bytes = waiting ?? (await adapter.readBinaryFile(entry));
+      const { bytes, restored, dropped } = resolveSetAside(disk, waiting);
+      activeBase = fingerprint(disk);
+      if (dropped) {
+        // The file moved on under the unsaved copy — pulled from another
+        // machine, most likely. Say so: the alternative is the writer saving
+        // an old chapter over a newer one without ever being told.
+        setAside.delete(entry.path);
+        persistSetAside();
+        flash(i18n.t.status.fileChangedElsewhere(entry.name), 6000);
+      }
       // Both routes: the prop covers the first chapter after launch, when
       // there's no editor yet; the setter covers every switch after that.
       initialPlace = places.get(entry.path) ?? null;
       editorRef?.setPendingPosition(initialPlace);
       adoptBundle(unpackMariBundle(bytes), entry.name, entry.handle);
       activePath = entry.path;
-      if (waiting) dirty = true;
+      if (restored) dirty = true;
       return;
     }
     // Word files are zips too, so they're read as bytes and converted to the
@@ -341,16 +352,25 @@
    * exactly as they were, still unsaved, and the file on disk is never touched.
    */
   const SET_ASIDE_KEY = "mari-unsaved-chapters";
-  const setAside = new Map<string, Uint8Array>(loadSetAside());
+  const setAside = new Map<string, SetAsideWork>(loadSetAside());
 
-  function loadSetAside(): [string, Uint8Array][] {
+  /**
+   * Fingerprint of the open chapter as it stands on disk, so work put aside
+   * records which version of the file it was made against.
+   */
+  let activeBase: string | null = null;
+
+  function loadSetAside(): [string, SetAsideWork][] {
     if (typeof localStorage === "undefined") return [];
     try {
       const stored = JSON.parse(localStorage.getItem(SET_ASIDE_KEY) ?? "{}");
-      return Object.entries(stored as Record<string, string>).map(([path, encoded]) => [
-        path,
-        Uint8Array.from(atob(encoded), (c) => c.charCodeAt(0)),
-      ]);
+      return Object.entries(stored as Record<string, unknown>).map(([path, held]) => {
+        // Older versions stored the bytes alone, with no note of the file they
+        // were based on. Read them, but they can't be vouched for.
+        const encoded = typeof held === "string" ? held : (held as { bytes: string }).bytes;
+        const base = typeof held === "string" ? null : ((held as { base: string | null }).base ?? null);
+        return [path, { bytes: Uint8Array.from(atob(encoded), (c) => c.charCodeAt(0)), base }];
+      });
     } catch {
       // Deliberately silent: unreadable backups only mean chapters open from
       // their files instead, which is what would have happened anyway.
@@ -411,11 +431,11 @@
   function persistSetAside() {
     if (typeof localStorage === "undefined") return;
     try {
-      const stored: Record<string, string> = {};
-      for (const [path, bytes] of setAside) {
+      const stored: Record<string, { bytes: string; base: string | null }> = {};
+      for (const [path, work] of setAside) {
         let binary = "";
-        for (const byte of bytes) binary += String.fromCharCode(byte);
-        stored[path] = btoa(binary);
+        for (const byte of work.bytes) binary += String.fromCharCode(byte);
+        stored[path] = { bytes: btoa(binary), base: work.base };
       }
       localStorage.setItem(SET_ASIDE_KEY, JSON.stringify(stored));
     } catch (error) {
@@ -436,7 +456,7 @@
     }
 
     if (isMariFile(displayName)) {
-      setAside.set(activePath, buildBundle());
+      setAside.set(activePath, { bytes: buildBundle(), base: activeBase });
       persistSetAside();
     }
     return true;
@@ -772,7 +792,11 @@
 
       if (isMariFile(file.name)) {
         activeBundle ??= { manifest: { format: "mari", version: MARI_FORMAT_VERSION }, unknownParts: {} };
-        await adapter.saveBinary(file, buildBundle());
+        const written = buildBundle();
+        await adapter.saveBinary(file, written);
+        // What is on disk is now this, so work put aside from here on is
+        // measured against it rather than whatever was there when it opened.
+        activeBase = fingerprint(written);
         file = { ...file, content: text };
         if (activePath) {
           setAside.delete(activePath);

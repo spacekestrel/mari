@@ -83,6 +83,8 @@ export const ru: Strings = {
     couldntReopen: (name) => `Не удалось снова открыть ${name}`,
     movedTo: (name) => `Перемещено в ${name}`,
     couldntMove: (name) => `Не удалось переместить ${name}`,
+    fileChangedElsewhere: (name) =>
+      `${name} изменён в другом месте — открыт файл с диска, несохранённая копия отброшена`,
     failure: (what, reason) => `${what} — ${reason}`,
   },
 
