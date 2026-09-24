@@ -95,9 +95,22 @@ jobs:
               (M1 and later), the `x64` one for Intel Macs
             - **Linux** — `.AppImage` runs anywhere, or `.deb` / `.rpm`
 
-            Mari isn't code-signed yet, so Windows SmartScreen and macOS
-            Gatekeeper will both warn the first time. On macOS: right-click the
-            app and choose Open.
+            Mari isn't code-signed yet, so Windows and macOS both object the
+            first time.
+
+            **Windows** says "unrecognised app": click *More info*, then
+            *Run anyway*.
+
+            **macOS** says Mari is damaged and should go in the Trash. It
+            isn't. macOS flags anything downloaded from the internet, and
+            refuses it outright because Apple doesn't know the app. Move Mari
+            to Applications, then run this once in Terminal:
+
+            ```
+            xattr -dr com.apple.quarantine /Applications/Mari.app
+            ```
+
+            Then open it normally. No `sudo` needed.
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
