@@ -6,6 +6,7 @@
   import { markdown } from "@codemirror/lang-markdown";
   import { syntaxHighlighting, HighlightStyle } from "@codemirror/language";
   import { hideMarkers } from "$lib/hideMarkers";
+  import { highlightTarget } from "$lib/highlightTarget";
   import { spaceOutsideEmphasis } from "$lib/spaceOutsideEmphasis";
   import { richCopy } from "$lib/richCopy";
   import { bookParagraphs } from "$lib/paragraphLayout";
@@ -1349,18 +1350,11 @@
     const slot = Number(digit);
     if (slot > HIGHLIGHT_STATES.length) return false;
 
+    // Same rule the right-click follows, against the line the cursor is on.
     const sel = view.state.selection.main;
-    let from: number;
-    let to: number;
-    if (sel.empty) {
-      const line = view.state.doc.lineAt(sel.head);
-      if (!line.text.trim()) return false; // blank line — nothing to mark
-      from = line.from;
-      to = line.to;
-    } else {
-      from = sel.from;
-      to = sel.to;
-    }
+    const target = highlightTarget(sel, view.state.doc.lineAt(sel.head));
+    if (!target) return false; // blank line — nothing to mark
+    const { from, to } = target;
 
     const stateId = slot === 0 ? null : HIGHLIGHT_STATES[slot - 1].id;
     // Pressing a chunk's own state again clears it, so one key both sets and
@@ -1411,14 +1405,23 @@
             },
             contextmenu: (event, editorView) => {
               if (plain) return false; // no marking in a plain text document
-              const sel = editorView.state.selection.main;
-              if (sel.empty) return false;
+              // The paragraph under the pointer, not the one holding the
+              // cursor: a right-click somewhere else in the chapter means
+              // there, and on macOS the cursor hasn't moved yet anyway.
+              const at = editorView.posAtCoords({ x: event.clientX, y: event.clientY });
+              const target = highlightTarget(
+                editorView.state.selection.main,
+                at === null ? null : editorView.state.doc.lineAt(at),
+              );
+              // Nothing to mark — a blank line, or past the end of the text.
+              // Leave the system's own menu alone there.
+              if (!target) return false;
               event.preventDefault();
               // Without this, the event keeps bubbling to window after preventDefault()
               // — and since ContextMenu listens on window for contextmenu-to-dismiss, it
               // would catch this same event and close the menu instantly.
               event.stopPropagation();
-              highlightMenu = { x: event.clientX, y: event.clientY, from: sel.from, to: sel.to };
+              highlightMenu = { x: event.clientX, y: event.clientY, from: target.from, to: target.to };
               return true;
             },
             // mouseover (not mouseenter) because it bubbles up from the
