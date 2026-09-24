@@ -1249,6 +1249,11 @@
       annotations: notUndoable,
     });
     onCutsChange?.([...cuts, cut]);
+    // Same as the other two operations that retire a highlight: say so, and
+    // repaint. Left to the ordinary edit debounce, the minimap went on showing
+    // the passage's colour after the passage itself had gone.
+    scheduleHighlightsSync();
+    drawMinimap();
   }
 
   /**
