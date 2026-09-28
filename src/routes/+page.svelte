@@ -8,6 +8,7 @@
   import { i18n } from "$lib/i18n.svelte";
   import { failureReason } from "$lib/failureReason";
   import { fingerprint, resolveSetAside, type SetAsideWork } from "$lib/setAside";
+  import { sampleChapter } from "$lib/sampleChapter";
   import MarkdownHelp from "$lib/components/MarkdownHelp.svelte";
   import Preview from "$lib/components/Preview.svelte";
   import Sidebar from "$lib/components/Sidebar.svelte";
@@ -483,6 +484,35 @@
     updateLastSession({ filePath: undefined });
   }
 
+  /**
+   * Opens the built-in chapter, already marked up.
+   *
+   * Deliberately not written to disk first: it belongs to nobody, so it can be
+   * read, pulled apart and abandoned without leaving anything behind. Saving it
+   * asks where to put it, the same as any chapter that has never been saved.
+   */
+  async function handleOpenSample() {
+    if (!(await confirmDiscardIfDirty("open the sample chapter"))) return;
+    const sample = sampleChapter(i18n.current);
+    resetDocumentExtras();
+    file = { name: sample.fileName, content: sample.text, handle: null };
+    text = sample.text;
+    activeBundle = { manifest: { format: "mari", version: MARI_FORMAT_VERSION }, unknownParts: {} };
+    currentHighlights = sample.highlights;
+    editorRef?.setPendingHighlights(sample.highlights);
+    currentChunkNotes = sample.notes;
+    editorRef?.setPendingChunkNotes(sample.notes);
+    currentChunkHistory = sample.history;
+    editorRef?.setPendingChunkHistory(sample.history);
+    currentSynopsis = sample.synopsis;
+    currentCuts = sample.cuts;
+    documentOpen = true;
+    dirty = false;
+    activePath = null;
+    activeBase = null;
+    updateLastSession({ filePath: undefined });
+  }
+
   /** Every format Mari can open, in the order a writer is likely to want them. */
   const OPENABLE = ["mari", "docx", "md", "markdown", "txt"];
 
@@ -784,8 +814,10 @@
     text = editorRef?.getValue() ?? text;
 
     // New documents are `.mari`, so an unsaved one goes straight to the bundle
-    // path rather than being written out as plain text under a .mari name.
-    if (!file) return handleSaveAsMari();
+    // path rather than being written out as plain text under a .mari name. The
+    // sample chapter has a name but no file behind it, which is the same case:
+    // there is nowhere to write, so ask.
+    if (!file || file.handle == null) return handleSaveAsMari();
 
     try {
       const adapter = await getFileSystemAdapter();
@@ -1018,6 +1050,10 @@
         <div class="nothing-open">
           <p>{i18n.t.document.nothingOpen}</p>
           <p class="hint">{i18n.t.document.nothingOpenHint}</p>
+          <p class="hint sample-lead">{i18n.t.document.seeSample}</p>
+          <button class="sample-button" onclick={handleOpenSample}>
+            {i18n.t.document.openSample}
+          </button>
         </div>
       {:else}
       <div class="pane" class:hidden={showPreview}>
@@ -1262,6 +1298,27 @@
   .nothing-open .hint {
     font-size: 0.82rem;
     opacity: 0.75;
+  }
+
+  .sample-lead {
+    margin-top: var(--space-4);
+  }
+
+  .sample-button {
+    margin-top: 2px;
+    padding: 6px 14px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: var(--color-text);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .sample-button:hover {
+    background: var(--color-hover);
+    border-color: var(--color-accent);
   }
 
   .status-bar {

@@ -1,0 +1,38 @@
+# Watches the app's dependencies for security advisories and updates.
+#
+# Grouped and monthly on purpose: Mari has one maintainer, and a pull request
+# per package per week is the surest way to make an update list unreadable and
+# then ignored. Security updates come through regardless of the schedule.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      # The editor is a dozen packages that are released together and expect to
+      # be on matching versions; splitting them across pull requests breaks the
+      # build for no reason.
+      codemirror:
+        patterns: ["@codemirror/*", "@lezer/*", "codemirror"]
+      svelte:
+        patterns: ["svelte", "@sveltejs/*", "vite", "@tauri-apps/*"]
+      everything-else:
+        patterns: ["*"]
+
+  - package-ecosystem: cargo
+    directory: /src-tauri
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      rust:
+        patterns: ["*"]
+
+  # The release and checks workflows pin actions by major version; this keeps
+  # those pins from going stale and unsupported.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
