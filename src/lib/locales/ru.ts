@@ -62,6 +62,8 @@ export const ru: Strings = {
     untitled: "Без названия.mari",
     nothingOpen: "Ничего не открыто",
     nothingOpenHint: "Откройте папку или файл, чтобы начать.",
+    seeSample: "Или посмотрите главу, которую уже правят",
+    openSample: "Открыть пример главы",
     words: (n) => `${n} ${plural(n, "слово", "слова", "слов")}`,
     characters: (n) => `${n} ${plural(n, "символ", "символа", "символов")}`,
   },
