@@ -60,6 +60,16 @@ export function markEnd(following: string, name: string, to: number): number {
 /** A rule down the left of a quoted passage, the way a quote is usually set. */
 const quoteLine = Decoration.line({ class: "cm-quoted" });
 
+/**
+ * A chapter title, centred the way a printed one is.
+ *
+ * On the line rather than the text: alignment belongs to the line box, and the
+ * highlight style can only reach the words. Only in a `.mari` chapter — a `.md`
+ * file is a document of some other kind, and centring its headings would be an
+ * opinion nobody asked for.
+ */
+const titleLine = Decoration.line({ class: "cm-chapter-title" });
+
 interface Built {
   /** Hidden punctuation. Also what the cursor treats as atomic. */
   markers: DecorationSet;
@@ -76,6 +86,14 @@ function buildDecorations(state: EditorState, view: EditorView): Built {
       from,
       to,
       enter: (node) => {
+        if (node.name === "ATXHeading1") {
+          lines.push({
+            from: state.doc.lineAt(node.from).from,
+            to: state.doc.lineAt(node.from).from,
+            value: titleLine,
+          });
+          return;
+        }
         if (node.name === "Blockquote") {
           // Marked line by line: a quote can run over several lines, and the
           // rule has to reach down all of them.
@@ -146,6 +164,7 @@ export function hideMarkers(): Extension {
         paddingLeft: "0.85em",
         marginLeft: "1px",
       },
+      ".cm-chapter-title": { textAlign: "center" },
     }),
   ];
 }

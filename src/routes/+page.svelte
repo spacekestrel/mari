@@ -258,10 +258,15 @@
 
   async function restoreLastSession() {
     const adapter = await getFileSystemAdapter();
-    if (adapter.kind !== "tauri") return; // browsers can't silently regain file access across restarts
-
-    const last = getLastSession();
-    if (!last) return;
+    // Browsers can't silently regain access to files across restarts, so there
+    // is never anything to restore there.
+    const last = adapter.kind === "tauri" ? getLastSession() : null;
+    // Nothing to come back to, so this is a first run: open the sample chapter
+    // rather than an empty screen. Everything Mari is for is in it already.
+    if (!last) {
+      openSample();
+      return;
+    }
 
     if (last.folderPath) {
       openedFolder = { name: basename(last.folderPath), path: last.folderPath, kind: "directory", handle: last.folderPath };
@@ -280,6 +285,10 @@
         updateLastSession({ filePath: undefined });
       }
     }
+
+    // A remembered folder but no file in it, or the file has gone. Still
+    // better to land on something readable than on nothing.
+    if (!documentOpen) openSample();
   }
 
   const displayName = $derived(file?.name ?? i18n.t.document.untitled);
@@ -491,8 +500,7 @@
    * read, pulled apart and abandoned without leaving anything behind. Saving it
    * asks where to put it, the same as any chapter that has never been saved.
    */
-  async function handleOpenSample() {
-    if (!(await confirmDiscardIfDirty("open the sample chapter"))) return;
+  function openSample() {
     const sample = sampleChapter(i18n.current);
     resetDocumentExtras();
     file = { name: sample.fileName, content: sample.text, handle: null };
@@ -1050,10 +1058,6 @@
         <div class="nothing-open">
           <p>{i18n.t.document.nothingOpen}</p>
           <p class="hint">{i18n.t.document.nothingOpenHint}</p>
-          <p class="hint sample-lead">{i18n.t.document.seeSample}</p>
-          <button class="sample-button" onclick={handleOpenSample}>
-            {i18n.t.document.openSample}
-          </button>
         </div>
       {:else}
       <div class="pane" class:hidden={showPreview}>
@@ -1298,27 +1302,6 @@
   .nothing-open .hint {
     font-size: 0.82rem;
     opacity: 0.75;
-  }
-
-  .sample-lead {
-    margin-top: var(--space-4);
-  }
-
-  .sample-button {
-    margin-top: 2px;
-    padding: 6px 14px;
-    font-family: inherit;
-    font-size: 0.85rem;
-    color: var(--color-text);
-    background: var(--color-bg);
-    border: 1px solid var(--color-border);
-    border-radius: 6px;
-    cursor: pointer;
-  }
-
-  .sample-button:hover {
-    background: var(--color-hover);
-    border-color: var(--color-accent);
   }
 
   .status-bar {
