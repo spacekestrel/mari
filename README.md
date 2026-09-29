@@ -114,13 +114,9 @@ untouched while you work.
 
 ## 🗄️ The drawer
 
-Some passages you don't want in the chapter but can't bring yourself to
-delete. Highlight one **Cut** and there's a button to put it in the drawer:
-out of your prose, still in the file.
-
-Open the drawer to read what's in there, copy it, put a passage back where it
-came from, or delete it for good. It's the only thing in Mari that actually
-destroys anything, and it asks first.
+Some passages don’t belong in the chapter, but you can’t bring yourself to delete them. Highlight one as **Cut**, then click the button to move it to the drawer. It’s out of your prose, but still in the file.
+Yo can open the drawer to read what's in there, copy it, put a passage back where it
+came from, or delete it for good.
 
 <img src="docs/drawer.gif" alt="A cut passage being put in the drawer and read back">
 
