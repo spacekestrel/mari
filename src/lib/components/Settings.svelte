@@ -13,16 +13,25 @@
 
 <div class="settings">
   <div class="section-header">{i18n.t.settings.language}</div>
-  <select
-    class="language-select"
-    value={i18n.current}
-    onchange={(e) => i18n.select(e.currentTarget.value)}
-    aria-label={i18n.t.settings.language}
-  >
+  <!-- A list like the fonts below rather than a dropdown. There are two of
+       them: a dropdown hides one behind a click and brings the system's own
+       widget into a panel that is otherwise Mari's. -->
+  <div class="options">
     {#each LOCALE_OPTIONS as locale (locale.id)}
-      <option value={locale.id}>{locale.label}</option>
+      <button
+        class="option"
+        class:selected={i18n.current === locale.id}
+        onclick={() => i18n.select(locale.id)}
+      >
+        <span class="check">
+          {#if i18n.current === locale.id}
+            <Icon name="check" size={14} />
+          {/if}
+        </span>
+        {locale.label}
+      </button>
     {/each}
-  </select>
+  </div>
 
   <div class="section-header">{i18n.t.settings.font}</div>
   <div class="options">
@@ -66,24 +75,6 @@
     color: var(--color-text-muted);
     font-weight: 600;
     padding: var(--space-2) var(--space-2) var(--space-1);
-  }
-
-  .language-select {
-    width: calc(100% - 8px);
-    margin: 0 4px;
-    padding: 5px 6px;
-    font-family: inherit;
-    font-size: 0.85rem;
-    color: var(--color-text);
-    background: var(--color-bg);
-    border: 1px solid var(--color-border);
-    border-radius: 6px;
-    cursor: pointer;
-  }
-
-  .language-select:focus {
-    outline: none;
-    border-color: var(--color-accent);
   }
 
   .options {
