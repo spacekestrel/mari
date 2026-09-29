@@ -33,24 +33,28 @@
     {/each}
   </div>
 
-  <div class="section-header">{i18n.t.settings.font}</div>
-  <div class="options">
-    {#each FONT_OPTIONS as font (font.id)}
-      <button
-        class="option"
-        class:selected={fontPreference.current.id === font.id}
-        style="font-family: {font.family}; font-weight: {font.weight};"
-        onclick={() => fontPreference.select(font.id)}
-      >
-        <span class="check">
-          {#if fontPreference.current.id === font.id}
-            <Icon name="check" size={14} />
-          {/if}
-        </span>
-        {font.label}
-      </button>
-    {/each}
-  </div>
+  <!-- None of these carry Chinese, so in Chinese they all render as the same
+       system face and the list would be five identical choices. -->
+  {#if i18n.current !== "zh"}
+    <div class="section-header">{i18n.t.settings.font}</div>
+    <div class="options">
+      {#each FONT_OPTIONS as font (font.id)}
+        <button
+          class="option"
+          class:selected={fontPreference.current.id === font.id}
+          style="font-family: {font.family}; font-weight: {font.weight};"
+          onclick={() => fontPreference.select(font.id)}
+        >
+          <span class="check">
+            {#if fontPreference.current.id === font.id}
+              <Icon name="check" size={14} />
+            {/if}
+          </span>
+          {font.label}
+        </button>
+      {/each}
+    </div>
+  {/if}
 
   <div class="section-header">{i18n.t.settings.confirmations}</div>
   <label class="toggle-row">
