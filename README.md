@@ -8,9 +8,7 @@
 
 Marí is also a powerful, free app for writing. ✍️
 
-It is usable at any stage of writing: draft it, keep the chapters in order,
-and work it into shape. It goes furthest on the part most tools ignore, which
-is revising.
+Marí helps at every stage of writing, from drafting and organizing chapters to shaping your work. Its greatest strength is revision, the stage most writing tools ignore.
 
 > **Status:** beta. Usable daily, but expect rough edges and occasional
 > breaking changes before 1.0. [Report bugs here](../../issues).
