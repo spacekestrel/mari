@@ -241,6 +241,8 @@
     /* Width comes from the inline style so it can be dragged; the min/max
        here mirror the clamp in the store as a second line of defence. */
     position: relative;
+    display: flex;
+    flex-direction: column;
     min-width: 160px;
     max-width: 520px;
     flex-shrink: 0;
@@ -253,6 +255,17 @@
 
   /* Sits over the border on the sidebar's right edge. Wider than it looks so
      it's actually grabbable, but visually it's just the existing 1px line. */
+  /* Fills whatever is left below the last row. Without this the tree was only
+     as tall as its rows, and the empty space beneath them belonged to nothing:
+     dragging a file out of a folder worked when dropped over another row and
+     did nothing at all when dropped lower down, which looked like the drop
+     being refused rather than missed. */
+  .tree {
+    /* Grows into the space left over, never shrinks below its rows: a long
+       chapter list still scrolls the sidebar rather than being clipped. */
+    flex: 1 0 auto;
+  }
+
   .resize-handle {
     position: absolute;
     top: 0;
