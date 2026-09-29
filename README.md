@@ -151,10 +151,7 @@ They save themselves the moment you change them.
 
 ## 🗺️ Minimap
 
-A small picture of the whole chapter down the side. Too small to read, but you
-can see its shape, where the long paragraphs are and where the dialogue thins
-out. Your highlights show as coloured bands, so a chapter's trouble spots are
-visible at a glance. Click anywhere to jump there.
+A picture of the whole chapter down the side. Too small to read, but you can see its shape in the long paragraphs and the stretches where dialogue thins out. Your highlights appear as coloured bands, so trouble spots are visible at a glance. Click anywhere to jump there.
 
 <img src="docs/minimap.png" width="196" alt="The minimap, with highlights showing as coloured bands">
 
