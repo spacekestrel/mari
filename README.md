@@ -79,8 +79,6 @@ They stay put as you write around them. Rewrite a paragraph above and the
 highlights below don't drift. With nothing selected the whole paragraph is
 highlighted; press the same key again to clear it.
 
-The shortcuts work on any keyboard layout, including non-Latin ones.
-
 <img src="docs/highlights.gif" alt="Passages being highlighted in different states">
 
 ---
