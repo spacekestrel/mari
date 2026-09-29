@@ -8,7 +8,7 @@
 
 Marí is also a powerful, free app for writing. ✍️
 
-It's where you write the whole thing: draft it, keep the chapters in order,
+It is usable at any stage of writing: draft it, keep the chapters in order,
 and work it into shape. It goes furthest on the part most tools ignore, which
 is revising.
 
@@ -19,11 +19,7 @@ is revising.
 
 ## 📸 What it looks like
 
-<!-- Replace these with real captures before publishing. -->
-
-| Writing, with highlights | Draft & compare | Focus mode |
-|---|---|---|
-| _screenshot_ | _screenshot_ | _screenshot_ |
+<img src="docs/why-mari.png" alt="A chapter open in Mari, with highlighted passages down the page">
 
 ---
 
@@ -35,7 +31,8 @@ stays, this one's flabby, this scene belongs three chapters earlier, I'm not
 sure about this line at all*. And then you have nowhere to put those
 judgments except a separate notes file that immediately goes stale.
 
-Mari puts them on the text itself, and gives you tools to act on them.
+Mari puts them on the text itself, in a `.mari` file you can share, and gives
+you tools to act on them.
 
 ---
 
@@ -86,15 +83,20 @@ highlighted; press the same key again to clear it.
 
 The shortcuts work on any keyboard layout, including non-Latin ones.
 
+<img src="docs/highlights.gif" alt="Passages being highlighted in different states">
+
 ---
 
 ## 📝 Notes
 
-Any highlighted passage takes a short note saying what you actually meant.
+Any highlighted passage takes a short note, where you can put what you
+actually meant.
 *"Too slow, cut to the argument."* *"Keep, but check the timeline here."*
 
 The note icon fills in when a passage carries one, so you can see at a glance
 which ones have something to say.
+
+<img src="docs/notes.png" alt="A note written against a highlighted passage">
 
 ---
 
@@ -110,6 +112,8 @@ untouched while you work.
 - Replacing clears the highlight, because you've done the work. Keep a
   different one if it still needs another look.
 
+<img src="docs/draft-and-compare.gif" alt="Two versions of a passage side by side, with the changed words picked out">
+
 ---
 
 ## 🗄️ The drawer
@@ -121,6 +125,8 @@ out of your prose, still in the file.
 Open the drawer to read what's in there, copy it, put a passage back where it
 came from, or delete it for good. It's the only thing in Mari that actually
 destroys anything, and it asks first.
+
+<img src="docs/drawer.gif" alt="A cut passage being put in the drawer and read back">
 
 ---
 
@@ -134,14 +140,14 @@ one undo takes it back.
 
 ## 🧭 Synopsis and plan
 
-Three quiet words at the top of every chapter.
-
 - **Synopsis** is what the chapter is about, in a line
 - **Plan** is what it has to get done, as a list of beats you tick off as you
   write them
 - **Drawer** is everything you've cut out of it
 
 They save themselves the moment you change them.
+
+<img src="docs/synopsis-and-plan.png" width="360" alt="A chapter synopsis and its plan of beats">
 
 ---
 
@@ -152,6 +158,8 @@ can see its shape, where the long paragraphs are and where the dialogue thins
 out. Your highlights show as coloured bands, so a chapter's trouble spots are
 visible at a glance. Click anywhere to jump there.
 
+<img src="docs/minimap.png" width="196" alt="The minimap, with highlights showing as coloured bands">
+
 ---
 
 ## 🌙 Focus mode
@@ -159,6 +167,8 @@ visible at a glance. Click anywhere to jump there.
 Your writing fills the screen and everything else gets out of the way:
 toolbar, chapter list, word count, minimap, even the highlights. Nothing left
 but the prose. `F11` toggles it, `Esc` brings it back.
+
+<img src="docs/focus-mode.png" alt="Focus mode, with nothing on screen but the writing">
 
 ---
 
@@ -193,7 +203,7 @@ warning about an app. Mari hasn't paid, so both of them complain the first time.
 
 **Windows** says "unrecognised app". Click *More info*, then *Run anyway*.
 
-**macOS** says Mari is damaged and should go in the Trash. That's a lie. The
+**macOS** says Mari is damaged and should go in the Trash. That is not true. The
 file is fine. Apple charges $99 a year to sign an app and calls anything
 unsigned damaged. Drag Mari to Applications, then run this once:
 
@@ -201,9 +211,7 @@ unsigned damaged. Drag Mari to Applications, then run this once:
 xattr -dr com.apple.quarantine /Applications/Mari.app
 ```
 
-Open it normally after that. No `sudo`, and only ever once.
-
-Both will be paid for before 1.0.
+Open it normally after that.
 
 <details>
 <summary>Building it yourself</summary>
@@ -250,11 +258,4 @@ npm run tauri build     # installer for your OS, in src-tauri/target/release/bun
 
 ## ⚖️ License
 
-[GNU AGPL-3.0-or-later](LICENSE).
-
-In short: Mari is free software, and it stays that way. You can use, study,
-modify and share it. If you distribute a modified version, or run one as a
-network service, you have to make your source available under the same
-terms.
-
-Commercial licensing for cases where AGPL doesn't fit is available on request.
+[GNU AGPL-3.0-or-later](LICENSE). 
