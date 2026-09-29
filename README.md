@@ -188,13 +188,14 @@ Grab the installer for your computer from
 | 🍎 **macOS** | `.dmg`. Take **aarch64** for Apple silicon (M1 and later), **x64** for older Intel Macs. |
 | 🐧 **Linux** | `.AppImage` runs anywhere without installing. Or `.deb` for Debian and Ubuntu, `.rpm` for Fedora. |
 
-Mari isn't code-signed yet, so the first launch needs a hand:
+Apple and Microsoft both charge for the certificate that stops their systems
+warning about an app. Mari hasn't paid, so both of them complain the first time.
 
 **Windows** says "unrecognised app". Click *More info*, then *Run anyway*.
 
-**macOS** says Mari is damaged and should be moved to the Trash. It isn't.
-macOS flags everything downloaded from the internet, and refuses it outright
-when Apple doesn't know the app. Drag Mari to Applications, then run this once:
+**macOS** says Mari is damaged and should go in the Trash. That's a lie. The
+file is fine. Apple charges $99 a year to sign an app and calls anything
+unsigned damaged. Drag Mari to Applications, then run this once:
 
 ```bash
 xattr -dr com.apple.quarantine /Applications/Mari.app
@@ -202,7 +203,7 @@ xattr -dr com.apple.quarantine /Applications/Mari.app
 
 Open it normally after that. No `sudo`, and only ever once.
 
-Signing certificates cost money every year. This will be sorted out before 1.0.
+Both will be paid for before 1.0.
 
 <details>
 <summary>Building it yourself</summary>
