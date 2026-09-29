@@ -72,6 +72,8 @@
     aria-label={i18n.t.menu.label}
   >
     <img src={catIcon} alt="" class="cat-icon" />
+    <!-- The cat alone gave no clue that it opens anything. The word does. -->
+    <span class="menu-label">{i18n.t.menu.open}</span>
   </button>
 
   {#if open}
@@ -152,9 +154,10 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
+    gap: 6px;
     height: 32px;
-    padding: 0;
+    /* Wide enough for the word rather than square for the icon. */
+    padding: 0 8px 0 6px;
     border: none;
     background: transparent;
     border-radius: var(--radius);
@@ -175,6 +178,12 @@
     object-fit: contain;
     border-radius: 4px;
     display: block;
+  }
+
+  .menu-label {
+    font-size: 0.82rem;
+    line-height: 1;
+    white-space: nowrap;
   }
 
   .popover {

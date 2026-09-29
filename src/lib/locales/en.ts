@@ -57,9 +57,8 @@ export const en = {
     untitled: "Untitled.mari",
     nothingOpen: "Nothing open",
     nothingOpenHint: "Open a folder or a file to start.",
-    /** Offers the built-in marked-up chapter to someone with nothing open. */
-    seeSample: "Or look at a chapter someone has been revising",
-    openSample: "Open the sample chapter",
+    /** Title on the chapter Mari opens when there is nothing else. */
+    sampleHeading: "Sample page",
     words: (n: number) => `${n} words`,
     characters: (n: number) => `${n} characters`,
   },
