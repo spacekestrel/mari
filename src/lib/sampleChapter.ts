@@ -193,6 +193,102 @@ const ANNOTATIONS: Record<LocaleId, Annotations> = {
       "cut-70ec138f": "Она отчитывает себя дважды за главу. Оставляю вторую.",
     },
   },
+  de: {
+    synopsis:
+      "Alice folgt dem weißen Kaninchen in den Bau und landet im Saal der Türen.",
+    plan: [
+      "Die Langeweile am Ufer aufbauen",
+      "Das Kaninchen: die Westentasche muss sitzen",
+      "Der Fall, in die Länge gezogen, sie reden lassen",
+      "Saal der Türen, ein Blick in den Garten",
+      "„Trink mich“, und das Problem mit der Größe beginnt",
+    ],
+    notes: {
+      "27caac44-9e39-49fb-8596-4502132e4dcd":
+        "Brauchbar. Den Anfang zuletzt überarbeiten, wenn klar ist, worum es im Kapitel geht.",
+      "01ac93fd-8613-4109-b454-0c5f363b3062":
+        "Das ist der Haken. Kein Wort daran ändern.",
+      "9a6ab8b7-d583-41ba-824f-19c71c059717":
+        "Zu viel Aufzählung. Auf die zwei Dinge kürzen, die ihr wirklich auffallen.",
+      "bd71bb70-6637-4a00-bb11-5f7b3211c17e":
+        "Der Fall sollte sich länger anfühlen, als er sich liest. Dehnen.",
+      "94b65fae-7862-4b98-9af3-6bac9653e7fa":
+        "Der Strang mit Dina ist gut, gehört aber hinter die Landung.",
+      "270fb5df-1774-4ab5-aa76-b64b16b8f02d":
+        "Nicht sicher, ob der Einschub über das Gift seine Länge wert ist. Beim nächsten Durchgang entscheiden.",
+      "8ed55bdb-8b9f-42d1-b2f9-e0fc9fcb2675":
+        "Das Fernrohr kommt zweimal auf einer Seite vor. Eines streichen.",
+    },
+    cutNotes: {
+      "cut-b8fc013b":
+        "Der Witz sitzt, bremst den Fall aber genau da, wo er Fahrt aufnehmen sollte.",
+      "cut-70ec138f":
+        "Sie schilt sich zweimal in diesem Kapitel. Die zweite Stelle bleibt.",
+    },
+  },
+  es: {
+    synopsis:
+      "Alicia sigue al Conejo Blanco por la madriguera y acaba en la sala de las puertas.",
+    plan: [
+      "Dejar clara la modorra en la orilla",
+      "El Conejo: que el chaleco se note",
+      "La caída, estirada, dejarla divagar",
+      "La sala de las puertas, el jardín entrevisto",
+      "«Bébeme», y empieza el problema del tamaño",
+    ],
+    notes: {
+      "27caac44-9e39-49fb-8596-4502132e4dcd":
+        "Pasable. Volver al principio al final, cuando sepa de qué va el capítulo.",
+      "01ac93fd-8613-4109-b454-0c5f363b3062":
+        "Este es el anzuelo. No tocar ni una palabra.",
+      "9a6ab8b7-d583-41ba-824f-19c71c059717":
+        "Demasiado inventario. Dejar solo las dos cosas en que de verdad se fija.",
+      "bd71bb70-6637-4a00-bb11-5f7b3211c17e":
+        "La caída debería sentirse más larga de lo que se lee. Estirarla.",
+      "94b65fae-7862-4b98-9af3-6bac9653e7fa":
+        "El hilo de Dina está bien, pero va después de que aterrice.",
+      "270fb5df-1774-4ab5-aa76-b64b16b8f02d":
+        "No sé si el inciso del veneno merece esa extensión. Decidirlo en la próxima pasada.",
+      "8ed55bdb-8b9f-42d1-b2f9-e0fc9fcb2675":
+        "El catalejo sale dos veces en una página. Quitar uno.",
+    },
+    cutNotes: {
+      "cut-b8fc013b":
+        "El chiste funciona, pero frena la caída justo donde debería coger velocidad.",
+      "cut-70ec138f":
+        "Se regaña dos veces en este capítulo. Me quedo con la segunda.",
+    },
+  },
+  zh: {
+    synopsis: "爱丽丝跟着白兔钻进洞里，落到了那间满是门的大厅。",
+    plan: [
+      "先把河岸上的百无聊赖写出来",
+      "白兔：那件背心要让人记住",
+      "把下落拉长，让她一路胡思乱想",
+      "满是门的大厅，花园惊鸿一瞥",
+      "「喝我」，身材的麻烦就此开始",
+    ],
+    notes: {
+      "27caac44-9e39-49fb-8596-4502132e4dcd":
+        "还行。等弄清这一章到底写什么，最后再回头改开头。",
+      "01ac93fd-8613-4109-b454-0c5f363b3062": "这是钩子。一个字都别动。",
+      "9a6ab8b7-d583-41ba-824f-19c71c059717":
+        "罗列太多。只留下她真正注意到的那两样。",
+      "bd71bb70-6637-4a00-bb11-5f7b3211c17e":
+        "下落读起来应该比现在更久。拉长。",
+      "94b65fae-7862-4b98-9af3-6bac9653e7fa":
+        "黛娜那条线写得好，但该放在她落地之后。",
+      "270fb5df-1774-4ab5-aa76-b64b16b8f02d":
+        "关于毒药的那段插话值不值这么长，没把握。下一遍再定。",
+      "8ed55bdb-8b9f-42d1-b2f9-e0fc9fcb2675":
+        "望远镜一页之内出现了两次。删掉一个。",
+    },
+    cutNotes: {
+      "cut-b8fc013b":
+        "这个玩笑是有效的，可它恰好在下落该加速的地方把节奏拖住了。",
+      "cut-70ec138f": "这一章里她训了自己两回。留后面那回。",
+    },
+  },
 };
 
 /** Which plan beats are already ticked off. */

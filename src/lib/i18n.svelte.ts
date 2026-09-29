@@ -1,7 +1,10 @@
 import { en, type Strings } from "./locales/en";
 import { ru } from "./locales/ru";
+import { de } from "./locales/de";
+import { es } from "./locales/es";
+import { zh } from "./locales/zh";
 
-export type LocaleId = "en" | "ru";
+export type LocaleId = "en" | "ru" | "de" | "es" | "zh";
 
 export interface LocaleOption {
   id: LocaleId;
@@ -12,14 +15,17 @@ export interface LocaleOption {
 export const LOCALE_OPTIONS: LocaleOption[] = [
   { id: "en", label: "English" },
   { id: "ru", label: "Русский" },
+  { id: "de", label: "Deutsch" },
+  { id: "es", label: "Español" },
+  { id: "zh", label: "中文" },
 ];
 
-const DICTIONARIES: Record<LocaleId, Strings> = { en, ru };
+const DICTIONARIES: Record<LocaleId, Strings> = { en, ru, de, es, zh };
 
 const KEY = "mari-language";
 
 function isLocale(value: string | null): value is LocaleId {
-  return value === "en" || value === "ru";
+  return value !== null && Object.prototype.hasOwnProperty.call(DICTIONARIES, value);
 }
 
 /**

@@ -1,0 +1,220 @@
+import type { Strings } from "./en";
+
+/**
+ * Simplified Chinese. Chinese has no plural forms, so the counting functions
+ * return one shape whatever the number, and the measure word carries the sense
+ * the English plural would.
+ */
+export const zh: Strings = {
+  tag: "zh",
+
+  menu: {
+    open: "菜单",
+    label: "文件菜单",
+    newFile: "新建文件",
+    openFile: "打开文件",
+    openFolder: "打开文件夹",
+    save: "保存",
+    exportAs: "导出为…",
+    terminal: "终端",
+    lightMode: "浅色主题",
+    darkMode: "深色主题",
+    settings: "设置",
+    back: "返回",
+  },
+
+  settings: {
+    title: "设置",
+    font: "字体",
+    language: "语言",
+    confirmations: "确认",
+    confirmBeforeDeleting: "删除前询问",
+  },
+
+  toolbar: {
+    toggleSidebar: "显示或隐藏侧边栏",
+    bookLayout: "书籍排版：首行缩进，段间无空白。点击改为段间留白。",
+    spacedLayout: "段间留白。点击改为书籍排版。",
+    paragraphLayout: "段落排版",
+    edit: "编辑（Ctrl+Shift+V）",
+    preview: "预览（Ctrl+Shift+V）",
+    togglePreview: "显示或隐藏预览",
+    showToolbar: "显示工具栏（Esc）",
+    focusMode: "专注模式",
+    toggleFocusMode: "切换专注模式",
+  },
+
+  window: {
+    minimize: "最小化",
+    maximize: "最大化",
+    close: "关闭",
+  },
+
+  document: {
+    untitled: "未命名.mari",
+    nothingOpen: "尚未打开任何文件",
+    nothingOpenHint: "打开一个文件夹或文件即可开始。",
+    sampleHeading: "示例页面",
+    words: (n) => `${n} 词`,
+    characters: (n) => `${n} 字符`,
+  },
+
+  status: {
+    saved: "已保存",
+    savedHighlightsNeedMari: "已保存 — 标记需要 .mari 文件才能保留",
+    savedMarksNeedMari: "已保存 — 标记需要 .mari 文件才能保留",
+    exported: "已导出",
+    exportedHighlightsStay: "已导出 — 标记仍留在 .mari 文件里",
+    couldntSave: "无法保存",
+    couldntExport: "无法导出",
+    couldntOpenFile: "无法打开文件",
+    couldntOpenFolder: "无法打开文件夹",
+    couldntCreateFile: "无法新建文件",
+    couldntCreateFolder: "无法新建文件夹",
+    couldntDelete: "无法删除",
+    couldntKeepUnsaved: "无法保留未保存的修改",
+    couldntReopen: (name) => `无法重新打开 ${name}`,
+    movedTo: (name) => `已移动到 ${name}`,
+    couldntMove: (name) => `无法移动 ${name}`,
+    fileChangedElsewhere: (name) => `${name} 已在别处改动 — 现在显示磁盘上的文件，未保存的副本已丢弃`,
+    failure: (what, reason) => `${what} — ${reason}`,
+  },
+
+  dialog: {
+    cancel: "取消",
+    delete: "删除",
+    dontAskAgain: "不再询问",
+    discard: "放弃",
+    discardTitle: "放弃未保存的修改？",
+    discardMessage: (name) => `您对 ${name} 的修改尚未保存。若要保留，请先保存。`,
+    deleteTitle: (name) => `删除 ${name}？`,
+    deleteFolderMessage: "这会删除该文件夹及其中的一切，且无法撤销。",
+    deleteFileMessage: "此操作无法撤销。",
+  },
+
+  sidebar: {
+    newFile: "新建文件",
+    newFolder: "新建文件夹",
+    loading: "正在载入…",
+    couldntOpenFolder: "无法打开这个文件夹",
+    folderGone: "这个文件夹已不存在",
+    emptyFolder: "空文件夹",
+    resize: "调整侧边栏宽度",
+    dragToResize: "拖动可调整宽度 — 双击恢复原宽",
+    filePlaceholder: "章节.mari",
+    folderPlaceholder: "文件夹名称",
+  },
+
+  format: {
+    label: "格式",
+    bold: "加粗",
+    italic: "斜体",
+    strikethrough: "删除线",
+    heading: "标题",
+    subheading: "小标题",
+    quote: "引文",
+  },
+
+  markdown: {
+    cheatSheet: "Markdown 速查表",
+    title: "Markdown",
+    heading: "标题",
+    bold: "加粗",
+    italic: "斜体",
+    quote: "引文",
+    bulletList: "项目符号列表",
+    numberedList: "编号列表",
+    link: "链接",
+    sceneBreak: "场景分隔",
+  },
+
+  editor: {
+    placeholder: "开始写吧……",
+    copied: "已复制",
+    copyChapter: "复制整章",
+    clearHighlight: "清除标记",
+    passageActions: "段落操作",
+    movePassage: "移动这段文字",
+    viewHistory: "查看历史版本",
+    draftRewrite: "另写一版",
+    moveToDrawer: "把这段文字放进抽屉",
+    addNote: "添加批注",
+    note: (text) => `批注：${text}`,
+    passageNote: "段落批注",
+    notePlaceholder: "这里需要做什么？",
+    repositioning: (preview) => `正在移动：「${preview}」 — 点击要放置的位置，或按 Esc 取消。`,
+  },
+
+  highlights: {
+    good: "很好",
+    "ok-for-now": "暂且可以",
+    tweak: "小改",
+    reposition: "换个位置",
+    rewrite: "重写",
+    expand: "展开",
+    cut: "删掉",
+    unsure: "拿不准",
+  } as Record<string, string>,
+
+  draft: {
+    write: "另写一版",
+    compare: "对照",
+    history: "历史版本",
+    resize: "调整面板宽度",
+    dragToResize: "拖动可调整宽度 — 双击恢复原宽",
+    close: "关闭",
+    placeholder: "在这里写新的一版……",
+    earlierVersions: (n) => `${n} 个早先的版本`,
+    original: "原文",
+    draft: "草稿",
+    current: "当前",
+    afterwards: "之后",
+    noMark: "不加标记",
+    leaveMarked: (label) => `这段文字仍标为「${label}」`,
+    keepTweaking: "继续修改",
+    replace: "替换",
+    backToList: "返回列表",
+    backToDraft: "返回草稿",
+    beforeMove: "移动前",
+    selectedVersion: "所选版本",
+    restoreVersion: "恢复到这一版",
+    movedBadge: "已移动",
+    draftBadge: "草稿",
+  },
+
+  drawer: {
+    title: "抽屉",
+    close: "关闭",
+    empty: "抽屉是空的。",
+    delete: "删除",
+    deleteForGood: "彻底删除",
+    keepIt: "留着",
+    copyText: "复制文字",
+    putBack: "放回原处",
+    wordCount: (n) => `${n} 词`,
+  },
+
+  chapter: {
+    synopsis: "梗概",
+    synopsisPlaceholder: "这一章发生了什么？",
+    plan: "计划",
+    planPlaceholder: "每行一条",
+    edit: "编辑",
+  },
+
+  terminal: {
+    title: "终端",
+    clear: "清屏",
+    close: "关闭终端",
+  },
+
+  search: {
+    placeholder: "在本章中查找",
+    noMatches: "没有匹配",
+    position: (current, total) => `第 ${current} 个，共 ${total} 个`,
+    found: (total) => `找到 ${total} 个`,
+    previous: "上一个匹配",
+    next: "下一个匹配",
+    close: "关闭查找",
+  },
+};
