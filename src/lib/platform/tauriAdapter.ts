@@ -139,6 +139,14 @@ export const tauriAdapter: FileSystemAdapter = {
     return { name: entry.name, path: to, kind: entry.kind, handle: to };
   },
 
+  async renameEntry(entry, name) {
+    const from = entry.handle as string;
+    const to = await join(await dirname(from), name);
+    if (from === to) return entry;
+    await rename(from, to);
+    return { name, path: to, kind: entry.kind, handle: to };
+  },
+
   async chooseSaveTarget(extensions, suggestedName) {
     const lastDir = getLastDirectory();
     const defaultPath = lastDir ? await join(lastDir, suggestedName) : suggestedName;

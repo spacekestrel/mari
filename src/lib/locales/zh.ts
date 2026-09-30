@@ -77,6 +77,7 @@ export const zh: Strings = {
     movedTo: (name) => `已移动到 ${name}`,
     couldntMove: (name) => `无法移动 ${name}`,
     fileChangedElsewhere: (name) => `${name} 已在别处改动 — 现在显示磁盘上的文件，未保存的副本已丢弃`,
+    couldntRename: (name) => `无法重命名 ${name}`,
     failure: (what, reason) => `${what} — ${reason}`,
   },
 
@@ -95,6 +96,10 @@ export const zh: Strings = {
   sidebar: {
     newFile: "新建文件",
     newFolder: "新建文件夹",
+    rename: "重命名",
+    renameProblemForbidden: "名称中不能含有 \\ / : * ? \" < > |",
+    renameProblemTaken: "这个文件夹里已经有同名的东西了",
+    renameProblemReserved: "这个名称指的是文件夹，不是文件",
     loading: "正在载入…",
     couldntOpenFolder: "无法打开这个文件夹",
     folderGone: "这个文件夹已不存在",

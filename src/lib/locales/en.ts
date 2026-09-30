@@ -84,6 +84,7 @@ export const en = {
     /** A chapter that changed on disk while unsaved changes waited for it. */
     fileChangedElsewhere: (name: string) =>
       `${name} changed elsewhere — showing the saved file, unsaved copy dropped`,
+    couldntRename: (name: string) => `Couldn't rename ${name}`,
     failure: (what: string, reason: string) => `${what} — ${reason}`,
   },
 
@@ -103,6 +104,10 @@ export const en = {
   sidebar: {
     newFile: "New file",
     newFolder: "New folder",
+    rename: "Rename",
+    renameProblemForbidden: "A name can't contain \\ / : * ? \" < > |",
+    renameProblemTaken: "Something in this folder is already called that",
+    renameProblemReserved: "That name means a folder, not a file",
     loading: "Loading…",
     couldntOpenFolder: "Couldn't open this folder",
     folderGone: "This folder no longer exists",

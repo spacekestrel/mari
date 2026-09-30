@@ -86,6 +86,7 @@ export const ru: Strings = {
     couldntMove: (name) => `Не удалось переместить ${name}`,
     fileChangedElsewhere: (name) =>
       `${name} изменён в другом месте — открыт файл с диска, несохранённая копия отброшена`,
+    couldntRename: (name) => `Не удалось переименовать ${name}`,
     failure: (what, reason) => `${what} — ${reason}`,
   },
 
@@ -105,6 +106,10 @@ export const ru: Strings = {
   sidebar: {
     newFile: "Новый файл",
     newFolder: "Новая папка",
+    rename: "Переименовать",
+    renameProblemForbidden: "В имени нельзя использовать \\ / : * ? \" < > |",
+    renameProblemTaken: "В этой папке уже есть что-то с таким именем",
+    renameProblemReserved: "Это имя обозначает папку, а не файл",
     loading: "Загрузка…",
     couldntOpenFolder: "Не удалось открыть эту папку",
     folderGone: "Этой папки больше нет",

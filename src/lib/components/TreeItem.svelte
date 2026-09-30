@@ -5,6 +5,7 @@
   import type { FsEntry } from "$lib/platform";
   import { expandedFolders } from "$lib/expandedFolders.svelte";
   import { canDrop } from "$lib/treeMove";
+  import { selectionForRename } from "$lib/renameEntry";
   import { i18n } from "$lib/i18n.svelte";
   import { isMissing } from "$lib/failureReason";
 
@@ -19,6 +20,10 @@
     onCreateFolder: (dir: FsEntry, name: string) => void;
     onContextMenu: (entry: FsEntry, parent: FsEntry, x: number, y: number) => void;
     onMove: (source: FsEntry, targetDir: FsEntry, sourceParent: FsEntry) => void;
+    onRename: (entry: FsEntry, name: string, parent: FsEntry) => void;
+    /** The row currently being renamed, held above so the menu can set it. */
+    renamingPath: string | null;
+    onRenamingPathChange: (path: string | null) => void;
     /** The row being dragged right now, so every row can judge its own drop. */
     dragging: { entry: FsEntry; parent: FsEntry } | null;
     onDragStateChange: (dragged: { entry: FsEntry; parent: FsEntry } | null) => void;
@@ -36,6 +41,9 @@
     onCreateFolder,
     onContextMenu,
     onMove,
+    onRename,
+    renamingPath,
+    onRenamingPathChange,
     dragging,
     onDragStateChange,
     refreshKey,
@@ -50,6 +58,8 @@
   let failure = $state<"gone" | "failed" | null>(null);
   let hovering = $state(false);
   let creating = $state<"file" | "folder" | null>(null);
+  /** True while this row is a text box holding its own name. */
+  const renaming = $derived(renamingPath === entry.path);
 
   function handleActivate() {
     if (entry.kind === "file") {
@@ -146,6 +156,19 @@
   });
 </script>
 
+{#if renaming}
+  <InlineNameInput
+    {depth}
+    placeholder={entry.name}
+    initial={entry.name}
+    select={selectionForRename(entry.name)}
+    onConfirm={(name) => {
+      onRenamingPathChange(null);
+      onRename(entry, name, parent);
+    }}
+    onCancel={() => onRenamingPathChange(null)}
+  />
+{:else}
 <div
   class="row"
   class:active={entry.kind === "file" && entry.path === activePath}
@@ -169,7 +192,14 @@
   ondragleave={clearDragOver}
   ondrop={handleDrop}
   onclick={handleActivate}
-  onkeydown={(e) => e.key === "Enter" && handleActivate()}
+  onkeydown={(e) => {
+    if (e.key === "Enter") handleActivate();
+    else if (e.key === "F2") {
+      e.preventDefault();
+      e.stopPropagation();
+      onRenamingPathChange(entry.path);
+    }
+  }}
   onmouseenter={() => (hovering = true)}
   onmouseleave={() => (hovering = false)}
   oncontextmenu={handleContextMenu}
@@ -194,6 +224,7 @@
     </span>
   {/if}
 </div>
+{/if}
 
 {#if entry.kind === "directory" && expanded}
   {#if creating}
@@ -216,6 +247,9 @@
         depth={depth + 1}
         {activePath}
         {onMove}
+        {onRename}
+        {renamingPath}
+        {onRenamingPathChange}
         {dragging}
         {onDragStateChange}
         {loadChildren}

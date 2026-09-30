@@ -22,6 +22,7 @@
   import { paragraphStyle } from "$lib/paragraphStyle.svelte";
   import { sidebarWidth } from "$lib/sidebarWidth.svelte";
   import { canDrop, pathAfterMove, isWithin } from "$lib/treeMove";
+  import { renameProblem, renamedPath } from "$lib/renameEntry";
   import { expandedFolders } from "$lib/expandedFolders.svelte";
   import { enterFullscreen, exitFullscreen } from "$lib/platform/fullscreen";
   import type { ChunkVersion } from "$lib/chunkHistory";
@@ -57,6 +58,8 @@
   let terminalOpen = $state(false);
   let pendingDelete = $state<{ entry: FsEntry; parent: FsEntry } | null>(null);
   let treeContextMenu = $state<{ entry: FsEntry; parent: FsEntry; x: number; y: number } | null>(null);
+  /** The sidebar row currently showing a box with its own name in it. */
+  let renamingPath = $state<string | null>(null);
   // Seeds a freshly-(re)constructed Editor instance's initial decorations — see
   // the comment on Editor's `initialHighlights` prop for why this exists.
   let currentHighlights = $state<HighlightRange[]>([]);
@@ -659,6 +662,55 @@
   }
 
   /** Re-files every key under a moved path, in place. */
+  /**
+   * Gives a file or folder a new name where it stands.
+   *
+   * The same bookkeeping a move needs: unsaved chapters, reading places and
+   * which folders are open are all filed by path, and the open document has to
+   * follow its file rather than be left pointing at a name nothing answers to.
+   */
+  async function handleRenameEntry(entry: FsEntry, name: string, parent: FsEntry) {
+    const problem = renameProblem(entry.name, name);
+    // Typing the same name back, or clicking away without changing it, is a
+    // writer saying never mind. Nothing to report.
+    if (problem === "unchanged" || problem === "empty") return;
+    if (problem) {
+      flash(
+        problem === "taken"
+          ? i18n.t.sidebar.renameProblemTaken
+          : problem === "reserved"
+            ? i18n.t.sidebar.renameProblemReserved
+            : i18n.t.sidebar.renameProblemForbidden,
+        5000,
+      );
+      return;
+    }
+
+    const adapter = await getFileSystemAdapter();
+    const from = entry.path;
+    const to = renamedPath(from, name.trim());
+    try {
+      await adapter.renameEntry(entry, name.trim(), parent);
+
+      remapPaths(setAside, from, to);
+      persistSetAside();
+      remapPaths(places, from, to);
+      persistPlaces();
+      expandedFolders.rename(from, to);
+
+      if (activePath && isWithin(activePath, from)) {
+        const next = pathAfterMove(activePath, from, to);
+        activePath = next;
+        if (file) file = { ...file, name: next.split("/").pop() ?? file.name, handle: next };
+        updateLastSession({ filePath: next });
+      }
+
+      sidebarRefreshKey++;
+    } catch (error) {
+      reportFailure(i18n.t.status.couldntRename(entry.name), error);
+    }
+  }
+
   function remapPaths<T>(store: Map<string, T>, from: string, to: string) {
     for (const key of [...store.keys()]) {
       if (!isWithin(key, from)) continue;
@@ -1050,6 +1102,9 @@
         onCreateFolder={handleCreateFolder}
         onContextMenu={handleTreeContextMenu}
         onMove={handleMoveEntry}
+        onRename={handleRenameEntry}
+        {renamingPath}
+        onRenamingPathChange={(path) => (renamingPath = path)}
         refreshKey={sidebarRefreshKey}
       />
     {/if}
@@ -1139,6 +1194,12 @@
       x={treeContextMenu.x}
       y={treeContextMenu.y}
       items={[
+        {
+          label: i18n.t.sidebar.rename,
+          icon: "pencil",
+          shortcut: "F2",
+          onClick: () => (renamingPath = treeContextMenu!.entry.path),
+        },
         {
           label: i18n.t.dialog.delete,
           icon: "trash",
