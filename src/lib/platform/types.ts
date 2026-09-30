@@ -76,6 +76,14 @@ export interface FileSystemAdapter {
   moveEntry(entry: FsEntry, targetDir: FsEntry, parent: FsEntry): Promise<FsEntry>;
 
   /**
+   * Give a file or folder a different name, in the folder it already sits in.
+   *
+   * `parent` is only needed by the browser, which has no path to work from and
+   * has to be handed the folder the entry belongs to.
+   */
+  renameEntry(entry: FsEntry, name: string, parent: FsEntry): Promise<FsEntry>;
+
+  /**
    * Prompt for a save destination without writing anything, so the caller can
    * see which format was chosen before encoding. Exporting offers several at
    * once — `.mari`, `.docx`, plain text — and they are different bytes.

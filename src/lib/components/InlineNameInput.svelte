@@ -6,15 +6,30 @@
     placeholder: string;
     onConfirm: (name: string) => void;
     onCancel: () => void;
+    /** The name being changed, when this is a rename rather than a new file. */
+    initial?: string;
+    /**
+     * The part of `initial` to select, so renaming a chapter doesn't mean
+     * retyping `.mari`. Left out, the whole thing is selected.
+     */
+    select?: { from: number; to: number };
   }
 
-  let { depth, placeholder, onConfirm, onCancel }: Props = $props();
+  let { depth, placeholder, onConfirm, onCancel, initial = "", select }: Props = $props();
 
-  let value = $state("");
+  // Taken once on purpose: from here the box is the writer's to edit, and a
+  // fresh one is mounted for each rename, so there is nothing to follow.
+  // svelte-ignore state_referenced_locally
+  let value = $state(initial);
   let inputEl: HTMLInputElement;
   let settled = false;
 
-  onMount(() => inputEl?.focus());
+  onMount(() => {
+    inputEl?.focus();
+    // Only the part worth changing, the way a file manager does it. The
+    // extension stays in the box but out of the way of the next keystroke.
+    if (initial) inputEl?.setSelectionRange(select?.from ?? 0, select?.to ?? initial.length);
+  });
 
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === "Enter") {
@@ -22,6 +37,7 @@
       if (!name) return;
       settled = true;
       onConfirm(name);
+      return;
     } else if (e.key === "Escape") {
       settled = true;
       onCancel();
@@ -29,10 +45,14 @@
   }
 
   function handleBlur() {
-    if (!settled) {
-      settled = true;
-      onCancel();
-    }
+    if (settled) return;
+    settled = true;
+    // Committing on blur the way a file manager does: clicking away from a
+    // name you have just typed should keep it, not throw it away. An unchanged
+    // name is handled upstream and costs nothing.
+    const name = value.trim();
+    if (initial && name) onConfirm(name);
+    else onCancel();
   }
 </script>
 

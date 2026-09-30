@@ -73,6 +73,7 @@ export const de: Strings = {
     couldntMove: (name) => `${name} lässt sich nicht verschieben`,
     fileChangedElsewhere: (name) =>
       `${name} wurde anderswo geändert — die gespeicherte Datei wird gezeigt, die ungespeicherte Fassung verworfen`,
+    couldntRename: (name) => `${name} lässt sich nicht umbenennen`,
     failure: (what, reason) => `${what} — ${reason}`,
   },
 
@@ -93,6 +94,10 @@ export const de: Strings = {
   sidebar: {
     newFile: "Neue Datei",
     newFolder: "Neuer Ordner",
+    rename: "Umbenennen",
+    renameProblemForbidden: "Ein Name darf \\ / : * ? \" < > | nicht enthalten",
+    renameProblemTaken: "In diesem Ordner heißt schon etwas so",
+    renameProblemReserved: "Dieser Name bezeichnet einen Ordner, keine Datei",
     loading: "Wird geladen…",
     couldntOpenFolder: "Dieser Ordner lässt sich nicht öffnen",
     folderGone: "Diesen Ordner gibt es nicht mehr",

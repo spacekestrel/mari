@@ -73,6 +73,7 @@ export const es: Strings = {
     couldntMove: (name) => `No se pudo mover ${name}`,
     fileChangedElsewhere: (name) =>
       `${name} cambió en otro sitio — se muestra el archivo guardado y se descarta la copia sin guardar`,
+    couldntRename: (name) => `No se pudo cambiar el nombre de ${name}`,
     failure: (what, reason) => `${what} — ${reason}`,
   },
 
@@ -92,6 +93,10 @@ export const es: Strings = {
   sidebar: {
     newFile: "Archivo nuevo",
     newFolder: "Carpeta nueva",
+    rename: "Cambiar el nombre",
+    renameProblemForbidden: "Un nombre no puede llevar \\ / : * ? \" < > |",
+    renameProblemTaken: "Ya hay algo con ese nombre en esta carpeta",
+    renameProblemReserved: "Ese nombre designa una carpeta, no un archivo",
     loading: "Cargando…",
     couldntOpenFolder: "No se pudo abrir esta carpeta",
     folderGone: "Esta carpeta ya no existe",

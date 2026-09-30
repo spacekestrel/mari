@@ -19,6 +19,9 @@
     onCreateFolder: (dir: FsEntry, name: string) => void;
     onContextMenu: (entry: FsEntry, parent: FsEntry, x: number, y: number) => void;
     onMove: (source: FsEntry, targetDir: FsEntry, sourceParent: FsEntry) => void;
+    onRename: (entry: FsEntry, name: string, parent: FsEntry) => void;
+    renamingPath: string | null;
+    onRenamingPathChange: (path: string | null) => void;
     refreshKey: number;
   }
 
@@ -31,6 +34,9 @@
     onCreateFolder,
     onContextMenu,
     onMove,
+    onRename,
+    renamingPath,
+    onRenamingPathChange,
     refreshKey,
   }: Props = $props();
 
@@ -212,6 +218,9 @@
           {onCreateFolder}
           {onContextMenu}
           {onMove}
+          {onRename}
+          {renamingPath}
+          {onRenamingPathChange}
           {dragging}
           onDragStateChange={(e) => (dragging = e)}
           {refreshKey}

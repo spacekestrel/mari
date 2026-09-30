@@ -161,6 +161,25 @@ const fsAccessAdapter: FileSystemAdapter = {
     return { name: entry.name, path: `${targetDir.path}/${entry.name}`, kind: "file", handle: created };
   },
 
+  async renameEntry(entry, name, parent) {
+    if (entry.kind !== "file") {
+      throw new Error("Renaming folders isn't supported in the browser. Use the desktop app.");
+    }
+    const dir = parent.handle as FileSystemDirectoryHandle;
+    const bytes = await (await (entry.handle as FileSystemFileHandle).getFile()).arrayBuffer();
+
+    const created = await dir.getFileHandle(name, { create: true });
+    const writable = await created.createWritable();
+    await writable.write(bytes);
+    await writable.close();
+
+    // Only once the copy is written, and only if the name really changed:
+    // removing first would lose the file if the write then failed.
+    if (name !== entry.name) await dir.removeEntry(entry.name);
+
+    return { name, path: `${parent.path}/${name}`, kind: "file", handle: created };
+  },
+
   async chooseSaveTarget(extensions, suggestedName) {
     const accept: Record<string, string[]> = {
       "application/octet-stream": extensions.map((e) => `.${e}`),
@@ -280,6 +299,10 @@ const downloadFallbackAdapter: FileSystemAdapter = {
       };
       input.click();
     });
+  },
+
+  async renameEntry(entry) {
+    throw new Error(`Cannot rename "${entry.name}": folder browsing is unsupported in this browser.`);
   },
 
   async moveEntry(entry) {
