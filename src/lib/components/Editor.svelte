@@ -1546,10 +1546,12 @@
             ".cm-line": { whiteSpace: "pre-wrap" },
             "&.cm-focused": { outline: "none" },
             ".cm-selectionBackground, ::selection": { backgroundColor: "var(--color-selection) !important" },
-            // Nudged clear of the caret. Both sit at the very start of an
-            // empty document, so the caret was drawn through the first letter
-            // of the prompt and the two read as one smudged character.
-            ".cm-placeholder": { color: "var(--color-text-muted)", paddingLeft: "3px" },
+            // Held a clear space away from the caret. Both sit at the very
+            // start of an empty document, and in Russian the prompt begins
+            // with Н, whose left stem is a vertical bar the same height as the
+            // caret: touching, the two read as two cursors. Set in em so the
+            // gap keeps its proportion whatever the font size.
+            ".cm-placeholder": { color: "var(--color-text-muted)", paddingLeft: "0.5em" },
           }),
           highlightThemeCompartment.of(highlightThemeFor(untrack(() => focusMode))),
         ],
