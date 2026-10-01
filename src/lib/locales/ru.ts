@@ -110,7 +110,6 @@ export const ru: Strings = {
     renameProblemForbidden: "В имени нельзя использовать \\ / : * ? \" < > |",
     renameProblemTaken: "В этой папке уже есть что-то с таким именем",
     renameProblemReserved: "Это имя обозначает папку, а не файл",
-    loading: "Загрузка…",
     couldntOpenFolder: "Не удалось открыть эту папку",
     folderGone: "Этой папки больше нет",
     emptyFolder: "Пустая папка",

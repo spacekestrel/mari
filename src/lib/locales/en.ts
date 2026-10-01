@@ -108,7 +108,6 @@ export const en = {
     renameProblemForbidden: "A name can't contain \\ / : * ? \" < > |",
     renameProblemTaken: "Something in this folder is already called that",
     renameProblemReserved: "That name means a folder, not a file",
-    loading: "Loading…",
     couldntOpenFolder: "Couldn't open this folder",
     folderGone: "This folder no longer exists",
     emptyFolder: "Empty folder",

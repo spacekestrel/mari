@@ -97,7 +97,6 @@ export const es: Strings = {
     renameProblemForbidden: "Un nombre no puede llevar \\ / : * ? \" < > |",
     renameProblemTaken: "Ya hay algo con ese nombre en esta carpeta",
     renameProblemReserved: "Ese nombre designa una carpeta, no un archivo",
-    loading: "Cargando…",
     couldntOpenFolder: "No se pudo abrir esta carpeta",
     folderGone: "Esta carpeta ya no existe",
     emptyFolder: "Carpeta vacía",
