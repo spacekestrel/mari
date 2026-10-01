@@ -100,7 +100,6 @@ export const zh: Strings = {
     renameProblemForbidden: "名称中不能含有 \\ / : * ? \" < > |",
     renameProblemTaken: "这个文件夹里已经有同名的东西了",
     renameProblemReserved: "这个名称指的是文件夹，不是文件",
-    loading: "正在载入…",
     couldntOpenFolder: "无法打开这个文件夹",
     folderGone: "这个文件夹已不存在",
     emptyFolder: "空文件夹",

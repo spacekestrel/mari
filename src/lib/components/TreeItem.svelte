@@ -8,7 +8,6 @@
   import { selectionForRename } from "$lib/renameEntry";
   import { i18n } from "$lib/i18n.svelte";
   import { isMissing } from "$lib/failureReason";
-  import { announceIfSlow } from "$lib/slowLoad";
 
   interface Props {
     entry: FsEntry;
@@ -54,7 +53,6 @@
   // it's on screen, so it can't remember whether it was open.
   const expanded = $derived(expandedFolders.isExpanded(entry.path));
   let children = $state<FsEntry[] | null>(null);
-  let loading = $state(false);
   /** Why this folder wouldn't open, or null while nothing has failed. */
   let failure = $state<"gone" | "failed" | null>(null);
   let hovering = $state(false);
@@ -137,11 +135,8 @@
       children = null;
       return;
     }
-    // Same as the root above: the word only earns its place once the read has
-    // taken long enough to notice, which a local folder never does.
-    loading = false;
+    // Nothing is said while it is being read; see the sidebar.
     failure = null;
-    const settled = announceIfSlow(() => (loading = true));
     loadChildren(entry)
       .then((result) => {
         children = result;
@@ -154,12 +149,6 @@
         console.error(`Couldn't read ${entry.path}`, error);
         failure = isMissing(error) ? "gone" : "failed";
       })
-      .finally(() => {
-        settled();
-        loading = false;
-      });
-
-    return settled;
   });
 </script>
 
@@ -267,8 +256,6 @@
         {refreshKey}
       />
     {/each}
-  {:else if loading}
-    <div class="loading" style="padding-left: {(depth + 1) * 14 + 8}px">{i18n.t.sidebar.loading}</div>
   {:else if failure !== null}
     <div class="failed" style="padding-left: {(depth + 1) * 14 + 8}px">
       {failure === "gone" ? i18n.t.sidebar.folderGone : i18n.t.sidebar.couldntOpenFolder}
@@ -360,13 +347,6 @@
     color: var(--color-text);
   }
 
-  .loading {
-    font-size: 0.78rem;
-    color: var(--color-text-muted);
-    font-style: italic;
-    padding-top: 4px;
-    padding-bottom: 4px;
-  }
 
   /* Wraps rather than truncating: the reason is the whole point of showing it,
      and the sidebar is narrow enough that one line rarely holds it. */

@@ -9,7 +9,6 @@
   import { canDrop } from "$lib/treeMove";
   import { i18n } from "$lib/i18n.svelte";
   import { isMissing } from "$lib/failureReason";
-  import { announceIfSlow } from "$lib/slowLoad";
 
   interface Props {
     folder: FsEntry;
@@ -42,7 +41,6 @@
   }: Props = $props();
 
   let rootChildren = $state<FsEntry[] | null>(null);
-  let loading = $state(false);
   /** Why the folder wouldn't open, or null while nothing has failed. */
   let error = $state<"gone" | "failed" | null>(null);
   let creatingRoot = $state<"file" | "folder" | null>(null);
@@ -61,26 +59,16 @@
     const sameFolder = untrack(() => shownFolderPath) === opened.path;
     if (!sameFolder) rootChildren = null;
 
-    // Only say so when there's nothing to look at yet, and only once the read
-    // has taken long enough to be worth mentioning. A local folder is read in
-    // a few milliseconds, and saying "Loading…" for those is a flicker rather
-    // than news — worst on an empty folder, where the word is the only thing
-    // on screen and is replaced by nothing at all.
-    loading = false;
+    // Nothing is said while a folder is being read. Off a local disk it takes
+    // a few milliseconds, and a word drawn and withdrawn in that time is a
+    // flicker rather than news.
     error = null;
-    const nothingToShow = untrack(() => rootChildren) === null;
-    const settled = nothingToShow
-      ? announceIfSlow(() => {
-          if (opened === folder) loading = true;
-        })
-      : () => {};
 
     loadChildren(opened)
       .then((entries) => {
         if (opened === folder) {
           rootChildren = entries;
           shownFolderPath = opened.path;
-          loading = false;
         }
       })
       // The system's own wording stays in the console. On screen it gets a
@@ -90,12 +78,8 @@
         console.error(`Couldn't read ${opened.path}`, reason);
         if (opened === folder) {
           error = isMissing(reason) ? "gone" : "failed";
-          loading = false;
         }
-      })
-      .finally(settled);
-
-    return settled;
+      });
   });
 
   function confirmCreateRoot(name: string) {
@@ -210,14 +194,12 @@
         onCancel={() => (creatingRoot = null)}
       />
     {/if}
-    {#if loading}
-      <div class="loading">{i18n.t.sidebar.loading}</div>
-    {:else if error !== null}
+    {#if error !== null}
       <div class="failed">
         {error === "gone" ? i18n.t.sidebar.folderGone : i18n.t.sidebar.couldntOpenFolder}
       </div>
     {:else if rootChildren && rootChildren.length === 0 && !creatingRoot}
-      <div class="loading">{i18n.t.sidebar.emptyFolder}</div>
+      <div class="note">{i18n.t.sidebar.emptyFolder}</div>
     {:else if rootChildren}
       {#each rootChildren as entry (entry.path)}
         <TreeItem
@@ -352,7 +334,7 @@
     color: var(--color-text);
   }
 
-  .loading {
+  .note {
     padding: var(--space-1) var(--space-3);
     font-size: 0.8rem;
     color: var(--color-text-muted);

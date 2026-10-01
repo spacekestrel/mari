@@ -98,7 +98,6 @@ export const de: Strings = {
     renameProblemForbidden: "Ein Name darf \\ / : * ? \" < > | nicht enthalten",
     renameProblemTaken: "In diesem Ordner heißt schon etwas so",
     renameProblemReserved: "Dieser Name bezeichnet einen Ordner, keine Datei",
-    loading: "Wird geladen…",
     couldntOpenFolder: "Dieser Ordner lässt sich nicht öffnen",
     folderGone: "Diesen Ordner gibt es nicht mehr",
     emptyFolder: "Leerer Ordner",
