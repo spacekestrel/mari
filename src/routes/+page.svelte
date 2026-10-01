@@ -21,7 +21,7 @@
   import { deletePreference } from "$lib/deletePreference.svelte";
   import { paragraphStyle } from "$lib/paragraphStyle.svelte";
   import { sidebarWidth } from "$lib/sidebarWidth.svelte";
-  import { canDrop, pathAfterMove, isWithin } from "$lib/treeMove";
+  import { canDrop, pathAfterMove, isWithin, remapWithin, forgetWithin } from "$lib/treeMove";
   import { renameProblem, renamedPath } from "$lib/renameEntry";
   import { expandedFolders } from "$lib/expandedFolders.svelte";
   import { enterFullscreen, exitFullscreen } from "$lib/platform/fullscreen";
@@ -639,21 +639,9 @@
 
       // Unsaved chapters and reading places are keyed by path; re-file them
       // before anything can look them up under the old name.
-      remapPaths(setAside, from, to);
-      persistSetAside();
-      remapPaths(places, from, to);
-      persistPlaces();
-      expandedFolders.rename(from, to);
-
       // The open document keeps its identity: same text, same unsaved state,
       // just a different address on disk.
-      if (activePath && isWithin(activePath, from)) {
-        const next = pathAfterMove(activePath, from, to);
-        activePath = next;
-        if (file) file = { ...file, handle: next };
-        updateLastSession({ filePath: next });
-      }
-
+      pathChanged(from, to);
       sidebarRefreshKey++;
       flash(i18n.t.status.movedTo(targetDir.name));
     } catch (error) {
@@ -692,32 +680,50 @@
     try {
       await adapter.renameEntry(entry, name.trim(), parent);
 
-      remapPaths(setAside, from, to);
-      persistSetAside();
-      remapPaths(places, from, to);
-      persistPlaces();
-      expandedFolders.rename(from, to);
-
-      if (activePath && isWithin(activePath, from)) {
-        const next = pathAfterMove(activePath, from, to);
-        activePath = next;
-        if (file) file = { ...file, name: next.split("/").pop() ?? file.name, handle: next };
-        updateLastSession({ filePath: next });
-      }
-
+      pathChanged(from, to);
       sidebarRefreshKey++;
     } catch (error) {
       reportFailure(i18n.t.status.couldntRename(entry.name), error);
     }
   }
 
-  function remapPaths<T>(store: Map<string, T>, from: string, to: string) {
-    for (const key of [...store.keys()]) {
-      if (!isWithin(key, from)) continue;
-      const value = store.get(key)!;
-      store.delete(key);
-      store.set(pathAfterMove(key, from, to), value);
+  /**
+   * Everything Mari files by path, re-filed after a move or a rename.
+   *
+   * Unsaved chapters, reading places and which folders were open are all kept
+   * under the path they belong to, and the open document has to follow its
+   * file rather than be left pointing at a name nothing answers to. Written
+   * once because it was written twice and a third caller forgot it entirely.
+   */
+  function pathChanged(from: string, to: string) {
+    remapWithin(setAside, from, to);
+    persistSetAside();
+    remapWithin(places, from, to);
+    persistPlaces();
+    expandedFolders.rename(from, to);
+
+    if (activePath && isWithin(activePath, from)) {
+      const next = pathAfterMove(activePath, from, to);
+      activePath = next;
+      if (file) file = { ...file, name: basename(next), handle: next };
+      updateLastSession({ filePath: next });
     }
+  }
+
+  /**
+   * The same stores, when the file behind a path has gone for good.
+   *
+   * Without this they kept entries for deleted chapters indefinitely, text and
+   * all: on this machine nineteen of forty-four remembered entries pointed at
+   * files that no longer existed, and eighty kilobytes of it was the unsaved
+   * text of chapters that had been deleted.
+   */
+  function pathGone(path: string) {
+    forgetWithin(setAside, path);
+    persistSetAside();
+    forgetWithin(places, path);
+    persistPlaces();
+    expandedFolders.forget(path);
   }
 
   async function handleCreateFolder(dir: FsEntry, name: string) {
@@ -734,6 +740,9 @@
     const adapter = await getFileSystemAdapter();
     try {
       await adapter.deleteEntry(entry, parent);
+      // Nothing filed under that path means anything now. Deleting a folder
+      // takes its contents with it, so this reaches underneath as well.
+      pathGone(entry.path);
       sidebarRefreshKey++;
       if (entry.kind === "file" && activePath === entry.path) {
         file = null;

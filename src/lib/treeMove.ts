@@ -60,3 +60,32 @@ export function pathAfterMove(path: string, movedFrom: string, movedTo: string):
 export function destinationFor(source: FsEntry, target: FsEntry): string {
   return joinPath(target.path, source.name);
 }
+
+/**
+ * Re-files everything a store holds at or under `from`, so a path that moved
+ * takes its unsaved work and its reading place with it.
+ *
+ * Mari keeps several things filed by path. They all have to follow the file,
+ * and the one that doesn't strands work under a name nothing points at.
+ */
+export function remapWithin<T>(store: Map<string, T>, from: string, to: string): void {
+  for (const key of [...store.keys()]) {
+    if (!isWithin(key, from)) continue;
+    const value = store.get(key)!;
+    store.delete(key);
+    store.set(pathAfterMove(key, from, to), value);
+  }
+}
+
+/**
+ * Drops everything a store holds at or under `path`, for when the file behind
+ * it has gone.
+ *
+ * Deleting a folder deletes its contents, so this has to reach under the path
+ * rather than match it exactly.
+ */
+export function forgetWithin<T>(store: Map<string, T>, path: string): void {
+  for (const key of [...store.keys()]) {
+    if (isWithin(key, path)) store.delete(key);
+  }
+}

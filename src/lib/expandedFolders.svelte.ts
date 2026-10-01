@@ -53,6 +53,13 @@ class ExpandedFolders {
     this.persist();
   }
 
+  /** Forgets a folder and everything under it, once it no longer exists. */
+  forget(path: string) {
+    const prefix = path.endsWith("/") ? path : `${path}/`;
+    this.paths = this.paths.filter((p) => p !== path && !p.startsWith(prefix));
+    this.persist();
+  }
+
   private persist() {
     if (typeof localStorage === "undefined") return;
     localStorage.setItem(KEY, JSON.stringify(this.paths));

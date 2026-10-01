@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { canDrop, isWithin, parentPath, pathAfterMove, joinPath } from "./treeMove";
+import { canDrop, isWithin, parentPath, pathAfterMove, joinPath, remapWithin, forgetWithin } from "./treeMove";
 
 const dir = (path: string) => ({ path, kind: "directory" });
 const file = (path: string) => ({ path, kind: "file" });
@@ -80,5 +80,68 @@ describe("following things that were filed by path", () => {
   it("does not rewrite a sibling with a similar name", () => {
     expect(pathAfterMove("/book/ARC II/9.mari", "/book/ARC I", "/book/Archive"))
       .toBe("/book/ARC II/9.mari");
+  });
+});
+
+describe("remapWithin", () => {
+  const store = () =>
+    new Map([
+      ["/books/arc/one.mari", "one"],
+      ["/books/arc/deep/two.mari", "two"],
+      ["/books/other/three.mari", "three"],
+    ]);
+
+  it("follows a folder and everything under it", () => {
+    const s = store();
+    remapWithin(s, "/books/arc", "/books/moved");
+    expect([...s.keys()].sort()).toEqual([
+      "/books/moved/deep/two.mari",
+      "/books/moved/one.mari",
+      "/books/other/three.mari",
+    ]);
+  });
+
+  it("keeps what it carried", () => {
+    const s = store();
+    remapWithin(s, "/books/arc/one.mari", "/books/arc/renamed.mari");
+    expect(s.get("/books/arc/renamed.mari")).toBe("one");
+  });
+
+  it("leaves a folder with a similar name alone", () => {
+    // "/books/arc2" starts with "/books/arc" as text but isn't inside it.
+    const s = new Map([["/books/arc2/x.mari", "x"]]);
+    remapWithin(s, "/books/arc", "/books/moved");
+    expect([...s.keys()]).toEqual(["/books/arc2/x.mari"]);
+  });
+});
+
+describe("forgetWithin", () => {
+  it("drops a file", () => {
+    const s = new Map([["/books/one.mari", 1], ["/books/two.mari", 2]]);
+    forgetWithin(s, "/books/one.mari");
+    expect([...s.keys()]).toEqual(["/books/two.mari"]);
+  });
+
+  it("drops a folder and everything inside it", () => {
+    const s = new Map([
+      ["/books/arc", 0],
+      ["/books/arc/one.mari", 1],
+      ["/books/arc/deep/two.mari", 2],
+      ["/books/other.mari", 3],
+    ]);
+    forgetWithin(s, "/books/arc");
+    expect([...s.keys()]).toEqual(["/books/other.mari"]);
+  });
+
+  it("leaves a folder with a similar name alone", () => {
+    const s = new Map([["/books/arc2/x.mari", 1]]);
+    forgetWithin(s, "/books/arc");
+    expect([...s.keys()]).toEqual(["/books/arc2/x.mari"]);
+  });
+
+  it("does nothing when nothing matches", () => {
+    const s = new Map([["/books/one.mari", 1]]);
+    forgetWithin(s, "/elsewhere");
+    expect(s.size).toBe(1);
   });
 });
