@@ -9,6 +9,7 @@
   import { canDrop } from "$lib/treeMove";
   import { i18n } from "$lib/i18n.svelte";
   import { isMissing } from "$lib/failureReason";
+  import { announceIfSlow } from "$lib/slowLoad";
 
   interface Props {
     folder: FsEntry;
@@ -60,10 +61,19 @@
     const sameFolder = untrack(() => shownFolderPath) === opened.path;
     if (!sameFolder) rootChildren = null;
 
-    // Only show the spinner when there's nothing to look at yet; a reload
-    // shouldn't blank out a tree the writer is working in.
-    loading = untrack(() => rootChildren) === null;
+    // Only say so when there's nothing to look at yet, and only once the read
+    // has taken long enough to be worth mentioning. A local folder is read in
+    // a few milliseconds, and saying "Loading…" for those is a flicker rather
+    // than news — worst on an empty folder, where the word is the only thing
+    // on screen and is replaced by nothing at all.
+    loading = false;
     error = null;
+    const nothingToShow = untrack(() => rootChildren) === null;
+    const settled = nothingToShow
+      ? announceIfSlow(() => {
+          if (opened === folder) loading = true;
+        })
+      : () => {};
 
     loadChildren(opened)
       .then((entries) => {
@@ -82,7 +92,10 @@
           error = isMissing(reason) ? "gone" : "failed";
           loading = false;
         }
-      });
+      })
+      .finally(settled);
+
+    return settled;
   });
 
   function confirmCreateRoot(name: string) {

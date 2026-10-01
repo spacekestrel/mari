@@ -8,6 +8,7 @@
   import { selectionForRename } from "$lib/renameEntry";
   import { i18n } from "$lib/i18n.svelte";
   import { isMissing } from "$lib/failureReason";
+  import { announceIfSlow } from "$lib/slowLoad";
 
   interface Props {
     entry: FsEntry;
@@ -136,8 +137,11 @@
       children = null;
       return;
     }
-    loading = true;
+    // Same as the root above: the word only earns its place once the read has
+    // taken long enough to notice, which a local folder never does.
+    loading = false;
     failure = null;
+    const settled = announceIfSlow(() => (loading = true));
     loadChildren(entry)
       .then((result) => {
         children = result;
@@ -151,8 +155,11 @@
         failure = isMissing(error) ? "gone" : "failed";
       })
       .finally(() => {
+        settled();
         loading = false;
       });
+
+    return settled;
   });
 </script>
 
