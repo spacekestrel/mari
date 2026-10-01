@@ -1546,7 +1546,10 @@
             ".cm-line": { whiteSpace: "pre-wrap" },
             "&.cm-focused": { outline: "none" },
             ".cm-selectionBackground, ::selection": { backgroundColor: "var(--color-selection) !important" },
-            ".cm-placeholder": { color: "var(--color-text-muted)" },
+            // Nudged clear of the caret. Both sit at the very start of an
+            // empty document, so the caret was drawn through the first letter
+            // of the prompt and the two read as one smudged character.
+            ".cm-placeholder": { color: "var(--color-text-muted)", paddingLeft: "3px" },
           }),
           highlightThemeCompartment.of(highlightThemeFor(untrack(() => focusMode))),
         ],
