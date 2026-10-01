@@ -1,6 +1,13 @@
 <script lang="ts">
   import { onMount, onDestroy, untrack } from "svelte";
-  import { EditorView, keymap, placeholder as placeholderExt, Decoration, type DecorationSet } from "@codemirror/view";
+  import {
+    EditorView,
+    keymap,
+    placeholder as placeholderExt,
+    drawSelection,
+    Decoration,
+    type DecorationSet,
+  } from "@codemirror/view";
   import { EditorState, StateField, StateEffect, Compartment, Transaction, type Range } from "@codemirror/state";
   import { defaultKeymap, history, historyKeymap, redo, selectAll, undo } from "@codemirror/commands";
   import { markdown } from "@codemirror/lang-markdown";
@@ -1377,6 +1384,14 @@
         doc: value,
         extensions: [
           historyCompartment.of(history()),
+          /**
+           * The editor draws the cursor itself rather than leaving it to the
+           * system. WebKitGTK, which is what the app runs on, sometimes fails
+           * to paint over the old one when the cursor moves, leaving two or
+           * three of them standing on screen until something forces a redraw.
+           * A cursor the editor owns is removed when it moves.
+           */
+          drawSelection(),
           keymap.of([...defaultKeymap, ...historyKeymap]),
           languageCompartment.of(languageExtensions(value.length)),
           paragraphCompartment.of(paragraphExtensions(untrack(() => paragraphStyle.current))),
@@ -1537,7 +1552,8 @@
               maxWidth: "66ch",
               margin: "0 auto",
               padding: "4rem 0",
-              caretColor: "var(--color-accent)",
+              // The drawn cursor below stands in for this one.
+              caretColor: "transparent",
             },
             // CodeMirror defaults lines to `white-space: break-spaces` (for precise
             // trailing-space measurement); WebKitGTK appears to rasterize text under
@@ -1546,12 +1562,11 @@
             ".cm-line": { whiteSpace: "pre-wrap" },
             "&.cm-focused": { outline: "none" },
             ".cm-selectionBackground, ::selection": { backgroundColor: "var(--color-selection) !important" },
-            // Held a clear space away from the caret. Both sit at the very
-            // start of an empty document, and in Russian the prompt begins
-            // with Н, whose left stem is a vertical bar the same height as the
-            // caret: touching, the two read as two cursors. Set in em so the
-            // gap keeps its proportion whatever the font size.
-            ".cm-placeholder": { color: "var(--color-text-muted)", paddingLeft: "0.5em" },
+            ".cm-cursor, .cm-dropCursor": {
+              borderLeftColor: "var(--color-accent)",
+              borderLeftWidth: "2px",
+            },
+            ".cm-placeholder": { color: "var(--color-text-muted)" },
           }),
           highlightThemeCompartment.of(highlightThemeFor(untrack(() => focusMode))),
         ],
