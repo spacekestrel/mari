@@ -192,7 +192,7 @@ warning about an app. Mari hasn't paid, so both of them complain the first time.
 
 **Windows** says "unrecognised app". Click *More info*, then *Run anyway*.
 
-**macOS** says Mari is damaged and should go in the Trash. That is not true. The
+**macOS** says Mari is damaged and should go in the Trash. The
 file is fine. Apple charges $99 a year to sign an app and calls anything
 unsigned damaged. Drag Mari to Applications, then run this once:
 
