@@ -305,7 +305,15 @@
           markdown({
             // Strikethrough is GFM, not commonmark, so the parser needs it
             // added explicitly or `~~cut~~` stays as literal tildes.
-            extensions: [{ remove: ["SetextHeading"] }, Strikethrough],
+            //
+            // IndentedCode goes for the same reason as SetextHeading. Four
+            // spaces at the start of a line is Markdown's way of writing a
+            // code block, and a writer indenting a paragraph by hand has no
+            // idea they have done it: the whole line turns to code, and every
+            // marker in it — the asterisks around an italic word included —
+            // stops being formatting and appears in the prose. Fenced blocks,
+            // which you have to ask for with ```, still work.
+            extensions: [{ remove: ["SetextHeading", "IndentedCode"] }, Strikethrough],
             // No list continuation on Enter. In a novel a line starting with a
             // dash is dialogue, not a bullet, and having Mari add another "- "
             // every time you break the line is worse than typing the odd list
