@@ -210,18 +210,27 @@ export function keepEmphasisWhole(): Extension {
     }
 
     if (change.insert.length > 0) return tr; // a replacement, not a deletion
+
     const hidden = hiddenCharacters(tree, tr.startState.doc);
-    const moved = deletionBelongsAt(
-      hidden,
-      change.from,
-      change.to,
-      tr.startState.doc.length,
-      tr.startState.selection.main.head,
-    );
-    if (!moved) return tr;
+    // First, don't let it eat a marker instead of a letter.
+    const reach =
+      deletionBelongsAt(
+        hidden,
+        change.from,
+        change.to,
+        tr.startState.doc.length,
+        tr.startState.selection.main.head,
+      ) ?? change;
+
+    // Then, if what it takes is the last of the words between a pair of
+    // markers, the markers go too. Otherwise deleting the only letter of a
+    // one-word italic left `**` standing in the prose.
+    const final = emphasisEmptiedBy(tree, reach.from, reach.to) ?? reach;
+
+    if (final.from === change.from && final.to === change.to) return tr;
     return {
-      changes: moved,
-      selection: { anchor: moved.from },
+      changes: { from: final.from, to: final.to },
+      selection: { anchor: final.from },
       scrollIntoView: true,
       userEvent: "delete",
     } satisfies TransactionSpec;

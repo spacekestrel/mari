@@ -14,14 +14,35 @@ import { keepEmphasisWhole } from "./emphasisGuard";
  * isolation could have caught that, and a browser test that pressed Enter from
  * a position needing no correction passed while the filter did nothing.
  */
-function editor(doc: string) {
+function editor(doc: string, caret = 0) {
   const state = EditorState.create({
     doc,
+    selection: { anchor: caret },
     extensions: [markdown({ extensions: [Strikethrough] }), keepEmphasisWhole()],
   });
   // Force the parse, so the filter has a tree to read.
   syntaxTree(state);
   return state;
+}
+
+/** Backspace with the caret at `caret`. */
+function backspace(doc: string, caret: number): string {
+  return editor(doc, caret).update({
+    changes: { from: caret - 1, to: caret },
+    selection: { anchor: caret - 1 },
+    userEvent: "delete",
+  }).state.doc.toString();
+}
+
+/** Whether the text still reads as italic to the parser. */
+function italic(text: string): boolean {
+  let found = false;
+  syntaxTree(editor(text)).iterate({
+    enter: (n) => {
+      if (n.name === "Emphasis") found = true;
+    },
+  });
+  return found;
 }
 
 /** Dispatches one change the way a key would, and returns the resulting text. */
@@ -86,6 +107,24 @@ describe("the filter, as the editor calls it", () => {
       userEvent: "input.type",
     }).state;
     expect(after.doc.toString()).toBe("*x*");
+  });
+
+  it("keeps the word italic wherever a letter is deleted from it", () => {
+    // Backspace at every position in and around `*two*`, including the two
+    // where the character behind the caret is a marker nobody can see.
+    for (let caret = 5; caret <= 10; caret++) {
+      const after = backspace("one *two* three", caret);
+      // The emphasis surviving is the whole claim: an orphaned marker would
+      // stop it parsing, which is exactly what put stars in the prose.
+      expect(italic(after), `caret ${caret} left ${JSON.stringify(after)}`).toBe(true);
+    }
+  });
+
+  it("takes the markers when the last letter of an italic word goes", () => {
+    // A one-letter italic word. Deleting the letter left `**` behind.
+    expect(backspace("one *a* two", 6)).toBe("one  two");
+    // And the same with the caret the other side of the closing marker.
+    expect(backspace("one *a* two", 7)).toBe("one  two");
   });
 
   it("keeps the emphasis parseable afterwards, which is the whole point", () => {
