@@ -1,6 +1,6 @@
-import { EditorState, type Extension, type TransactionSpec } from "@codemirror/state";
+import { EditorState, Transaction, type Extension, type TransactionSpec } from "@codemirror/state";
 import { syntaxTree } from "@codemirror/language";
-import type { Tree } from "@lezer/common";
+import type { SyntaxNode, Tree } from "@lezer/common";
 import { isHidden, markEnd } from "./hideMarkers";
 
 /**
@@ -115,17 +115,54 @@ export function deletionBelongsAt(
   return null;
 }
 
-/** True when the writer, not the app, made this change. */
-function fromTheKeyboard(isUserEvent: (type: string) => boolean): "typing" | "deleting" | null {
-  if (isUserEvent("input.type")) return "typing";
-  if (isUserEvent("delete")) return "deleting";
+/**
+ * The whole of an emphasis whose content is exactly `from`..`to`, markers
+ * included, or null when the range isn't that.
+ *
+ * Replacing an italic word with a line break left `*` and `*` behind with
+ * nothing between them: the content went, and the markers, being invisible,
+ * were never part of what the writer thought they had selected. Emphasis with
+ * nothing inside it isn't emphasis, so the markers go with the words.
+ */
+export function emphasisEmptiedBy(
+  tree: Tree,
+  from: number,
+  to: number,
+): { from: number; to: number } | null {
+  if (to <= from) return null;
+  // From the node itself outwards: with nothing but text between the marks,
+  // the position resolves to the emphasis rather than to anything inside it.
+  for (let node: SyntaxNode | null = tree.resolveInner(from, 1); node; node = node.parent) {
+    const first = node.firstChild;
+    const last = node.lastChild;
+    if (!first || !last || first === last) continue;
+    if (!MARKS.has(first.name) || !MARKS.has(last.name)) continue;
+    // The marks sit either side of exactly what is being replaced.
+    if (first.to === from && last.from === to) return { from: node.from, to: node.to };
+  }
+  return null;
+}
+
+/**
+ * True when the writer, not the app, made this change.
+ *
+ * Matched on the exact label rather than by family. Typing arrives as
+ * "input.type" but Enter arrives as plain "input", and asking whether a
+ * transaction is an "input.type" says no to Enter — which is how the line
+ * break went on breaking emphasis after the space had been fixed. Asking the
+ * family question instead would say yes to pasting and dropping, which are
+ * their own decisions.
+ */
+function fromTheKeyboard(event: string | undefined): "typing" | "deleting" | null {
+  if (event === "input" || event === "input.type") return "typing";
+  if (event === "delete") return "deleting";
   return null;
 }
 
 export function keepEmphasisWhole(): Extension {
   return EditorState.transactionFilter.of((tr) => {
     if (!tr.docChanged) return tr;
-    const kind = fromTheKeyboard((type) => tr.isUserEvent(type));
+    const kind = fromTheKeyboard(tr.annotation(Transaction.userEvent));
     if (!kind) return tr;
 
     // One change at a time. A multi-cursor edit or a bulk replacement is not
@@ -143,9 +180,23 @@ export function keepEmphasisWhole(): Extension {
 
     if (kind === "typing") {
       // Only whitespace moves. A letter typed at the end of an italic word
-      // belongs to that word.
-      if (change.to !== change.from) return tr;
-      if (!/^\s+$/.test(change.insert)) return tr;
+      // belongs to that word, and a letter typed over a whole italic word
+      // replaces its contents and stays italic.
+      if (!/^\s*$/.test(change.insert)) return tr;
+
+      if (change.to !== change.from) {
+        // Whitespace over a whole italic word. What is left would be a pair of
+        // markers with nothing between them, so they go too.
+        const emptied = emphasisEmptiedBy(tree, change.from, change.to);
+        if (!emptied) return tr;
+        return {
+          changes: { ...emptied, insert: change.insert },
+          selection: { anchor: emptied.from + change.insert.length },
+          scrollIntoView: true,
+          userEvent: "input.type",
+        } satisfies TransactionSpec;
+      }
+      if (change.insert.length === 0) return tr;
       const target = spaceBelongsAt(tree, change.from);
       if (target === null || target === change.from) return tr;
       return {
