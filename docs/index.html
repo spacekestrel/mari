@@ -374,7 +374,7 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
   margin: clamp(3rem, 6vw, 5rem) clamp(6px, 1.5vw, 20px) 0;
   padding: clamp(10px, 1.4vw, 16px);
   border-radius: clamp(28px, 5vw, 56px);
-  background: repeating-linear-gradient(-45deg, var(--pink) 0 22px, var(--paper) 22px 40px, var(--cobalt) 40px 62px, var(--paper) 62px 80px);
+  background: repeating-linear-gradient(-45deg, var(--pink) 0 22px, var(--paper) 22px 40px, var(--cobalt) 40px 62px, var(--paper) 62px 80px) 0 0 / 113.137px 113.137px;
   border: var(--line);
   box-shadow: 10px 10px 0 var(--ink);
 }
@@ -388,11 +388,6 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .mf h2 { font-size: clamp(2.8rem, 6vw, 5.8rem); max-width: 9em; }
 .mf h2 em { color: var(--grape); }
 .mf-lede { margin: 1.4rem 0 0; max-width: 27em; font-size: clamp(1.1rem, 1.6vw, 1.35rem); font-weight: 500; text-wrap: pretty; }
-.mf-chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 1.8rem 0 0; padding: 0; list-style: none; }
-.mf-chips li { padding: .45em 1em; border: var(--line); border-radius: 999px; background: var(--paper); font: 800 .95rem/1 var(--sans); box-shadow: 3px 3px 0 var(--ink); }
-.mf-chips li:nth-child(1) { rotate: -2deg; }
-.mf-chips li:nth-child(2) { rotate: 1.5deg; background: var(--lime); }
-.mf-chips li:nth-child(3) { rotate: -1deg; }
 
 /* stamp and postmark, top right of the envelope */
 .mf-stamp {
@@ -425,7 +420,7 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .av-proof { background: var(--mov, #26c6da); }
 .chat-title { font: 800 1rem/1.15 var(--sans); }
 .chat-title small { display: block; font: 500 .78rem var(--sans); color: #6c665a; }
-.chat-body { display: flex; flex-direction: column; gap: .55rem; padding: 1.2rem 1rem 1.4rem; background: radial-gradient(circle at 20% 30%, rgba(20,18,15,.05) 0 1.5px, transparent 2px) 0 0 / 22px 22px, var(--paper); }
+.chat-body { position: relative; display: flex; flex-direction: column; gap: .55rem; padding: 1.2rem 1rem 1.4rem; background: radial-gradient(circle at 20% 30%, rgba(20,18,15,.05) 0 1.5px, transparent 2px) 0 0 / 22px 22px, var(--paper); }
 .msg { position: relative; max-width: 84%; padding: .6rem .9rem; border: 2px solid var(--ink); border-radius: 20px; font: 500 clamp(.95rem, 1.2vw, 1.05rem)/1.35 var(--sans); box-shadow: 3px 3px 0 var(--ink); transform-origin: 0 100%; }
 .msg.me { align-self: flex-end; background: var(--pink); color: #fff; border-bottom-right-radius: 6px; transform-origin: 100% 100%; }
 .msg.them { align-self: flex-start; background: #fff; border-bottom-left-radius: 6px; }
@@ -443,7 +438,7 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .pg i.g { background: var(--hl-good); } .pg i.c { background: var(--hl-cut); } .pg i.r { background: var(--hl-rew); } .pg i.t { background: var(--hl-tw); } .pg i.m { background: var(--hl-mov); }
 .pg .note { position: absolute; width: 12px; height: 12px; background: #fff36b; border: 1.5px solid var(--ink); rotate: 8deg; }
 .pg { position: relative; }
-.typing { align-self: flex-start; display: inline-flex; gap: 5px; padding: .75rem .9rem; border: 2px solid var(--ink); border-radius: 20px; border-bottom-left-radius: 6px; background: #fff; }
+.typing { position: absolute; display: inline-flex; gap: 5px; padding: .75rem .9rem; border: 2px solid var(--ink); border-radius: 20px; border-bottom-left-radius: 6px; background: #fff; }
 .typing i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink); opacity: .5; animation: dot 1s infinite; }
 .typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
 @keyframes dot { 30% { transform: translateY(-5px); opacity: 1; } }
@@ -640,8 +635,7 @@ footer nav a:hover { color: var(--pink); }
   html:lang(ru) .rd h2 { font-size: min(2.7rem, 9.4vw); }
   .mf h2 { font-size: min(2.8rem, 11vw); }
   html:lang(ru) .mf h2 { font-size: min(2.5rem, 9vw); }
-  .mf-chips li { font-size: .85rem; }
-  .chat { rotate: 0deg; box-shadow: 6px 6px 0 var(--ink); }
+    .chat { rotate: 0deg; box-shadow: 6px 6px 0 var(--ink); }
   .msg { max-width: 90%; }
   .file-info b { font-size: .82rem; }
   .rd-steps li { gap: .3rem; padding: .35rem .4rem .35rem .3rem; font-size: .74rem; }
@@ -789,11 +783,6 @@ footer nav a:hover { color: var(--pink); }
       <div>
         <h2 class="split" id="mf-h" data-i18n="mf.h2">Send it out. Get it back <em>marked.</em></h2>
         <p class="mf-lede" data-i18n="mf.lede">One .mari file carries your chapter with every highlight, note and old version. Your beta readers and proofreaders open it in Mari, mark it right on the text, and send it back.</p>
-        <ul class="mf-chips">
-          <li data-i18n="mf.chip1">Free for them too</li>
-          <li data-i18n="mf.chip2">No account</li>
-          <li data-i18n="mf.chip3">Just a zip inside</li>
-        </ul>
       </div>
 
       <div class="chat" role="img" aria-label="A group chat: the writer sends chapter-07.mari to a beta reader and a proofreader, and both send it back marked up" data-i18n-aria="mf.chatLabel">
@@ -1048,9 +1037,6 @@ window.I18N = (() => {
     "dl.betaTag": "БЕТА",
     "mf.h2": "Отправь главу. Она вернётся <em>вся в\u00a0пометках.</em>",
     "mf.lede": "В\u00a0одном файле .mari летит глава со\u00a0всеми выделениями, заметками и\u00a0старыми версиями. Бета-ридеры и\u00a0корректоры открывают его в\u00a0Мари, ставят пометки прямо в\u00a0тексте и\u00a0шлют обратно.",
-    "mf.chip1": "Им\u00a0тоже бесплатно",
-    "mf.chip2": "Без\u00a0регистрации",
-    "mf.chip3": "Внутри обычный zip",
     "mf.chatLabel": "Групповой чат: писатель отправляет chapter-07.mari бета-ридеру и\u00a0корректору, и\u00a0оба присылают файл обратно с\u00a0пометками",
     "mf.chatName": "Банда седьмой главы",
     "mf.chatPeople": "Ты, бета-ридер, корректор",
@@ -1372,13 +1358,15 @@ window.I18N = (() => {
     const typing = document.createElement("div");
     typing.className = "typing"; typing.setAttribute("aria-hidden", "true");
     typing.innerHTML = "<i></i><i></i><i></i>";
+    body.append(typing);
+    typing.style.display = "none";
     gsap.set(msgs, { autoAlpha: 0, scale: 0.6, y: 20 });
     const tl = gsap.timeline({ paused: true });
     let at = 0.2;
     msgs.forEach((m) => {
       if (m.classList.contains("them")) {
         // the other side types first
-        tl.call(() => { m.before(typing); typing.style.display = ""; }, null, at);
+        tl.call(() => { typing.style.top = m.offsetTop + "px"; typing.style.left = m.offsetLeft + "px"; typing.style.display = ""; }, null, at);
         tl.fromTo(typing, { autoAlpha: 0, scale: 0.7 }, { autoAlpha: 1, scale: 1, duration: 0.2 }, at);
         at += 0.6;
         tl.call(() => (typing.style.display = "none"), null, at);
