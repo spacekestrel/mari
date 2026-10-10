@@ -15,9 +15,15 @@
 <meta property="og:image" content="https://spacekestrel.github.io/mari/og.png">
 <meta property="og:locale" content="en_US">
 <meta property="og:locale:alternate" content="ru_RU">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:locale:alternate" content="zh_CN">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="alternate" hreflang="en" href="https://spacekestrel.github.io/mari/?lang=en">
 <link rel="alternate" hreflang="ru" href="https://spacekestrel.github.io/mari/ru/">
+<link rel="alternate" hreflang="de" href="https://spacekestrel.github.io/mari/de/">
+<link rel="alternate" hreflang="es" href="https://spacekestrel.github.io/mari/es/">
+<link rel="alternate" hreflang="zh-Hans" href="https://spacekestrel.github.io/mari/zh/">
 <link rel="alternate" hreflang="x-default" href="https://spacekestrel.github.io/mari/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,20 +37,29 @@
   ones the README uses: replace one and the page follows.
 
   LANGUAGES
-  English is written into the page below. Russian lives in the RU block in
-  the script at the bottom. A visitor gets, in this order: the language in
-  the link (?lang=ru), the one they picked before, the one for the country
-  their IP address is in, then their browser's language.
+  English is written into the page below. Russian, German, Spanish and
+  Chinese live in the RU, DE, ES and ZH blocks in the script at the bottom.
+  A visitor gets, in this order: the language in the link (?lang=de), the
+  one they picked before, the one for the country their IP address is in,
+  their browser's language, then English.
 -->
 <script>
   // Before anything paints: hold the hero's words back until the language is
   // settled and the intro is ready to play, so nothing flashes in the wrong
   // language or jumps. A CSS fallback shows them after 2s whatever happens.
   (function () {
-    var d = document.documentElement, q = /[?&]lang=(en|ru)\b/.exec(location.search), saved = null;
+    var d = document.documentElement, q = /[?&]lang=(en|ru|de|es|zh)\b/.exec(location.search), saved = null;
     try { saved = localStorage.getItem("mari-lang"); } catch (e) {}
-    var lang = q ? q[1] : (saved === "en" || saved === "ru" ? saved : null);
-    if (lang) d.lang = lang;
+    var lang = q ? q[1] : (/^(en|ru|de|es|zh)$/.test(saved || "") ? saved : null);
+    // Chinese needs faces of its own; only people reading Chinese download them
+    window.mariFonts = function (l) {
+      if (l !== "zh" || document.getElementById("zh-fonts")) return;
+      var k = document.createElement("link");
+      k.id = "zh-fonts"; k.rel = "stylesheet";
+      k.href = "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400..900&family=Noto+Serif+SC:wght@400..900&family=ZCOOL+KuaiLe&display=swap";
+      document.head.appendChild(k);
+    };
+    if (lang) { d.lang = lang === "zh" ? "zh-Hans" : lang; window.mariFonts(lang); }
     d.classList.add("i18n-wait");
   })();
 </script>
@@ -65,6 +80,7 @@
   --sans: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
   --hand: "Caveat", "Comic Sans MS", cursive;
   --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --book: "Literata", Georgia, serif;  /* the text of a book, as Mari sets it */
 
   --wrap: min(1240px, 100% - 32px);
   --line: 3px solid var(--ink);
@@ -78,6 +94,17 @@ html:lang(ru) {
 html:lang(ru) h1, html:lang(ru) h2, html:lang(ru) h3 { letter-spacing: -.03em; line-height: .92; }
 /* Russian words run long («Переписывай», «программы»): headings step down a size so every word fits its column */
 html:lang(ru) .reasons-head { font-size: clamp(2.6rem, 7vw, 6.4rem); }
+
+/* Chinese: the same faces for Latin letters, heavy Song and Hei for the characters, a playful hand for the cat */
+html:lang(zh) {
+  --display: "Fraunces", "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --sans: "Bricolage Grotesque", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --hand: "Caveat", "ZCOOL KuaiLe", "Kaiti SC", cursive;
+  --book: "Literata", "Noto Serif SC", "Songti SC", "SimSun", serif;
+}
+/* characters need air between lines and none squeezed out between them; there are no italics in Chinese */
+html:lang(zh) h1, html:lang(zh) h2, html:lang(zh) h3 { letter-spacing: 0; line-height: 1.12; }
+html:lang(zh) em, html:lang(zh) i { font-style: normal; }
 
 /* while the language is being worked out, the hero's words wait (never longer than 2s) */
 .i18n-wait .hero-copy, .i18n-wait .nav .btn, .i18n-wait .shot .sticker { visibility: hidden; animation: i18n-show 0s 2s forwards; }
@@ -167,9 +194,9 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 800; }
 .nav-end { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .nav .btn { min-height: 46px; padding: .6em 1.3em; font-size: 1rem; box-shadow: 0 4px 0 var(--ink); white-space: nowrap; }
 
-/* language picker: a real <select> laid invisibly over a chunky pill, so phones get their own native picker */
-.lang {
-  position: relative;
+/* language picker: a chunky pill that drops a little card of languages, each with its own colour chip */
+.lang { position: relative; flex: none; }
+.lang-btn {
   display: inline-flex; align-items: center; gap: .35rem;
   height: 46px; padding: 0 .85rem 0 .7rem;
   border: var(--line); border-radius: 999px;
@@ -177,18 +204,60 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 800; }
   font: 800 .95rem/1 var(--sans);
   box-shadow: 0 4px 0 var(--ink);
   cursor: pointer;
+  transition: transform .15s, box-shadow .15s, background-color .2s, color .2s;
 }
-.lang svg { width: 18px; height: 18px; flex: none; }
-.lang .caret { font-size: .7em; }
-.lang select {
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  opacity: 0; cursor: pointer;
-  font-size: 16px; /* 16px keeps iOS from zooming in when it opens */
-  border: 0; appearance: none; -webkit-appearance: none;
+.lang-btn svg { width: 18px; height: 18px; flex: none; }
+.lang-btn .caret { font-size: .7em; transition: rotate .3s cubic-bezier(.3, 1.6, .5, 1); }
+.lang-btn[aria-expanded="true"] { background: var(--ink); color: var(--gold); }
+.lang-btn[aria-expanded="true"] .caret { rotate: 180deg; }
+@media (hover: hover) { .lang-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--ink); } }
+.lang-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+.lang-list {
+  position: absolute; top: calc(100% + 16px); right: -6px;
+  min-width: 214px; margin: 0; padding: 8px; list-style: none;
+  border: var(--line); border-radius: 24px;
+  background: var(--paper);
+  box-shadow: 0 7px 0 var(--ink);
+  transform-origin: calc(100% - var(--tail, 38px) - 10px) -12px;
 }
-.lang:focus-within { outline: 3px solid var(--pink); outline-offset: 3px; }
-@media (hover: hover) { .lang:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--ink); } }
-.lang { transition: transform .15s, box-shadow .15s; }
+.lang-list:focus { outline: none; }
+/* a little tail pointing up at the pill */
+.lang-list::before {
+  content: ""; position: absolute; top: -12px; right: var(--tail, 38px);
+  width: 20px; height: 20px; rotate: 45deg;
+  border-left: var(--line); border-top: var(--line); border-radius: 5px 0 0 0;
+  background: var(--paper);
+}
+.lang-list li {
+  position: relative;
+  display: flex; align-items: center; gap: .75rem;
+  min-height: 52px; padding: 6px 16px 6px 6px;
+  border-radius: 16px;
+  font: 700 1.08rem/1 var(--sans);
+  cursor: pointer;
+  user-select: none; -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.lang-list li:lang(ru) { font-family: "Onest", var(--sans); }
+.lang-list b {
+  display: grid; place-items: center; flex: none;
+  width: 40px; height: 40px;
+  border: var(--line); border-radius: 50%;
+  background: var(--c); color: var(--fg, #fff);
+  font: 800 .8rem/1 var(--sans); letter-spacing: .03em;
+  box-shadow: 0 3px 0 var(--ink);
+  transition: rotate .25s cubic-bezier(.3, 1.6, .5, 1), scale .25s cubic-bezier(.3, 1.6, .5, 1);
+}
+.lang-list li:lang(zh) b { font-size: 1rem; letter-spacing: 0; }
+.lang-list li.active { background: #ffe9b8; background: color-mix(in srgb, var(--c) 16%, var(--paper)); }
+.lang-list li.active b { rotate: -10deg; scale: 1.08; }
+.lang-list li[aria-selected="true"] span { font-weight: 900; }
+.lang-list li[aria-selected="true"]::after {
+  content: ""; margin-left: auto; padding-left: 1.2rem;
+  width: 10px; height: 18px; flex: none;
+  border: solid var(--ink); border-width: 0 3.5px 3.5px 0; padding: 0;
+  translate: 0 -3px; rotate: 45deg;
+}
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* ---------- hero ---------- */
@@ -340,7 +409,7 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .odo { display: inline-block; height: 1.6em; min-width: 1.6em; overflow: hidden; border-radius: 999px; background: var(--ink); color: var(--paper); text-align: center; font: 800 .9em/1.6em var(--sans); font-variant-numeric: tabular-nums; }
 .odo-in, .odo-in span { display: block; }
 .odo-in span { height: 1.6em; }
-.rd-lines { position: relative; font: 400 clamp(1.1rem, 2vw, 1.8rem)/1.5 "Literata", Georgia, serif; }
+.rd-lines { position: relative; font: 400 clamp(1.1rem, 2vw, 1.8rem)/1.5 var(--book); }
 .rd-row { display: grid; }
 .rd-row + .rd-row { margin-top: .55em; }
 .rd-row > * { grid-area: 1 / 1; min-width: 0; align-self: start; }
@@ -405,7 +474,7 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .lay:nth-child(3n) { --r: 1.4deg; }
 .mf .lay h3 { display: flex; align-items: center; gap: .5rem; font: 800 1rem/1.15 var(--sans); letter-spacing: 0; }
 .lay h3 i { flex: none; width: 12px; height: 12px; border: 2px solid var(--ink); border-radius: 50%; background: var(--c, var(--pink)); }
-.art { position: relative; flex: 1; min-height: 0; font: 400 .84rem/1.5 "Literata", Georgia, serif; }
+.art { position: relative; flex: 1; min-height: 0; font: 400 .84rem/1.5 var(--book); }
 .art mark { color: inherit; padding: .05em 0; border-radius: 2px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .art .g { background: color-mix(in srgb, var(--hl-good) 45%, transparent); }
 .art .y { background: color-mix(in srgb, var(--hl-tw) 55%, transparent); }
@@ -423,14 +492,14 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .vers span::after { content: ""; position: absolute; left: 8px; right: 14px; top: 24px; height: 30px; background: repeating-linear-gradient(180deg, rgba(20, 18, 15, .2) 0 4px, transparent 4px 10px); }
 .vers span:last-child { background: var(--paper); }
 .plan { display: grid; gap: .3rem; font: 500 .82rem/1.3 var(--sans); }
-.plan em { font: italic 400 .84rem/1.35 "Literata", Georgia, serif; }
+.plan em { font: italic 400 .84rem/1.35 var(--book); }
 .plan ul { list-style: none; margin: .2rem 0 0; padding: 0; display: grid; gap: .25rem; }
 .plan li { display: flex; gap: .45rem; align-items: center; }
 .plan li::before { content: ""; flex: none; width: 13px; height: 13px; border: 2px solid var(--ink); border-radius: 3px; background: #fff; }
 .plan li.done::before { content: "✓"; display: grid; place-items: center; font: 900 .7rem/1 var(--sans); background: var(--lime); }
 .plan li.done { opacity: .7; text-decoration: line-through; }
 .drawer { position: relative; height: 100%; min-height: 92px; }
-.drawer .cut { position: absolute; left: 6%; right: 10%; top: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; padding: .4rem .55rem; border: 2px solid var(--ink); border-radius: 4px; background: #fff; rotate: -3deg; font: 400 .78rem/1.35 "Literata", Georgia, serif; }
+.drawer .cut { position: absolute; left: 6%; right: 10%; top: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; padding: .4rem .55rem; border: 2px solid var(--ink); border-radius: 4px; background: #fff; rotate: -3deg; font: 400 .78rem/1.35 var(--book); }
 .drawer .box { position: absolute; left: 0; right: 0; bottom: 0; height: 48%; border: 3px solid var(--ink); border-radius: 8px; background: color-mix(in srgb, var(--hl-cut) 30%, var(--paper)); box-shadow: inset 0 6px 0 rgba(20, 18, 15, .12); }
 .drawer .box::after { content: ""; position: absolute; left: 50%; top: 50%; width: 34%; height: 9px; translate: -50% -50%; border: 2px solid var(--ink); border-radius: 999px; background: var(--paper); }
 .lay.send { background: var(--pink); color: #fff; justify-content: center; }
@@ -582,7 +651,7 @@ html:lang(ru) .fz h2 { font-size: clamp(2.4rem, 4.2vw, 4.2rem); }
 .fz-side li { padding: .25rem .45rem; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fz-side li.on { background: var(--ink); color: var(--paper); font-weight: 700; }
 .fz-text { display: grid; align-content: center; padding: clamp(1.2rem, 3vw, 2.6rem) clamp(1.2rem, 4vw, 3.4rem); transform-origin: 50% 50%; }
-.fz-text p { margin: 0; max-width: 34em; font: 400 clamp(1rem, 1.55vw, 1.32rem)/1.75 "Literata", Georgia, serif; }
+.fz-text p { margin: 0; max-width: 34em; font: 400 clamp(1rem, 1.55vw, 1.32rem)/1.75 var(--book); }
 .fz-text mark { color: inherit; border-radius: 3px; -webkit-box-decoration-break: clone; box-decoration-break: clone; transition: background-color .2s; }
 .fz { --ma: 1; --noise: 1; }
 .fz-text mark.g { background: rgba(92, 184, 92, calc(.3 * var(--ma))); } .fz-text mark.y { background: rgba(242, 201, 76, calc(.4 * var(--ma))); } .fz-text mark.m { background: rgba(38, 198, 218, calc(.3 * var(--ma))); }
@@ -804,7 +873,7 @@ footer nav a:hover { color: var(--pink); }
   .cmd button { min-height: 40px; }
   .nav { padding-left: 14px; }
   .nav .btn { padding: .6em 1.05em; font-size: .95rem; }
-  .lang { padding: 0 .7rem 0 .6rem; }
+  .lang-btn { padding: 0 .7rem 0 .6rem; }
 }
 @media (max-width: 460px) {
   .brand-name { display: none; }
@@ -842,14 +911,19 @@ footer nav a:hover { color: var(--pink); }
     <span class="brand-name">Mari</span>
   </a>
   <div class="nav-end">
-    <label class="lang">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19M12 2.5c2.6 2.6 3.9 5.8 3.9 9.5s-1.3 6.9-3.9 9.5c-2.6-2.6-3.9-5.8-3.9-9.5s1.3-6.9 3.9-9.5z"/></svg>
-      <span class="lang-code" aria-hidden="true">EN</span><span class="caret" aria-hidden="true">▼</span>
-      <select id="lang" aria-label="Language" data-i18n-aria="lang.label">
-        <option value="en" lang="en">English</option>
-        <option value="ru" lang="ru">Русский</option>
-      </select>
-    </label>
+    <div class="lang" id="lang">
+      <button class="lang-btn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="lang-list" aria-label="Language">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19M12 2.5c2.6 2.6 3.9 5.8 3.9 9.5s-1.3 6.9-3.9 9.5c-2.6-2.6-3.9-5.8-3.9-9.5s1.3-6.9 3.9-9.5z"/></svg>
+        <span class="lang-code" aria-hidden="true">EN</span><span class="caret" aria-hidden="true">▼</span>
+      </button>
+      <ul class="lang-list" id="lang-list" role="listbox" tabindex="-1" aria-label="Language" data-i18n-aria="lang.label" hidden>
+        <li role="option" id="lang-en" data-lang="en" lang="en" style="--c: var(--cobalt)"><b>EN</b><span>English</span></li>
+        <li role="option" id="lang-ru" data-lang="ru" lang="ru" style="--c: var(--pink)"><b>RU</b><span>Русский</span></li>
+        <li role="option" id="lang-de" data-lang="de" lang="de" style="--c: var(--lime); --fg: var(--ink)"><b>DE</b><span>Deutsch</span></li>
+        <li role="option" id="lang-es" data-lang="es" lang="es" style="--c: var(--tang)"><b>ES</b><span>Español</span></li>
+        <li role="option" id="lang-zh" data-lang="zh" lang="zh-Hans" style="--c: var(--violet)"><b>中</b><span>中文</span></li>
+      </ul>
+    </div>
     <a class="btn" href="#download" data-dl data-i18n="nav.cta">Download beta</a>
   </div>
 </nav>
@@ -862,7 +936,7 @@ footer nav a:hover { color: var(--pink); }
       <span class="sticker" data-i18n="hero.sticker">✍️ Made for novelists</span>
       <h1 class="split" data-i18n="hero.h1">Marí is a cat. <em class="gold">Mari is also a cool writing app.</em></h1>
       <div class="cta">
-        <a class="btn" href="#download" data-dl data-i18n="hero.cta">Beta</a>
+        <a class="btn" href="#download" data-dl data-i18n="hero.cta">Download beta</a>
         <small data-i18n="hero.platforms">Windows · Mac · Linux</small>
       </div>
     </div>
@@ -1158,7 +1232,7 @@ window.I18N = (() => {
     "lang.label": "Язык",
     "hero.sticker": "✍️ Для\u00a0романистов",
     "hero.h1": "Мари вообще-то кошка. <em class=\"gold\">А\u00a0ещё так зовут крутую программу для\u00a0писателей.</em>",
-    "hero.cta": "Бета",
+    "hero.cta": "Скачать бету",
     "hero.platforms": "Windows · Mac · Linux",
     "hero.petLabel": "Погладить Мари",
     "cat.hello": "Привет, я\u00a0Мари. Погладь меня.",
@@ -1332,6 +1406,504 @@ window.I18N = (() => {
     "dm.deb.s1": "Установи пакет из\u00a0папки «Загрузки»:",
     "dm.lin.s2": "Найди Мари среди приложений и\u00a0пиши."
   };
+  const DE = {
+    "band.1": "Kostenlos",
+    "band.2": "Ohne Konto",
+    "band.3": "Ohne Abo",
+    "band.4": "Deine Texte gehören dir",
+    "band.5": "Windows, Mac und Linux",
+    "band.6": "Katze inklusive",
+    "cat.hello": "Hi. Ich bin Mari. Kraul mich.",
+    "cat.line1": "Mrrr?",
+    "cat.line2": "Psst. Dein Plotloch steht offen.",
+    "cat.line3": "Das Adverb da? Streichen.",
+    "cat.line4": "Kapitel drei hakt noch. Glaub mir.",
+    "cat.line5": "Ich lag auf der Tastatur. Gern geschehen.",
+    "cat.line6": "Töte deine Lieblinge. Mich nicht.",
+    "cat.line7": "Erst schreiben, dann kraulen.",
+    "dl.beta": "Version <span data-version=\"\">0.2.7</span>. Fit für den Schreiballtag, wetzt aber noch die Krallen.",
+    "dl.betaTag": "BETA",
+    "dl.bug": "Bug gefunden? Sag Bescheid",
+    "dl.copied": "Kopiert",
+    "dl.copy": "Kopieren",
+    "dl.h2": "Deine zweite Fassung wartet schon.",
+    "dl.kick": "Download",
+    "dl.lede": "Mari läuft unter Windows, macOS und Linux. Such dir dein System aus und schreib los.",
+    "dl.linux.alt": "Oder <a data-asset=\"deb\" href=\"https://github.com/spacekestrel/mari/releases/download/v0.2.7/Mari_0.2.7_amd64.deb\">.deb</a> für Debian und Ubuntu, <a data-asset=\"rpm\" href=\"https://github.com/spacekestrel/mari/releases/download/v0.2.7/Mari-0.2.7-1.x86_64.rpm\">.rpm</a> für Fedora",
+    "dl.linux.btn": ".AppImage, läuft überall",
+    "dl.mac.alt": "Älterer Mac? Nimm die <a data-asset=\"dmg-intel\" href=\"https://github.com/spacekestrel/mari/releases/download/v0.2.7/Mari_0.2.7_x64.dmg\">Intel-Version</a>",
+    "dl.mac.armLink": "Version für Apple silicon",
+    "dl.mac.armPrefix": "Neuerer Mac? Nimm die ",
+    "dl.mac.btn": "Apple silicon (M1 und neuer)",
+    "dl.mac.intelBtn": "Intel-Mac",
+    "dl.mobile": "Mari wohnt auf dem Computer, nicht auf dem Handy. Öffne diese Seite am Laptop oder PC und hol sie dir.",
+    "dl.rec": "Dein Computer",
+    "dl.warn.p1": "Apple und Microsoft verlangen Geld für das Zertifikat, das ihre Warnungen abstellt. Mari ist kostenlos und hat nicht bezahlt, also meckern beide einmal kurz. Mit der Datei ist alles in Ordnung.",
+    "dl.warn.p2": "<strong>Windows</strong> meldet: „Der Computer wurde durch Windows geschützt“. Klick auf <em>Weitere Informationen</em> und dann auf <em>Trotzdem ausführen</em>.",
+    "dl.warn.p3": "<strong>macOS</strong> behauptet, Mari sei beschädigt. Ist sie nicht. Zieh Mari in den Ordner „Programme“, öffne das <em>Terminal</em>, füg diese Zeile einmal ein und öffne Mari dann ganz normal:",
+    "dl.warn.summary": "Windows oder macOS meckert beim ersten Start? Hier lang.",
+    "dl.win.alt": "Oder die <a data-asset=\"msi\" href=\"https://github.com/spacekestrel/mari/releases/download/v0.2.7/Mari_0.2.7_x64_en-US.msi\">.msi</a>, falls deine IT darauf schwört",
+    "dl.win.btn": "Installer laden",
+    "dm.app.s1": "Mach die Datei einmal ausführbar:",
+    "dm.app.s2": "Doppelklick drauf und schreib los.",
+    "dm.back": "Andere Datei wählen",
+    "dm.close": "Schließen",
+    "dm.deb.s1": "Installier das Paket aus deinem Ordner „Downloads“:",
+    "dm.done": "Mari ist unterwegs zu dir!",
+    "dm.free": "Kostenlos. Ohne Konto. Ohne E-Mail.",
+    "dm.go": "Für %s herunterladen",
+    "dm.h": "Hol dir Mari",
+    "dm.lin.s2": "Such Mari unter deinen Apps und schreib los.",
+    "dm.mac.s1": "Öffne die .dmg und zieh Mari in den Ordner <em>Programme</em>.",
+    "dm.mac.s2": "macOS nennt alles „beschädigt“, wofür Apple kein Geld gesehen hat. Mari ist kerngesund. Öffne das <em>Terminal</em> und füg das hier einmal ein:",
+    "dm.mac.s3": "Öffne Mari wie gewohnt und schreib los.",
+    "dm.mb": "MB",
+    "dm.n.appimage": "Läuft überall, ohne Installation",
+    "dm.n.deb": "Debian und Ubuntu",
+    "dm.n.dmg-arm": "M1 und neuer",
+    "dm.n.dmg-intel": "Ältere Macs",
+    "dm.n.exe": "Die übliche Wahl",
+    "dm.n.msi": "Falls deine IT darauf schwört",
+    "dm.n.rpm": "Fedora",
+    "dm.o.appimage": ".AppImage",
+    "dm.o.deb": ".deb",
+    "dm.o.dmg-arm": "Apple silicon",
+    "dm.o.dmg-intel": "Intel",
+    "dm.o.exe": "Installer (.exe)",
+    "dm.o.msi": "Paket (.msi)",
+    "dm.o.rpm": ".rpm",
+    "dm.phone": "Du bist gerade am Handy. Mari läuft unter Windows, macOS und Linux. Öffne diese Seite also am Computer, um Mari zu installieren.",
+    "dm.pick": "Dein Computer",
+    "dm.retry": "Nichts passiert? Noch mal versuchen",
+    "dm.started": "Dein Download läuft.",
+    "dm.win.s1": "Öffne die Datei, die du gerade heruntergeladen hast.",
+    "dm.win.s2": "Windows meldet vielleicht: <em>Der Computer wurde durch Windows geschützt</em>. Mari ist harmlos, sie hat nur kein Zertifikat gekauft. Klick auf <em>Weitere Informationen</em> und dann auf <em>Trotzdem ausführen</em>.",
+    "dm.win.s3": "Installier Mari, öffne sie und schreib los.",
+    "dm.yours": "deins",
+    "footer.bug": "Fehler melden",
+    "footer.downloads": "Alle Downloads",
+    "footer.github": "GitHub",
+    "footer.license": "AGPL-3.0",
+    "fz.ch1": "01 · Regen",
+    "fz.ch2": "02 · Das Büro",
+    "fz.ch3": "03 · Mrs Pell",
+    "fz.ch4": "04 · Der Pier",
+    "fz.ch5": "05 · Zwei Mäntel",
+    "fz.ch6": "06 · Schlüssel",
+    "fz.chapters": "Kapitel",
+    "fz.h2": "Und jetzt lass alles <em>verschwinden.</em>",
+    "fz.p": "Drück F11 und konzentrier dich auf das reine Schreiberlebnis.",
+    "fz.saved": "Gespeichert",
+    "fz.typed": "Auf dem Etikett im Kragen stand: Hale.",
+    "fz.words": "2.431 Wörter",
+    "hero.cta": "Beta herunterladen",
+    "hero.h1": "Marí ist eine Katze. <em class=\"gold\">Mari ist auch eine coole Schreib-App.</em>",
+    "hero.petLabel": "Mari kraulen",
+    "hero.platforms": "Windows · Mac · Linux",
+    "hero.sticker": "✍️ Für Romane gemacht",
+    "lang.label": "Sprache",
+    "meta.description": "Mari ist die kostenlose Schreib-App, die aus chaotischen Entwürfen Bücher macht, auf die du stolz bist. Für Windows, macOS und Linux.",
+    "meta.title": "Mari · Andere Schreib-Apps sind neidisch",
+    "mf.b1": "Hale trifft ein",
+    "mf.b2": "Der Mantel",
+    "mf.b3": "Wer hat seine Schlüssel?",
+    "mf.c1": "Dein Kapitel",
+    "mf.c2": "Markierungen",
+    "mf.c3": "Notizen",
+    "mf.c4": "Minimap",
+    "mf.c4t": "Deine Markierungen reisen mit. Wer liest, sieht dieselbe Karte.",
+    "mf.c5": "Frühere Fassungen",
+    "mf.c6": "Inhalt und Plan",
+    "mf.c7": "Die Schublade",
+    "mf.c8": "Ab damit.",
+    "mf.c8t": "Wer es öffnet, sieht genau, was du siehst.",
+    "mf.h2": "Mari hebt alles auf. <em>Typisch Katze.</em>",
+    "mf.lede": "Jedes Kapitel wohnt in seiner eigenen .mari-Datei: dein Text, Markierungen, Notizen, frühere Fassungen, Plan und Schublade. Schick die Datei an deine Testleser, und sie öffnen genau das, was du siehst.",
+    "mf.note": "Drinlassen, aber Chronologie prüfen.",
+    "mf.postmark": "KAPITEL 7 · RAUS",
+    "mf.syn": "Hale findet eine Leiche. In seinem Mantel.",
+    "mf.to": "An: meine Testleser",
+    "nav.cta": "Beta laden",
+    "nav.footer": "Fußzeile",
+    "nav.home": "Mari, zurück nach oben",
+    "nav.main": "Hauptnavigation",
+    "rc.h2": "Der Rest <em>geht aufs Haus.</em>",
+    "rc.i1": "Fokusmodus",
+    "rc.i10": "5 Sprachen",
+    "rc.i2": "Buchschriften × 5",
+    "rc.i3": "Hell und dunkel",
+    "rc.i4": "Projektordner",
+    "rc.i5": "Weiß, wo du aufgehört hast",
+    "rc.i6": "Ungespeichertes überlebt",
+    "rc.i7": "Wörter live gezählt",
+    "rc.i8": "Öffnet .docx, .md, .txt",
+    "rc.i9": "Leseansicht für Markdown",
+    "rc.order": "Bestellung #0007 · 03:12 Uhr",
+    "rc.paidby": "Bezahlt von: niemandem",
+    "rc.price": "0,00",
+    "rc.shop": "Schreibwaren und eine Katze",
+    "rc.stamp": "BEZAHLT",
+    "rc.sub": "Zwischensumme",
+    "rc.tax": "Abo",
+    "rc.thanks": "Danke fürs Schreiben!",
+    "rc.total": "Summe",
+    "rd.cut": "Streichen",
+    "rd.drawer": "Schublade",
+    "rd.file": "07 · Die Leiche im Mantel",
+    "rd.good": "Gut",
+    "rd.h2": "Bücher schreibt man nicht. Man schreibt sie <em>neu.</em>",
+    "rd.kept": "Fassungen",
+    "rd.move": "Umstellen",
+    "rd.rewrite": "Neu schreiben",
+    "rd.s1": "Der Regen fiel vom Himmel oben herab nach unten, und zwar nass.",
+    "rd.s2": "Kommissar Hale stand in der Tür und blickte mit seinen Augen auf die Leiche, die tot war.",
+    "rd.s2new": "Kommissar Hale blieb in der Tür stehen.",
+    "rd.s3": "In zwanzig Jahren hatte er viele Leichen gesehen. Keine hatte je seinen Mantel getragen.",
+    "rd.s4": "Irgendwo bellte ein Hund, oder möglicherweise war es ein anderer Hund.",
+    "rd.s5": "Dann ging er sehr langsam und sehr vorsichtig sehr leise durch den Raum.",
+    "rd.s5new": "Lautlos durchquerte er den Raum.",
+    "rd.s6": "„Niemand rührt hier was an“, sagte er zu niemandem.",
+    "rd.step1": "Rohfassung",
+    "rd.step2": "Markiert",
+    "rd.step3": "Überarbeitet",
+    "rd.sub": "Scroll runter und sieh zu, wie aus einer Rohfassung was wird.",
+    "shot.alt": "Mari mit geöffnetem Kapitel, die Passagen farbig markiert, links die Kapitelliste, rechts eine Karte des Kapitels",
+    "shot.s1": "Dein Buch. Aber in schön.",
+    "shot.s2": "100\u00a0% gratis",
+    "trailer.h2": "Mari <em>in Aktion.</em>"
+  };
+  const ES = {
+    "band.1": "Gratis",
+    "band.2": "Sin registrarte",
+    "band.3": "Sin suscripción",
+    "band.4": "Tus archivos son tuyos",
+    "band.5": "Windows, Mac y Linux",
+    "band.6": "Gata incluida",
+    "cat.hello": "Hola. Soy Mari. Acaríciame.",
+    "cat.line1": "¿Mrrr?",
+    "cat.line2": "Se te ve el agujero de la trama.",
+    "cat.line3": "¿Ese adverbio en -mente? Fuera.",
+    "cat.line4": "El capítulo tres cojea. Créeme.",
+    "cat.line5": "Me senté en tu teclado. De nada.",
+    "cat.line6": "Mata tus frases favoritas. A mí no.",
+    "cat.line7": "Primero escribe. Luego, mimos.",
+    "dl.beta": "Versión <span data-version=\"\">0.2.7</span>. Lista para escribir a diario, aunque todavía se afila las uñas.",
+    "dl.betaTag": "BETA",
+    "dl.bug": "¿Algo falla? Avísanos",
+    "dl.copied": "Copiado",
+    "dl.copy": "Copiar",
+    "dl.h2": "Tu segundo borrador te espera.",
+    "dl.kick": "Descarga",
+    "dl.lede": "Mari funciona en Windows, macOS y Linux. Elige tu sistema y ponte a escribir.",
+    "dl.linux.alt": "O el <a data-asset=\"deb\" href=\"https://github.com/spacekestrel/mari/releases/download/v0.2.7/Mari_0.2.7_amd64.deb\">.deb</a> para Debian y Ubuntu, o el <a data-asset=\"rpm\" href=\"https://github.com/spacekestrel/mari/releases/download/v0.2.7/Mari-0.2.7-1.x86_64.rpm\">.rpm</a> para Fedora",
+    "dl.linux.btn": ".AppImage, universal",
+    "dl.mac.alt": "¿Tu Mac ya tiene sus años? Llévate la <a data-asset=\"dmg-intel\" href=\"https://github.com/spacekestrel/mari/releases/download/v0.2.7/Mari_0.2.7_x64.dmg\">versión para Intel</a>",
+    "dl.mac.armLink": "versión para Apple silicon",
+    "dl.mac.armPrefix": "¿Tu Mac es reciente? Llévate la ",
+    "dl.mac.btn": "Apple silicon (desde el M1)",
+    "dl.mac.intelBtn": "Mac con Intel",
+    "dl.mobile": "Mari es una app de escritorio. Abre esta página en Windows, macOS o Linux para descargarla.",
+    "dl.rec": "Tu sistema",
+    "dl.warn.p1": "Apple y Microsoft cobran por el certificado que silencia sus avisos. Mari es gratis y no lo ha pagado, así que los dos protestan una vez. Al archivo no le pasa nada.",
+    "dl.warn.p2": "<strong>Windows</strong> dice: «Windows protegió su PC». Haz clic en <em>Más información</em> y luego en <em>Ejecutar de todas formas</em>.",
+    "dl.warn.p3": "<strong>macOS</strong> dice que Mari está dañada. No lo está. Arrastra Mari a Aplicaciones, abre <em>Terminal</em>, pega esta línea una sola vez y luego abre Mari como siempre:",
+    "dl.warn.summary": "¿Windows o macOS refunfuña la primera vez? Lee esto.",
+    "dl.win.alt": "O el <a data-asset=\"msi\" href=\"https://github.com/spacekestrel/mari/releases/download/v0.2.7/Mari_0.2.7_x64_en-US.msi\">.msi</a>, si en tu trabajo lo prefieren",
+    "dl.win.btn": "Descargar instalador",
+    "dm.app.s1": "Una sola vez, haz que el archivo sea ejecutable:",
+    "dm.app.s2": "Haz doble clic en él y a escribir.",
+    "dm.back": "Elegir otro archivo",
+    "dm.close": "Cerrar",
+    "dm.deb.s1": "Instálalo desde la carpeta Descargas:",
+    "dm.done": "¡Mari ya está en camino!",
+    "dm.free": "Gratis. Sin cuenta. Sin correo.",
+    "dm.go": "Descargar para %s",
+    "dm.h": "Llévate a Mari",
+    "dm.lin.s2": "Busca Mari entre tus aplicaciones y a escribir.",
+    "dm.mac.s1": "Abre el .dmg y arrastra Mari a <em>Aplicaciones</em>.",
+    "dm.mac.s2": "macOS llama «dañada» a toda app por la que no ha cobrado. Mari está perfectamente. Abre <em>Terminal</em> y pega esto una sola vez:",
+    "dm.mac.s3": "Abre Mari como siempre y a escribir.",
+    "dm.mb": "MB",
+    "dm.n.appimage": "Funciona en todas partes, sin instalar",
+    "dm.n.deb": "Debian y Ubuntu",
+    "dm.n.dmg-arm": "M1 y posteriores",
+    "dm.n.dmg-intel": "Mac con unos años",
+    "dm.n.exe": "La opción de siempre",
+    "dm.n.msi": "Si en tu trabajo lo prefieren",
+    "dm.n.rpm": "Fedora",
+    "dm.o.appimage": ".AppImage",
+    "dm.o.deb": ".deb",
+    "dm.o.dmg-arm": "Apple silicon",
+    "dm.o.dmg-intel": "Intel",
+    "dm.o.exe": "Instalador (.exe)",
+    "dm.o.msi": "Paquete (.msi)",
+    "dm.o.rpm": ".rpm",
+    "dm.phone": "Nos visitas desde un teléfono, pero Mari funciona en Windows, macOS y Linux. Abre esta página desde uno de esos sistemas para instalarla.",
+    "dm.pick": "Tu sistema",
+    "dm.retry": "¿No empieza? Inténtalo otra vez",
+    "dm.started": "Tu descarga está en marcha.",
+    "dm.win.s1": "Abre el archivo que acabas de descargar.",
+    "dm.win.s2": "Puede que Windows te diga: <em>Windows protegió su PC</em>. Mari está bien, es solo que no ha pagado el certificado. Haz clic en <em>Más información</em> y luego en <em>Ejecutar de todas formas</em>.",
+    "dm.win.s3": "Instala, abre Mari y a escribir.",
+    "dm.yours": "el tuyo",
+    "footer.bug": "Reportar un error",
+    "footer.downloads": "Todas las descargas",
+    "footer.github": "GitHub",
+    "footer.license": "AGPL-3.0",
+    "fz.ch1": "01 · Lluvia",
+    "fz.ch2": "02 · La oficina",
+    "fz.ch3": "03 · La señora Pell",
+    "fz.ch4": "04 · El muelle",
+    "fz.ch5": "05 · Dos abrigos",
+    "fz.ch6": "06 · Llaves",
+    "fz.chapters": "Capítulos",
+    "fz.h2": "Y ahora, haz que todo se <em>esfume.</em>",
+    "fz.p": "Pulsa F11 y concéntrate en la experiencia pura de escribir.",
+    "fz.saved": "Guardado",
+    "fz.typed": "La etiqueta del cuello decía: Hale.",
+    "fz.words": "2431 palabras",
+    "hero.cta": "Descargar beta",
+    "hero.h1": "Marí es una gata. <em class=\"gold\">Mari también es una app genial para escribir.</em>",
+    "hero.petLabel": "Acariciar a Mari",
+    "hero.platforms": "Windows · Mac · Linux",
+    "hero.sticker": "✍️ Hecha para novelistas",
+    "lang.label": "Idioma",
+    "meta.description": "Mari es la app gratuita para escribir que convierte tus borradores caóticos en libros de los que presumir. Windows, macOS y Linux.",
+    "meta.title": "Mari · Las otras apps se mueren de envidia",
+    "mf.b1": "Llega Hale",
+    "mf.b2": "El abrigo",
+    "mf.b3": "¿Quién tiene sus llaves?",
+    "mf.c1": "Tu capítulo",
+    "mf.c2": "Resaltados",
+    "mf.c3": "Notas",
+    "mf.c4": "Minimapa",
+    "mf.c4t": "Tus marcas viajan con el archivo: tus lectores ven el mismo mapa que tú.",
+    "mf.c5": "Versiones anteriores",
+    "mf.c6": "Sinopsis y plan",
+    "mf.c7": "El cajón",
+    "mf.c8": "Envíalo.",
+    "mf.c8t": "Verán exactamente lo que ves tú.",
+    "mf.h2": "Mari lo guarda todo. <em>Como buena gata.</em>",
+    "mf.lede": "Cada capítulo vive en su propio archivo .mari: tu prosa, los resaltados, las notas, las versiones anteriores, el plan y el cajón. Envíaselo a tus lectores beta y verán exactamente lo que ves tú.",
+    "mf.note": "Se queda, pero ojo con la cronología.",
+    "mf.postmark": "ENVIADO · CAP. 7",
+    "mf.syn": "Hale encuentra un cadáver. Y el abrigo es suyo.",
+    "mf.to": "Para: lectores beta",
+    "nav.cta": "Descargar beta",
+    "nav.footer": "Pie de página",
+    "nav.home": "Mari, volver al inicio",
+    "nav.main": "Principal",
+    "rc.h2": "Todo lo demás, <em>invita la casa.</em>",
+    "rc.i1": "Modo concentración",
+    "rc.i10": "Interfaz en 5 idiomas",
+    "rc.i2": "Fuentes de libro × 5",
+    "rc.i3": "Tema claro y oscuro",
+    "rc.i4": "Carpetas de proyecto",
+    "rc.i5": "Se abre donde lo dejaste",
+    "rc.i6": "Sin guardar, pero a salvo",
+    "rc.i7": "Cuenta palabras en vivo",
+    "rc.i8": "Abre .docx, .md, .txt",
+    "rc.i9": "Modo lectura para Markdown",
+    "rc.order": "Pedido #0007 · 03:12 a.\u00a0m.",
+    "rc.paidby": "Pagado por: nadie",
+    "rc.price": "0,00",
+    "rc.shop": "Todo para escribir y una gata",
+    "rc.stamp": "PAGADO",
+    "rc.sub": "Subtotal",
+    "rc.tax": "Suscripción",
+    "rc.thanks": "¡Gracias por escribir!",
+    "rc.total": "Total",
+    "rd.cut": "Cortar",
+    "rd.drawer": "Cajón",
+    "rd.file": "07 · El muerto del abrigo",
+    "rd.good": "Bien",
+    "rd.h2": "Los libros no se escriben. Se <em>reescriben.</em>",
+    "rd.kept": "Versiones",
+    "rd.move": "Cambiar de sitio",
+    "rd.rewrite": "Reescribir",
+    "rd.s1": "La lluvia llovía hacia abajo desde el cielo de arriba, mojadamente.",
+    "rd.s2": "El detective Hale estaba de pie en la puerta y miraba el cadáver, que estaba muerto.",
+    "rd.s2new": "El detective Hale se detuvo en el umbral.",
+    "rd.s3": "En veinte años había visto muchos cadáveres. Nunca uno con su abrigo puesto.",
+    "rd.s4": "En algún lugar ladró un perro, o a lo mejor era otro perro distinto.",
+    "rd.s5": "Entonces, muy lentamente y muy cuidadosamente, caminó muy silenciosamente a través de la habitación.",
+    "rd.s5new": "Cruzó la habitación sin hacer ruido.",
+    "rd.s6": "«Que nadie toque nada», le dijo a nadie.",
+    "rd.step1": "Borrador",
+    "rd.step2": "Marcado",
+    "rd.step3": "En limpio",
+    "rd.sub": "Sigue bajando y mira cómo un primer borrador se pone las pilas.",
+    "shot.alt": "Mari con un capítulo abierto: sus pasajes marcados en color, la lista de capítulos a la izquierda y un mapa del capítulo a la derecha",
+    "shot.s1": "Tu libro. Pero de gala.",
+    "shot.s2": "100 % gratis",
+    "trailer.h2": "Mírala <em>en acción.</em>"
+  };
+  const ZH = {
+    "band.1": "免费",
+    "band.2": "不用注册",
+    "band.3": "不搞订阅",
+    "band.4": "你的文件只归你",
+    "band.5": "Windows、Mac 和 Linux",
+    "band.6": "附赠猫一只",
+    "cat.hello": "嗨，我是 Mari。快摸摸我。",
+    "cat.line1": "喵呜？",
+    "cat.line2": "你的剧情漏洞走光啦。",
+    "cat.line3": "这个副词？删掉。",
+    "cat.line4": "第三章还欠点火候。信我。",
+    "cat.line5": "我替你在键盘上坐了坐。不客气。",
+    "cat.line6": "杀死你的宝贝。我除外。",
+    "cat.line7": "先码字，再撸猫。",
+    "dl.beta": "版本 <span data-version=\"\">0.2.7</span>。已经能陪你天天写了，爪子还在磨着呢。",
+    "dl.betaTag": "公测",
+    "dl.bug": "抓到 bug 了？告诉我们",
+    "dl.copied": "已复制",
+    "dl.copy": "复制",
+    "dl.h2": "二稿等你好久了。",
+    "dl.kick": "下载",
+    "dl.lede": "Mari 支持 Windows、macOS 和 Linux。选好你的系统，开写吧。",
+    "dl.linux.alt": "Debian 和 Ubuntu 也可以用 <a data-asset=\"deb\" href=\"https://github.com/spacekestrel/mari/releases/download/v0.2.7/Mari_0.2.7_amd64.deb\">.deb</a>，Fedora 用 <a data-asset=\"rpm\" href=\"https://github.com/spacekestrel/mari/releases/download/v0.2.7/Mari-0.2.7-1.x86_64.rpm\">.rpm</a>",
+    "dl.linux.btn": ".AppImage，到处都能跑",
+    "dl.mac.alt": "Mac 有些年头了？那就下 <a data-asset=\"dmg-intel\" href=\"https://github.com/spacekestrel/mari/releases/download/v0.2.7/Mari_0.2.7_x64.dmg\">Intel 版</a>",
+    "dl.mac.armLink": "Apple silicon 版",
+    "dl.mac.armPrefix": "Mac 比较新？那就下 ",
+    "dl.mac.btn": "Apple silicon（M1 及以上）",
+    "dl.mac.intelBtn": "Intel 芯片 Mac",
+    "dl.mobile": "Mari 住在电脑里，手机里可住不下。用电脑打开这个页面就能下载。",
+    "dl.rec": "你的电脑",
+    "dl.warn.p1": "苹果和微软都卖一种证书，买了它，系统才不弹警告。Mari 免费，没掏这笔钱，所以两家都会嘟囔一回。文件本身没毛病。",
+    "dl.warn.p2": "<strong>Windows</strong> 会如临大敌：“Windows 已保护你的电脑”。点<em>更多信息</em>，再点<em>仍要运行</em>。",
+    "dl.warn.p3": "<strong>macOS</strong> 会说 Mari 已损坏。别信，她好着呢。把 Mari 拖进“应用程序”文件夹，打开<em>终端</em>，粘贴下面这行（只需一次），然后照常打开 Mari：",
+    "dl.warn.summary": "第一次打开，Windows 或 macOS 发牢骚？看这里。",
+    "dl.win.alt": "公司指定要 <a data-asset=\"msi\" href=\"https://github.com/spacekestrel/mari/releases/download/v0.2.7/Mari_0.2.7_x64_en-US.msi\">.msi</a>？这里也有",
+    "dl.win.btn": "下载安装程序",
+    "dm.app.s1": "先给文件加上可执行权限，一次就好：",
+    "dm.app.s2": "双击它，开写。",
+    "dm.back": "换一个文件",
+    "dm.close": "关闭",
+    "dm.deb.s1": "从“下载”文件夹安装：",
+    "dm.done": "Mari 正朝你飞奔而来！",
+    "dm.free": "免费。不用注册，不留邮箱。",
+    "dm.go": "下载 %s 版",
+    "dm.h": "把 Mari 领回家",
+    "dm.lin.s2": "在应用列表里找到 Mari，开写。",
+    "dm.mac.s1": "打开 .dmg，把 Mari 拖进<em>应用程序</em>。",
+    "dm.mac.s2": "没给苹果交钱的应用，macOS 一律说它“已损坏”。Mari 好好的。打开<em>终端</em>，把下面这行粘贴进去，只需一次：",
+    "dm.mac.s3": "照常打开 Mari，开写。",
+    "dm.mb": "MB",
+    "dm.n.appimage": "到处都能跑，免安装",
+    "dm.n.deb": "Debian 和 Ubuntu",
+    "dm.n.dmg-arm": "M1 及以上",
+    "dm.n.dmg-intel": "老款 Mac",
+    "dm.n.exe": "大多数人选这个",
+    "dm.n.msi": "公司指定用它的话",
+    "dm.n.rpm": "Fedora",
+    "dm.o.appimage": ".AppImage",
+    "dm.o.deb": ".deb",
+    "dm.o.dmg-arm": "Apple silicon",
+    "dm.o.dmg-intel": "Intel",
+    "dm.o.exe": "安装程序（.exe）",
+    "dm.o.msi": "安装包（.msi）",
+    "dm.o.rpm": ".rpm",
+    "dm.phone": "你在用手机。Mari 只在 Windows、macOS 和 Linux 上跑，用电脑打开这个页面再安装吧。",
+    "dm.pick": "你的电脑",
+    "dm.retry": "没动静？再试一次",
+    "dm.started": "下载已经开始了。",
+    "dm.win.s1": "打开刚下载的文件。",
+    "dm.win.s2": "Windows 可能会提示 <em>Windows 已保护你的电脑</em>。别慌，Mari 没问题，只是没买证书。点<em>更多信息</em>，再点<em>仍要运行</em>。",
+    "dm.win.s3": "安装，打开 Mari，开写。",
+    "dm.yours": "本机",
+    "footer.bug": "反馈 bug",
+    "footer.downloads": "全部安装包",
+    "footer.github": "GitHub",
+    "footer.license": "AGPL-3.0",
+    "fz.ch1": "01 · 雨夜",
+    "fz.ch2": "02 · 事务所",
+    "fz.ch3": "03 · 佩尔太太",
+    "fz.ch4": "04 · 码头",
+    "fz.ch5": "05 · 两件大衣",
+    "fz.ch6": "06 · 钥匙",
+    "fz.chapters": "章节",
+    "fz.h2": "见证奇迹：一切<em>消失。</em>",
+    "fz.p": "按下 F11，专注于纯粹的写作体验。",
+    "fz.saved": "已保存",
+    "fz.typed": "领口里的标签上写着：黑尔。",
+    "fz.words": "2,431 词",
+    "hero.cta": "下载公测版",
+    "hero.h1": "Marí 是一只猫。<em class=\"gold\">Mari 还是个超酷的写作软件。</em>",
+    "hero.petLabel": "摸摸 Mari",
+    "hero.platforms": "Windows · Mac · Linux",
+    "hero.sticker": "✍️ 为小说家而生",
+    "lang.label": "语言",
+    "meta.description": "Mari 是一款免费的写作软件，能把一团乱麻的草稿变成你引以为傲的书。支持 Windows、macOS 和 Linux。",
+    "meta.title": "Mari · 别的写作软件都酸了",
+    "mf.b1": "黑尔到场",
+    "mf.b2": "大衣",
+    "mf.b3": "谁拿了他的钥匙？",
+    "mf.c1": "你的这一章",
+    "mf.c2": "标记",
+    "mf.c3": "批注",
+    "mf.c4": "小地图",
+    "mf.c4t": "标记跟着文件走，读者看到的地图和你的一模一样。",
+    "mf.c5": "历史版本",
+    "mf.c6": "梗概和计划",
+    "mf.c7": "抽屉",
+    "mf.c8": "发出去。",
+    "mf.c8t": "他们打开的，就是你看到的。",
+    "mf.h2": "Mari 什么都收着。<em>猫都这样。</em>",
+    "mf.lede": "每一章都住在自己的 .mari 文件里：正文、标记、批注、历史版本、计划和抽屉，一样不少。发给你的试读者，他们打开的，就是你看到的。",
+    "mf.note": "留着，但对一下时间线。",
+    "mf.postmark": "已寄出 · 第七章",
+    "mf.syn": "黑尔发现一具尸体，穿着他的大衣。",
+    "mf.to": "收件人：我的试读者",
+    "nav.cta": "下载公测版",
+    "nav.footer": "页脚导航",
+    "nav.home": "Mari，回到顶部",
+    "nav.main": "主导航",
+    "rc.h2": "其余一切，<em>本店请客。</em>",
+    "rc.i1": "专注模式",
+    "rc.i10": "5 种界面语言",
+    "rc.i2": "书籍字体 × 5",
+    "rc.i3": "浅色和深色主题",
+    "rc.i4": "项目文件夹",
+    "rc.i5": "从上次停笔的地方打开",
+    "rc.i6": "没保存的也丢不了",
+    "rc.i7": "实时字数统计",
+    "rc.i8": "通吃 .docx、.md、.txt",
+    "rc.i9": "Markdown 阅读模式",
+    "rc.order": "订单 #0007 · 凌晨 03:12",
+    "rc.paidby": "付款人：查无此人",
+    "rc.price": "0.00",
+    "rc.shop": "写作用品，外加一只猫",
+    "rc.stamp": "已付款",
+    "rc.sub": "小计",
+    "rc.tax": "订阅费",
+    "rc.thanks": "谢谢惠顾，接着写！",
+    "rc.total": "合计",
+    "rd.cut": "删掉",
+    "rd.drawer": "抽屉",
+    "rd.file": "07 · 大衣里的尸体",
+    "rd.good": "很好",
+    "rd.h2": "书不是写出来的，是<em>改出来的。</em>",
+    "rd.kept": "历史版本",
+    "rd.move": "换个位置",
+    "rd.rewrite": "重写",
+    "rd.s1": "雨从上面的天上往下落了下来，湿湿地。",
+    "rd.s2": "黑尔探长站在门口，看着那具尸体，尸体已经死了。",
+    "rd.s2new": "黑尔探长在门口站定。",
+    "rd.s3": "二十年来，他见过的尸体数不胜数。可从来没有一具，穿着他的大衣。",
+    "rd.s4": "不知哪里有条狗叫了，也可能是另一条狗。",
+    "rd.s5": "然后他非常缓慢地、非常小心地、非常安静地走过了房间。",
+    "rd.s5new": "他悄无声息地穿过房间。",
+    "rd.s6": "“谁都别碰任何东西。”他对着空气说。",
+    "rd.step1": "初稿",
+    "rd.step2": "标记",
+    "rd.step3": "定稿",
+    "rd.sub": "往下滑，看初稿怎么改邪归正。",
+    "shot.alt": "Mari 里打开着一章，段落用颜色做了标记，左边是章节列表，右边是这一章的地图",
+    "shot.s1": "你的书，但开了美颜。",
+    "shot.s2": "100% 免费",
+    "trailer.h2": "看她<em>跑起来。</em>"
+  };
 
   // English lines that only the script shows (the cat's lines, button states)
   const EN_EXTRA = {
@@ -1370,9 +1942,15 @@ window.I18N = (() => {
     "dm.lin.s2": "Find Mari among your apps, and write.",
   };
 
-  const LANGS = ["en", "ru"];
-  // Countries where a visitor gets Russian unless they pick otherwise
-  const RU_COUNTRIES = ["RU", "BY", "KZ", "KG"];
+  const LANGS = ["en", "ru", "de", "es", "zh"];
+  // Countries whose visitors get a language other than English, unless they pick one.
+  // Anywhere else, the browser's language decides.
+  const COUNTRIES = {
+    ru: ["RU", "BY", "KZ", "KG"],
+    de: ["DE", "AT", "CH", "LI"],
+    es: ["ES", "MX", "AR", "CO", "CL", "PE", "VE", "EC", "GT", "CU", "BO", "DO", "HN", "PY", "SV", "NI", "CR", "PA", "UY", "PR", "GQ"],
+    zh: ["CN"],
+  };
 
   const root = document.documentElement;
   const $$ = (s) => [...document.querySelectorAll(s)];
@@ -1383,26 +1961,34 @@ window.I18N = (() => {
   $$("[data-i18n]").forEach((el) => (EN[el.dataset.i18n] = el.innerHTML));
   $$("[data-i18n-alt]").forEach((el) => (EN[el.dataset.i18nAlt] = el.alt));
   $$("[data-i18n-aria]").forEach((el) => (EN[el.dataset.i18nAria] = el.getAttribute("aria-label")));
-  const DICT = { en: EN, ru: RU };
+  const DICT = { en: EN, ru: RU, de: DE, es: ES, zh: ZH };
 
   let current = "en";
   const listeners = [];
   const t = (key) => DICT[current][key] ?? EN[key] ?? "";
 
+  // the picker: a pill that drops a card of languages (a listbox, so keys work too)
+  const picker = document.getElementById("lang");
+  const pickBtn = picker.querySelector(".lang-btn"), pickList = picker.querySelector(".lang-list");
+  const opts = [...pickList.children];
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   function apply(lang) {
     current = lang;
-    root.lang = lang;
+    root.lang = lang === "zh" ? "zh-Hans" : lang;
+    if (window.mariFonts) mariFonts(lang);
     document.title = t("meta.title");
     metaDesc.content = t("meta.description");
     $$("[data-i18n]").forEach((el) => { const v = t(el.dataset.i18n); if (el.innerHTML !== v) el.innerHTML = v; });
     $$("[data-i18n-alt]").forEach((el) => (el.alt = t(el.dataset.i18nAlt)));
     $$("[data-i18n-aria]").forEach((el) => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
     $$(".os").forEach((el) => (el.dataset.rec = t("dl.rec")));
-    const sel = document.getElementById("lang");
-    if (sel) sel.value = lang;
-    const code = document.querySelector(".lang-code");
-    if (code) code.textContent = lang.toUpperCase();
+    const opt = opts.find((o) => o.dataset.lang === lang);
+    opts.forEach((o) => o.setAttribute("aria-selected", String(o === opt)));
+    $$(".lang-code").forEach((c) => (c.textContent = opt.querySelector("b").textContent));
+    pickBtn.setAttribute("aria-label", `${t("lang.label")}: ${opt.querySelector("span").textContent}`);
     if (lang === "ru" && document.fonts) document.fonts.load('600 1em Caveat', "Привет").catch(() => {});
+    if (lang === "zh" && document.fonts) document.fonts.load('400 1em "ZCOOL KuaiLe"', "你好").catch(() => {});
     listeners.forEach((fn) => fn(lang));
   }
 
@@ -1431,18 +2017,58 @@ window.I18N = (() => {
 
   // Order: the language in the link, the one picked before, the visitor's
   // country, their browser's language.
-  const q = /[?&]lang=(en|ru)\b/.exec(location.search);
+  const q = /[?&]lang=(en|ru|de|es|zh)\b/.exec(location.search);
   let saved = null;
   try { saved = localStorage.getItem("mari-lang"); } catch (e) {}
-  const browser = /^ru\b/i.test(navigator.language || "") ? "ru" : "en";
+  // the first of the browser's languages that the page speaks
+  const browser = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ""])
+    .map((l) => (/^(en|ru|de|es|zh)\b/i.exec(l) || [])[1]).find(Boolean)?.toLowerCase() || "en";
+  const byCountry = (c) => LANGS.find((l) => COUNTRIES[l] && COUNTRIES[l].includes(c));
   let picked = null;  // a choice made in the picker before the lookup answers wins
   const ready = (q ? Promise.resolve(q[1])
     : LANGS.includes(saved) ? Promise.resolve(saved)
-    : countryFromIP().then((c) => (c ? (RU_COUNTRIES.includes(c) ? "ru" : "en") : browser))
+    : countryFromIP().then((c) => (c && byCountry(c)) || browser)
   ).then((lang) => { lang = picked || lang; apply(lang); return lang; });
 
-  document.getElementById("lang").addEventListener("change", (e) => {
-    const lang = e.target.value;
+  let open = false, active = 0, openY = 0;
+  const setActive = (i) => {
+    active = (i + opts.length) % opts.length;
+    opts.forEach((o, j) => o.classList.toggle("active", j === active));
+    pickList.setAttribute("aria-activedescendant", opts[active].id);
+  };
+  // the card hangs under the pill, but never off the left of a narrow phone;
+  // its tail always points at the pill
+  const place = () => {
+    const pill = pickBtn.getBoundingClientRect(), w = pickList.offsetWidth;
+    const right = Math.max(pill.right + 6, Math.min(innerWidth - 8, w + 8));
+    pickList.style.right = `${pill.right - right}px`;
+    pickList.style.setProperty("--tail", `${Math.round(right - (pill.left + pill.width / 2) - 10)}px`);
+  };
+  function openList() {
+    if (open) return;
+    open = true;
+    openY = scrollY;
+    pickList.getAnimations().forEach((a) => a.cancel());
+    pickList.hidden = false;
+    place();
+    pickBtn.setAttribute("aria-expanded", "true");
+    setActive(opts.findIndex((o) => o.dataset.lang === current));
+    pickList.focus({ preventScroll: true });
+    if (still) return;
+    pickList.animate([{ opacity: 0, transform: "translateY(-14px) scale(.6) rotate(5deg)" }, { opacity: 1, transform: "none" }], { duration: 460, easing: "cubic-bezier(.3, 1.5, .5, 1)" });
+    opts.forEach((o, i) => o.animate([{ opacity: 0, transform: "translateX(18px) rotate(3deg)" }, { opacity: 1, transform: "none" }], { duration: 340, delay: 70 + i * 45, easing: "cubic-bezier(.3, 1.5, .5, 1)", fill: "backwards" }));
+  }
+  function closeList(backToButton) {
+    if (!open) return;
+    open = false;
+    pickBtn.setAttribute("aria-expanded", "false");
+    if (backToButton) pickBtn.focus({ preventScroll: true });
+    if (still) { pickList.hidden = true; return; }
+    pickList.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(-8px) scale(.85)" }], { duration: 150, easing: "ease-in" })
+      .onfinish = () => { if (!open) pickList.hidden = true; };
+  }
+  function choose(lang) {
+    closeList(true);
     try { localStorage.setItem("mari-lang", lang); } catch (err) {}
     try {
       const u = new URL(location.href);
@@ -1450,8 +2076,29 @@ window.I18N = (() => {
       history.replaceState(null, "", u);
     } catch (err) {}
     picked = lang;
-    apply(lang);
+    if (lang !== current) apply(lang);
+  }
+  pickBtn.addEventListener("click", () => (open ? closeList(true) : openList()));
+  pickBtn.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); openList(); }
   });
+  pickList.addEventListener("keydown", (e) => {
+    const k = e.key;
+    if (k === "ArrowDown") setActive(active + 1);
+    else if (k === "ArrowUp") setActive(active - 1);
+    else if (k === "Home") setActive(0);
+    else if (k === "End") setActive(opts.length - 1);
+    else if (k === "Enter" || k === " ") choose(opts[active].dataset.lang);
+    else if (k === "Escape") closeList(true);
+    else return;
+    e.preventDefault();
+    e.stopPropagation();
+  });
+  pickList.addEventListener("click", (e) => { const o = e.target.closest("[role=option]"); if (o) choose(o.dataset.lang); });
+  pickList.addEventListener("pointermove", (e) => { const o = e.target.closest("[role=option]"); if (o && opts.indexOf(o) !== active) setActive(opts.indexOf(o)); });
+  pickList.addEventListener("focusout", (e) => { if (!picker.contains(e.relatedTarget)) closeList(false); });
+  document.addEventListener("pointerdown", (e) => { if (open && !picker.contains(e.target)) closeList(false); });
+  addEventListener("scroll", () => { if (open && Math.abs(scrollY - openY) > 80) closeList(false); }, { passive: true });
 
   return { ready, t, onChange: (fn) => listeners.push(fn), get lang() { return current; } };
 })();
@@ -1468,6 +2115,22 @@ window.I18N = (() => {
   const motion = !!(window.gsap && window.ScrollTrigger && !reduced);
 
   /* ---------- split headings into words for the reveal ---------- */
+  // Chinese has no spaces: it is cut into words (or single characters where the
+  // browser can't find words), with punctuation kept on the right side of its word
+  const HAN = /[\u3000-\u9fff\uff00-\uffef]/;
+  const zhWords = window.Intl && Intl.Segmenter ? new Intl.Segmenter("zh", { granularity: "word" }) : null;
+  const pieces = (s) => {
+    if (!HAN.test(s)) return [s];
+    const out = [];
+    let lead = "";
+    for (const p of zhWords ? [...zhWords.segment(s)].map((x) => x.segment) : [...s]) {
+      if (/^[“‘《（「『【]+$/.test(p)) lead += p;
+      else if (out.length && !lead && /^[\p{P}\p{S}]+$/u.test(p)) out[out.length - 1] += p;
+      else { out.push(lead + p); lead = ""; }
+    }
+    if (lead) out.push(lead);
+    return out;
+  };
   const split = (el) => {
     for (const n of [...el.childNodes]) {
       if (n.nodeType === 3) {
@@ -1476,9 +2139,11 @@ window.I18N = (() => {
         n.textContent.split(/([ \t\n\r\f]+)/).forEach((part) => {
           if (!part) return;
           if (/^[ \t\n\r\f]+$/.test(part)) { frag.append(part); return; }
-          const outer = document.createElement("span"); outer.className = "wd";
-          const inner = document.createElement("span"); inner.textContent = part;
-          outer.append(inner); frag.append(outer);
+          pieces(part).forEach((w) => {
+            const outer = document.createElement("span"); outer.className = "wd";
+            const inner = document.createElement("span"); inner.textContent = w;
+            outer.append(inner); frag.append(outer);
+          });
         });
         n.replaceWith(frag);
       } else if (n.nodeType === 1) split(n);
@@ -2068,7 +2733,7 @@ window.I18N = (() => {
     document.documentElement.classList.remove("i18n-wait");
     setTimeout(() => {
       const hello = () => say("cat.hello");
-      document.fonts ? document.fonts.load('600 1em Caveat', t("cat.hello")).then(hello, hello) : hello();
+      document.fonts ? document.fonts.load(`600 1em ${getComputedStyle(document.documentElement).getPropertyValue("--hand")}`, t("cat.hello")).then(hello, hello) : hello();
     }, 1900);
     I18N.onChange(() => {
       resplit();
@@ -2079,7 +2744,10 @@ window.I18N = (() => {
       fillRelease();
       if (motion) {
         ScrollTrigger.refresh();
-        if (document.fonts) Promise.all(["400 1em Literata", "400 1em Onest", "600 1em Caveat"].map((f) => document.fonts.load(f, "Дж"))).then(() => ScrollTrigger.refresh(), () => {});
+        const faces = I18N.lang === "zh"
+          ? [['900 1em "Noto Serif SC"', "中文"], ['400 1em "Noto Sans SC"', "中文"], ['400 1em "ZCOOL KuaiLe"', "中文"]]
+          : [["400 1em Literata", "Дж"], ["400 1em Onest", "Дж"], ["600 1em Caveat", "Дж"]];
+        if (document.fonts) Promise.all(faces.map(([f, s]) => document.fonts.load(f, s))).then(() => ScrollTrigger.refresh(), () => {});
       }
     });
   });
