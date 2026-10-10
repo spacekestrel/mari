@@ -76,7 +76,7 @@ html:lang(ru) {
 }
 html:lang(ru) h1, html:lang(ru) h2, html:lang(ru) h3 { letter-spacing: -.03em; line-height: .92; }
 /* Russian words run long («Переписывай», «программы»): headings step down a size so every word fits its column */
-html:lang(ru) .beat h3 { font-size: clamp(2rem, 2.9vw, 3rem); }
+html:lang(ru) .beat h3 { font-size: clamp(2.3rem, 4.4vw, 4.2rem); }
 html:lang(ru) .reasons-head { font-size: clamp(2.6rem, 7vw, 6.4rem); }
 
 /* while the language is being worked out, the hero's words wait (never longer than 2s) */
@@ -289,58 +289,45 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .reasons-head { font-size: clamp(3rem, 8.5vw, 7.6rem); max-width: 10em; }
 .reasons-head em { color: var(--pink); }
 .beats { display: grid; gap: 36px; margin-top: clamp(3rem, 6vw, 5rem); }
-/* words in a narrow column, the picture alongside in a wide one; cards swap sides as they go */
 .beat {
   --bg: var(--lime); --acc: var(--pink); --fg: var(--ink);
-  --pad: clamp(1.6rem, 3.4vw, 3rem);
   position: sticky; top: calc(100px + env(safe-area-inset-top, 0px));
-  display: grid; grid-template-columns: minmax(0, .6fr) minmax(0, 1.4fr); align-items: center;
-  gap: clamp(1.5rem, 3vw, 2.6rem);
-  min-height: min(600px, calc(100vh - 140px));
-  padding: var(--pad);
+  display: grid; grid-template-columns: .9fr 1.1fr; align-items: center; gap: clamp(1.5rem, 4vw, 4rem);
+  min-height: min(620px, calc(100vh - 140px));
+  padding: clamp(1.8rem, 4.5vw, 4rem);
   border: var(--line); border-radius: clamp(28px, 4vw, 48px);
   background: var(--bg); color: var(--fg);
   box-shadow: 10px 10px 0 var(--ink);
   transform-origin: 50% 0;
 }
-.beat:nth-child(even) { grid-template-columns: minmax(0, 1.4fr) minmax(0, .6fr); }
-.beat:nth-child(even) .copy { order: 2; }
 .beat > * { min-width: 0; }
 .beat .num {
   display: inline-grid; place-items: center;
-  width: 64px; height: 64px; margin-bottom: 1.2rem;
+  width: 64px; height: 64px; margin-bottom: 1.4rem;
   border: var(--line); border-radius: 50%;
   background: var(--acc); color: var(--ink);
   font: 900 1.9rem/1 var(--display);
   box-shadow: 3px 3px 0 var(--ink);
   rotate: -8deg;
 }
-.beat h3 { font-size: clamp(2.3rem, 3.7vw, 3.8rem); }
+.beat h3 { font-size: clamp(2.7rem, 6vw, 5.4rem); }
 .beat h3 em { color: var(--acc); }
-.beat p { margin: 1.1rem 0 0; max-width: 22em; font-size: clamp(1.05rem, 1.4vw, 1.25rem); font-weight: 500; }
-/* pictures are never shown bigger than they really are, so they stay sharp */
-.beat .media { position: relative; justify-self: center; width: 100%; max-width: 900px; }
-.beat .frame img { width: 100%; }
+.beat p { margin: 1.3rem 0 0; max-width: 22em; font-size: clamp(1.1rem, 1.6vw, 1.35rem); font-weight: 500; }
+.beat .media { position: relative; }
 .beat .media::before {
   content: ""; position: absolute; inset: 8% -6% -8% 8%; z-index: 0;
   border-radius: 50% 44% 52% 40%;
   background: var(--acc);
 }
-.beat:nth-child(even) .media::before { inset: 8% 8% -8% -6%; }
 .beat .frame {
   position: relative; z-index: 1;
   border: var(--line); border-radius: 18px;
   background: #1f1e1a;
   box-shadow: 8px 8px 0 var(--ink);
   overflow: hidden;
-  rotate: 1.5deg;
+  rotate: 2.5deg;
 }
-.beat:nth-child(even) .frame { rotate: -1.5deg; }
-/* on wide screens the picture runs past the card's edge, like a sticker, which buys it more size */
-@media (min-width: 1300px) {
-  .beat .media { width: calc(100% + var(--pad) + 36px); margin-right: calc(-1 * var(--pad) - 36px); max-width: none; }
-  .beat:nth-child(even) .media { margin-right: 0; margin-left: calc(-1 * var(--pad) - 36px); }
-}
+.beat:nth-child(even) .frame { rotate: -2.5deg; }
 .b1 { --bg: var(--lime); --acc: var(--pink); }
 .b2 { --bg: var(--tang); --acc: var(--gold); }
 .b3 { --bg: var(--pink); --acc: var(--lime); }
@@ -349,6 +336,42 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .peek { position: absolute; z-index: 0; left: 12%; top: -86px; width: 150px; }
 .peek .mari { width: 100%; display: block; }
 .b3 .media { margin-top: 70px; }
+
+/* ---------- tap or click a picture to see it big ---------- */
+.beat .frame { cursor: zoom-in; -webkit-tap-highlight-color: transparent; }
+.beat .frame:focus-visible { outline: 3px solid var(--pink); outline-offset: 5px; }
+.zoom-hint {
+  position: absolute; right: 12px; bottom: 12px; z-index: 2;
+  display: grid; place-items: center; width: 46px; height: 46px;
+  border: var(--line); border-radius: 50%;
+  background: var(--paper); color: var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  transform: scale(.85);
+  transition: transform .3s cubic-bezier(.3, 1.6, .5, 1);
+  pointer-events: none;
+}
+.zoom-hint svg { width: 22px; height: 22px; }
+@media (hover: hover) { .beat .frame:hover .zoom-hint { transform: scale(1.1) rotate(-12deg); } }
+.zoom { position: fixed; inset: 0; z-index: 150; display: grid; place-items: center; cursor: zoom-out; overscroll-behavior: contain; }
+.zoom[hidden] { display: none; }
+.zoom-back { position: absolute; inset: 0; background: rgba(20, 18, 15, .86); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.zoom-img {
+  position: absolute; max-width: none;
+  border: 3px solid var(--paper); border-radius: 18px;
+  background: #1f1e1a;
+  box-shadow: 14px 14px 0 var(--zacc, var(--pink));
+  transform-origin: 50% 50%;
+}
+.zoom-close {
+  position: absolute; z-index: 2;
+  top: calc(16px + env(safe-area-inset-top, 0px)); right: 16px;
+  display: grid; place-items: center; width: 52px; height: 52px;
+  border: var(--line); border-radius: 50%;
+  background: var(--gold); color: var(--ink);
+  box-shadow: 0 4px 0 var(--ink);
+  cursor: pointer;
+}
+.zoom-close svg { width: 22px; height: 22px; }
 
 /* ---------- trailer ---------- */
 .trailer { padding: clamp(3rem, 6vw, 5rem) 0; }
@@ -419,9 +442,7 @@ footer nav a:hover { color: var(--pink); }
 @media (max-width: 960px) {
   .hero-grid { grid-template-columns: 1fr; }
   .hero-art { max-width: 360px; margin-top: 1rem; }
-  .beat, .beat:nth-child(even) { position: relative; top: 0; grid-template-columns: 1fr; min-height: 0; }
-  .beat:nth-child(even) .copy { order: 0; }
-  .beat:nth-child(even) .media::before { inset: 8% -6% -8% 8%; }
+  .beat { position: relative; top: 0; grid-template-columns: 1fr; min-height: 0; }
   .oses { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
@@ -522,47 +543,47 @@ footer nav a:hover { color: var(--pink); }
 
     <div class="beats">
       <article class="beat b1">
-        <div class="copy">
+        <div>
           <span class="num">1</span>
           <h3 class="split" data-i18n="b1.h3">Read it like an <em>editor.</em></h3>
           <p data-i18n="b1.p">Mark what sings, what drags and what's in the wrong place. Right on the page.</p>
         </div>
         <div class="media">
-          <div class="frame"><img src="highlights.gif" width="900" height="512" alt="Passages in a chapter being marked in different colours" data-i18n-alt="b1.alt" loading="lazy"></div>
+          <div class="frame" role="button" tabindex="0" aria-label="Enlarge the picture" data-i18n-aria="zoom.open"><img src="highlights.gif" width="900" height="512" alt="Passages in a chapter being marked in different colours" data-i18n-alt="b1.alt" loading="lazy"><span class="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg></span></div>
         </div>
       </article>
 
       <article class="beat b2">
-        <div class="copy">
+        <div>
           <span class="num">2</span>
           <h3 class="split" data-i18n="b2.h3">Rewrite without <em>fear.</em></h3>
           <p data-i18n="b2.p">Try a new version right beside the old one. Every version you replace is kept.</p>
         </div>
         <div class="media">
-          <div class="frame"><img src="draft-and-compare.gif" width="900" height="553" alt="Two versions of a passage side by side, with the changed words picked out" data-i18n-alt="b2.alt" loading="lazy"></div>
+          <div class="frame" role="button" tabindex="0" aria-label="Enlarge the picture" data-i18n-aria="zoom.open"><img src="draft-and-compare.gif" width="900" height="553" alt="Two versions of a passage side by side, with the changed words picked out" data-i18n-alt="b2.alt" loading="lazy"><span class="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg></span></div>
         </div>
       </article>
 
       <article class="beat b3">
-        <div class="copy">
+        <div>
           <span class="num">3</span>
           <h3 class="split" data-i18n="b3.h3">Kill your darlings. Keep the <em>bodies.</em></h3>
           <p data-i18n="b3.p">Cut scenes go in the drawer, not the bin. Bring them back whenever you like.</p>
         </div>
         <div class="media">
           <div class="peek" aria-hidden="true"><svg class="mari" viewBox="300 205 400 200"><path class="body" d="M294.5 851.9C217.7 846.1 172.0 812.6 181.1 768.8C184.0 754.8 194.4 741.6 207.6 735.0C211.4 733.1 214.6 731.5 214.8 731.5C214.9 731.4 213.9 726.9 212.6 721.4C203.0 681.8 206.9 638.0 223.5 598.5C243.8 550.2 280.0 510.3 329.0 482.5C333.7 479.8 337.7 477.5 337.9 477.4C338.1 477.2 336.4 472.7 334.2 467.3C319.9 432.7 321.2 401.7 338.8 361.4C341.0 356.4 342.4 350.4 344.0 340.0C353.3 276.7 367.5 228.1 379.3 218.6C384.5 214.5 392.7 213.8 399.1 217.0C411.9 223.5 431.2 247.5 454.1 285.5L463.8 301.5L470.7 301.3C485.5 300.7 510.3 303.5 531.2 308.1L536.8 309.4L552.7 293.9C598.0 250.0 620.0 236.7 633.4 244.9C642.0 250.3 644.6 263.3 643.7 298.4C643.0 325.0 641.5 341.3 636.8 369.0L633.7 387.5L635.0 404.3C639.1 459.6 623.7 496.4 586.5 520.1C579.0 524.8 578.0 525.8 578.3 528.0C578.5 529.4 579.7 535.1 580.9 540.6C587.5 572.0 586.5 592.5 575.4 653.1C566.9 700.0 564.5 738.3 568.9 756.6C570.1 761.4 570.4 761.8 576.0 764.3C599.5 775.1 601.8 813.2 579.6 824.5L573.6 827.5L547.3 827.8C532.8 828.0 521.0 827.9 521.0 827.6C521.0 827.4 521.9 825.6 522.9 823.8C530.6 810.8 529.1 792.8 519.2 779.8C508.0 765.0 488.3 757.8 463.8 759.6C458.9 760.0 455.0 759.9 455.0 759.5C455.0 759.1 455.6 756.2 456.4 753.1C466.8 712.6 449.4 665.6 417.2 646.7C404.7 639.4 389.4 635.0 381.5 636.4C376.8 637.3 377.4 637.8 388.6 642.8C418.6 655.9 438.4 679.8 444.6 710.0C446.4 719.1 446.2 744.0 444.1 751.0C443.6 752.9 442.6 756.4 442.0 758.8C441.4 761.1 440.4 763.0 439.7 763.0C439.0 763.0 427.9 765.9 415.0 769.4C385.7 777.3 372.8 780.4 357.5 783.0C324.4 788.7 288.7 787.3 262.5 779.4C251.0 775.9 246.6 775.7 246.2 778.7C245.8 781.7 249.1 784.4 257.4 787.9C276.3 795.8 295.5 798.4 328.0 797.7C358.3 796.9 372.1 794.6 405.5 784.6C446.9 772.3 469.4 769.2 487.3 773.4C513.7 779.6 524.4 803.6 510.0 824.5C503.9 833.4 496.8 835.8 473.5 837.0C459.6 837.7 452.3 838.7 434.0 842.3C406.0 848.0 394.3 849.7 372.0 851.5C353.3 853.1 312.7 853.3 294.5 851.9Z"/><path class="wh wh-l" d="M262.6 459.4C260.5 457.3 260.6 453.7 262.8 451.8C265.6 449.3 297.0 443.0 306.7 443.0C310.9 443.0 313.7 446.7 312.0 449.9C310.5 452.7 308.5 453.6 301.5 454.5C298.2 454.8 289.0 456.5 281.0 458.1C264.2 461.5 264.6 461.5 262.6 459.4ZM297.5 427.0C295.3 426.5 289.2 425.9 284.0 425.5C268.1 424.5 264.1 423.9 262.5 422.4C260.2 420.0 260.7 416.3 263.6 414.4C265.9 412.9 267.5 412.8 280.1 413.9C292.9 414.9 304.9 416.9 309.3 418.5C311.4 419.4 312.6 423.8 311.3 425.9C310.1 427.7 303.6 428.3 297.5 427.0Z"/><path class="wh wh-r" d="M662.5 501.8C659.2 500.0 652.0 496.8 646.6 494.5C635.6 489.9 634.1 488.5 635.6 484.3C637.5 478.8 645.3 480.6 666.3 491.2C676.5 496.5 678.3 498.6 676.0 502.9C674.4 505.9 669.7 505.5 662.5 501.8ZM672.5 469.4C668.6 468.6 661.1 467.6 655.8 467.1C645.2 466.2 643.0 465.2 643.0 461.0C643.0 456.2 644.8 455.6 657.8 456.3C681.4 457.4 691.7 462.3 685.0 469.0C682.7 471.3 682.1 471.3 672.5 469.4Z"/><g class="eyes"><ellipse class="eye" cx="446.8" cy="425" rx="14.5" ry="22.5"/><ellipse class="eye" cx="581.7" cy="440.5" rx="14" ry="23"/></g></svg></div>
-          <div class="frame"><img src="drawer.gif" width="900" height="506" alt="A cut passage going into the drawer and being read back" data-i18n-alt="b3.alt" loading="lazy"></div>
+          <div class="frame" role="button" tabindex="0" aria-label="Enlarge the picture" data-i18n-aria="zoom.open"><img src="drawer.gif" width="900" height="506" alt="A cut passage going into the drawer and being read back" data-i18n-alt="b3.alt" loading="lazy"><span class="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg></span></div>
         </div>
       </article>
 
       <article class="beat b4">
-        <div class="copy">
+        <div>
           <span class="num">4</span>
           <h3 class="split" data-i18n="b4.h3">Then just <em>write.</em></h3>
           <p data-i18n="b4.p">One key, and everything disappears except your words.</p>
         </div>
         <div class="media">
-          <div class="frame"><img src="focus-mode.png" width="1920" height="1080" alt="Focus mode, with nothing on screen but the writing" data-i18n-alt="b4.alt" loading="lazy"></div>
+          <div class="frame" role="button" tabindex="0" aria-label="Enlarge the picture" data-i18n-aria="zoom.open"><img src="focus-mode.png" width="1920" height="1080" alt="Focus mode, with nothing on screen but the writing" data-i18n-alt="b4.alt" loading="lazy"><span class="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg></span></div>
         </div>
       </article>
     </div>
@@ -624,6 +645,12 @@ footer nav a:hover { color: var(--pink); }
 </section>
 
 </main>
+
+<div class="zoom" id="zoom" hidden>
+  <div class="zoom-back"></div>
+  <img class="zoom-img" alt="">
+  <button class="zoom-close" type="button" aria-label="Close" data-i18n-aria="zoom.close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+</div>
 
 <footer>
   <div class="wrap">
@@ -714,7 +741,9 @@ window.I18N = (() => {
     "footer.github": "GitHub",
     "footer.downloads": "Все загрузки",
     "footer.bug": "Сообщить об\u00a0ошибке",
-    "footer.license": "AGPL-3.0"
+    "footer.license": "AGPL-3.0",
+    "zoom.open": "Увеличить картинку",
+    "zoom.close": "Закрыть"
   };
 
   // English lines that only the script shows (the cat's lines, button states)
@@ -1037,6 +1066,98 @@ window.I18N = (() => {
       fillRelease();
       if (motion) ScrollTrigger.refresh();
     });
+  });
+
+  /* ---------- tap or click a picture to see it big ----------
+     The picture flies out of its card to the middle of the screen, as big as
+     the screen allows but never past its real size (so it stays sharp). On a
+     phone held upright it turns sideways to use the long side. */
+  const zoom = $("#zoom"), zoomImg = $(".zoom-img", zoom), zoomBack = $(".zoom-back", zoom), zoomClose = $(".zoom-close", zoom);
+  const zoomMs = reduced ? 0 : 560;
+  let zoomFrom = null, zoomL = null;
+
+  const zoomLayout = (img) => {
+    const nw = img.naturalWidth || img.width, nh = img.naturalHeight || img.height;
+    const roomW = innerWidth - 40, roomH = innerHeight - 150;
+    const turn = innerWidth < 700 && innerHeight > innerWidth * 1.15 && nw > nh;
+    const s = turn ? Math.min(1, roomH / nw, roomW / nh) : Math.min(1, roomW / nw, roomH / nh);
+    return { w: Math.round(nw * s), h: Math.round(nh * s), rot: turn ? 90 : 0 };
+  };
+  // where the picture sits in its card, as a transform from the middle of the screen
+  const zoomStart = (frame) => {
+    const r = frame.getBoundingClientRect();
+    const rot = parseFloat(getComputedStyle(frame).rotate) || 0;
+    const rad = (rot * Math.PI) / 180, ow = frame.offsetWidth, oh = frame.offsetHeight;
+    const k = r.width / (ow * Math.abs(Math.cos(rad)) + oh * Math.abs(Math.sin(rad)));  // a card shrunk by the stack
+    const dx = r.left + r.width / 2 - innerWidth / 2, dy = r.top + r.height / 2 - innerHeight / 2;
+    return `translate(${dx}px, ${dy}px) rotate(${rot}deg) scale(${(ow * k) / zoomL.w}, ${(oh * k) / zoomL.h})`;
+  };
+  const zoomEnd = () => `rotate(${zoomL.rot}deg)`;
+  const zoomPlace = () => {
+    zoomImg.style.width = zoomL.w + "px";
+    zoomImg.style.height = zoomL.h + "px";
+    zoomImg.style.left = (innerWidth - zoomL.w) / 2 + "px";
+    zoomImg.style.top = (innerHeight - zoomL.h) / 2 + "px";
+  };
+  const stopScroll = (e) => e.preventDefault();
+
+  function openZoom(frame) {
+    if (zoomFrom) return;
+    const img = frame.querySelector("img");
+    zoomFrom = frame;
+    zoomL = zoomLayout(img);
+    zoomImg.src = img.currentSrc || img.src;
+    zoomImg.alt = img.alt;
+    zoomPlace();
+    zoom.style.setProperty("--zacc", getComputedStyle(frame.closest(".beat")).getPropertyValue("--acc"));
+    zoom.hidden = false;
+    if (lenis) lenis.stop();
+    zoomImg.getAnimations().forEach((a) => a.cancel());
+    zoomImg.style.transform = zoomEnd();
+    if (zoomMs) {
+      zoomImg.animate([{ transform: zoomStart(frame) }, { transform: zoomEnd() }], { duration: zoomMs, easing: "cubic-bezier(.2, .9, .25, 1.08)" });
+      zoomBack.animate([{ opacity: 0 }, { opacity: 1 }], { duration: zoomMs * 0.6, easing: "ease-out" });
+      zoomClose.animate([{ opacity: 0, transform: "scale(.4) rotate(-90deg)" }, { opacity: 1, transform: "none" }], { duration: zoomMs, delay: zoomMs * 0.3, easing: "cubic-bezier(.3, 1.6, .5, 1)", fill: "backwards" });
+    }
+    frame.style.visibility = "hidden";
+    zoomClose.focus({ preventScroll: true });
+  }
+
+  function closeZoom() {
+    const frame = zoomFrom;
+    if (!frame || zoom.dataset.closing) return;
+    const done = () => {
+      zoom.hidden = true;
+      delete zoom.dataset.closing;
+      zoomImg.getAnimations().forEach((a) => a.cancel());
+      zoomBack.getAnimations().forEach((a) => a.cancel());
+      frame.style.visibility = "";
+      zoomFrom = null;
+      if (lenis) lenis.start();
+      frame.focus({ preventScroll: true });
+    };
+    if (!zoomMs) return done();
+    zoom.dataset.closing = "1";
+    zoomImg.animate([{ transform: zoomEnd() }, { transform: zoomStart(frame) }], { duration: zoomMs * 0.75, easing: "cubic-bezier(.5, 0, .2, 1)", fill: "forwards" }).onfinish = done;
+    zoomBack.animate([{ opacity: 1 }, { opacity: 0 }], { duration: zoomMs * 0.75, fill: "forwards" });
+    zoomClose.animate([{ opacity: 1 }, { opacity: 0 }], { duration: zoomMs * 0.3, fill: "forwards" });
+  }
+
+  $$(".beat .frame").forEach((frame) => {
+    frame.addEventListener("click", () => openZoom(frame));
+    frame.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openZoom(frame); }
+    });
+  });
+  zoom.addEventListener("click", closeZoom);
+  zoom.addEventListener("wheel", stopScroll, { passive: false });
+  zoom.addEventListener("touchmove", stopScroll, { passive: false });
+  addEventListener("keydown", (e) => { if (e.key === "Escape") closeZoom(); });
+  addEventListener("resize", () => {
+    if (!zoomFrom || zoom.dataset.closing) return;
+    zoomL = zoomLayout(zoomFrom.querySelector("img"));
+    zoomPlace();
+    zoomImg.style.transform = zoomEnd();
   });
 
   /* ---------- your own trailer, when it's there ---------- */
