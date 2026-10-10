@@ -22,7 +22,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Fraunces and Bricolage have no Cyrillic, so Russian is set in Literata (the font Mari itself writes in) and Onest -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Caveat:wght@600&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,0..100,0..1;1,9..144,300..900,0..100,0..1&family=JetBrains+Mono:wght@500&family=Literata:ital,opsz,wght@0,7..72,700..900;1,7..72,700..900&family=Onest:wght@400..800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Caveat:wght@600&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,0..100,0..1;1,9..144,300..900,0..100,0..1&family=JetBrains+Mono:wght@500&family=Literata:ital,opsz,wght@0,7..72,400..900;1,7..72,400..900&family=Onest:wght@400..800&display=swap">
 <!--
   YOUR OWN MEDIA
   Drop a video at docs/media/trailer.mp4 (and, if you like, a still at
@@ -59,6 +59,7 @@
   --lime: #d6f53b;
   --tang: #ff6a2b;
   --violet: #7d5cff;
+  --grape: #5b3cf0;
 
   --display: "Fraunces", Georgia, serif;
   --sans: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -128,6 +129,7 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 800; }
   border-radius: 999px; border: var(--line);
   background: var(--bg); color: var(--fg);
   font: 800 1.1rem/1 var(--sans);
+  text-align: center;
   text-decoration: none;
   box-shadow: 0 6px 0 var(--ink);
   transition: transform .15s, box-shadow .15s;
@@ -284,6 +286,77 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .band-track span::after { content: "✶"; color: var(--pink); font-size: .6em; }
 @keyframes marquee { to { transform: translateX(-50%); } }
 
+/* ---------- books aren't written: a first draft gets good as you scroll ---------- */
+.rd {
+  --cut: #eb5757; --rew: #f2994a; --mov: #26c6da; --good: #5cb85c;
+  position: relative; isolation: isolate;
+  margin: clamp(3rem, 6vw, 5rem) clamp(6px, 1.5vw, 20px) 0;
+  padding: clamp(4rem, 8vw, 6.5rem) 0 clamp(2rem, 4vw, 3rem);
+  border-radius: clamp(28px, 5vw, 56px);
+  background: var(--grape); color: var(--paper);
+}
+.rd::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(circle at 15% 20%, rgba(255,255,255,.13) 0 2px, transparent 3px) 0 0 / 34px 34px;
+}
+.rd h2 { font-size: clamp(3rem, 7.4vw, 7rem); max-width: 11em; }
+.rd h2 em { color: var(--lime); }
+.rd-sub { margin: 1.3rem 0 0; font-size: clamp(1.1rem, 1.6vw, 1.35rem); font-weight: 500; color: #ddd6ff; }
+.rd-stage { display: grid; grid-template-columns: minmax(180px, 250px) minmax(0, 1fr); align-items: center; gap: clamp(1.5rem, 4vw, 4rem); padding-block: clamp(2.5rem, 5vw, 4rem); }
+.rd-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.rd-steps li {
+  display: flex; align-items: center; gap: .8rem; min-width: 0;
+  padding: .7rem 1.1rem .7rem .7rem;
+  border: 3px solid transparent; border-radius: 999px;
+  font: 800 clamp(1rem, 1.5vw, 1.25rem)/1.1 var(--sans); color: #cfc6ff;
+  transition: background .3s, color .3s, border-color .3s, box-shadow .3s, transform .4s cubic-bezier(.3, 1.6, .5, 1);
+}
+.rd-steps b { display: grid; place-items: center; flex: none; width: 38px; height: 38px; border: 3px solid currentColor; border-radius: 50%; font: 900 1.1rem/1 var(--display); }
+.rd-steps li.on { background: var(--lime); color: var(--ink); border-color: var(--ink); box-shadow: 4px 4px 0 var(--ink); transform: rotate(-2deg) scale(1.04); }
+.rd-steps li.on b { background: var(--paper); }
+.rd-page {
+  position: relative;
+  padding: clamp(1.1rem, 2.6vw, 2rem) clamp(1.2rem, 3.4vw, 2.8rem) clamp(1.4rem, 3.4vw, 2.6rem);
+  border: var(--line); border-radius: 26px;
+  background: var(--paper); color: var(--ink);
+  box-shadow: 12px 12px 0 var(--ink);
+  rotate: -1deg;
+}
+.rd-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .6rem 1rem; padding-bottom: 1rem; margin-bottom: clamp(1rem, 2.4vw, 1.6rem); border-bottom: 2px dashed rgba(20, 18, 15, .2); }
+.rd-file { font: 500 .8rem var(--mono); color: #6c665a; }
+.rd-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.rd-pill { display: inline-flex; align-items: center; gap: .45em; padding: .3em .35em .3em .8em; border: 2px solid var(--ink); border-radius: 999px; font: 700 .85rem/1 var(--sans); }
+.rd-drawer { background: color-mix(in srgb, var(--cut) 24%, #fff); }
+.rd-kept { background: color-mix(in srgb, var(--rew) 28%, #fff); }
+.odo { display: inline-block; height: 1.6em; min-width: 1.6em; overflow: hidden; border-radius: 999px; background: var(--ink); color: var(--paper); text-align: center; font: 800 .9em/1.6em var(--sans); font-variant-numeric: tabular-nums; }
+.odo-in, .odo-in span { display: block; }
+.odo-in span { height: 1.6em; }
+.rd-lines { position: relative; font: 400 clamp(1.1rem, 2vw, 1.8rem)/1.5 "Literata", Georgia, serif; }
+.rd-row { display: grid; }
+.rd-row + .rd-row { margin-top: .55em; }
+.rd-row > * { grid-area: 1 / 1; min-width: 0; }
+.rd-old, .rd-new { display: block; }
+.rd-new { display: none; }
+.rd-row[data-mark="cut"] { --m: var(--cut); }
+.rd-row[data-mark="rewrite"] { --m: var(--rew); }
+.rd-row[data-mark="move"] { --m: var(--mov); }
+.rd-row[data-mark="good"] { --m: var(--good); }
+.rd-fresh { --m: var(--lime); }
+.rd-t {
+  --hl: 0; --hp: 0%;
+  background: linear-gradient(color-mix(in srgb, var(--m) 45%, transparent), color-mix(in srgb, var(--m) 45%, transparent)) no-repeat var(--hp) 88% / calc(var(--hl) * 1%) 82%;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  padding: 0 .08em; margin: 0 -.08em; border-radius: .18em;
+}
+.rd-chip { display: none; padding: .14em .6em; border: 2px solid var(--ink); border-radius: 999px; background: var(--m); color: var(--ink); font: 800 .55em/1.3 var(--sans); vertical-align: .25em; white-space: nowrap; transform-origin: 30% 60%; }
+/* live: the script lays the lines out itself, so they can move, shrink and swap places */
+.rd-live .rd-row { position: absolute; left: 0; right: 0; margin: 0; }
+.rd-live .rd-new { display: block; opacity: 0; }
+.rd-live .rd-chip, .rd-still .rd-chip { display: inline-block; }
+.rd-live .rd-chip { transform: scale(0); }
+/* still (no motion): the draft shown marked up */
+.rd-still .rd-t { --hl: 100; }
+
 /* ---------- reasons ---------- */
 .reasons { padding: clamp(5rem, 11vw, 9rem) 0 clamp(3rem, 6vw, 5rem); }
 .reasons-head { font-size: clamp(3rem, 8.5vw, 7.6rem); max-width: 10em; }
@@ -301,6 +374,7 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
   transform-origin: 50% 0;
 }
 .beat > * { min-width: 0; }
+.beats > .beat { min-width: 0; }
 .beat .num {
   display: inline-grid; place-items: center;
   width: 64px; height: 64px; margin-bottom: 1.4rem;
@@ -403,7 +477,8 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .os.rec::before { content: attr(data-rec); position: absolute; top: -13px; right: 16px; padding: .15rem .7rem; border-radius: 999px; background: var(--gold); border: 2px solid var(--ink); font: 700 .75rem var(--sans); }
 .os h3 { display: flex; align-items: center; gap: .6rem; font-size: 1.7rem; letter-spacing: -.02em; }
 .os h3 svg { width: 28px; height: 28px; }
-.os .btn { min-height: 50px; font-size: .98rem; padding: .7em 1.1em; box-shadow: 0 4px 0 var(--ink); }
+.os .btn { min-height: 50px; font-size: .98rem; line-height: 1.15; text-wrap: balance; padding: .7em 1.1em; box-shadow: 0 4px 0 var(--ink); }
+.beat p, .os .alt, .dl .lede, .rd-sub { text-wrap: pretty; }
 .os .alt { font-size: .9rem; color: #6c665a; }
 .os .alt a { font-weight: 700; color: var(--ink); }
 .warn { margin-top: 1.4rem; border-radius: 18px; background: rgba(255,253,248,.88); border: 2px solid var(--ink); }
@@ -414,7 +489,7 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .warn .in-warn { padding: 0 1.3rem 1.3rem; display: grid; gap: .8rem; max-width: 52em; }
 .warn p { margin: 0; }
 .cmd { display: flex; align-items: center; gap: .6rem; padding: .5rem .5rem .5rem 1rem; border-radius: 12px; background: var(--ink); color: var(--paper); font: 500 .9rem var(--mono); overflow-x: auto; }
-.cmd code { white-space: nowrap; flex: 1; }
+.cmd code { white-space: nowrap; flex: 1 1 auto; min-width: 0; overflow-x: auto; }
 .cmd button { flex: none; border: 0; border-radius: 8px; padding: .45rem .8rem; background: var(--gold); color: var(--ink); font: 700 .8rem var(--sans); cursor: pointer; }
 .dl-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1.5rem; margin-top: 2rem; font-weight: 600; }
 .dl-meta .beta { padding: .25rem .7rem; border-radius: 999px; background: var(--ink); color: var(--paper); font: 600 .78rem var(--mono); }
@@ -440,6 +515,13 @@ footer nav a:hover { color: var(--pink); }
 
 /* ---------- small screens ---------- */
 @media (max-width: 960px) {
+  .rd-stage { grid-template-columns: minmax(0, 1fr); gap: 1.1rem; }
+  .rd-steps { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; }
+  .rd-steps li { gap: .45rem; padding: .4rem .55rem .4rem .4rem; font-size: .82rem; }
+  .rd-steps b { width: 26px; height: 26px; border-width: 2px; font-size: .85rem; }
+  .rd-steps li.on { box-shadow: 3px 3px 0 var(--ink); transform: rotate(-2deg); }
+}
+@media (max-width: 960px) {
   .hero-grid { grid-template-columns: 1fr; }
   .hero-art { max-width: 360px; margin-top: 1rem; }
   .beat { position: relative; top: 0; grid-template-columns: 1fr; min-height: 0; }
@@ -455,6 +537,12 @@ footer nav a:hover { color: var(--pink); }
   .beat { box-shadow: 6px 6px 0 var(--ink); }
   .peek { width: 110px; top: -62px; }
   .b3 .media { margin-top: 56px; }
+  .rd-page { rotate: 0deg; box-shadow: 6px 6px 0 var(--ink); }
+  .rd-pill { font-size: .78rem; }
+  html:lang(ru) .beat h3 { font-size: min(2.2rem, 10vw); }
+  .cmd { flex-wrap: wrap; overflow: hidden; }
+  .cmd code { flex-basis: 100%; white-space: normal; overflow-wrap: anywhere; }
+  .cmd button { min-height: 40px; }
   .nav { padding-left: 14px; }
   .nav .btn { padding: .6em 1.05em; font-size: .95rem; }
   .lang { padding: 0 .7rem 0 .6rem; }
@@ -473,7 +561,7 @@ footer nav a:hover { color: var(--pink); }
 </head>
 <body>
 
-<nav class="nav" aria-label="Main">
+<nav class="nav" aria-label="Main" data-i18n-aria="nav.main">
   <a class="brand" href="#top" aria-label="Mari, back to top" data-i18n-aria="nav.home">
     <svg viewBox="150 140 720 740" aria-hidden="true"><path d="M294.5 851.9C217.7 846.1 172.0 812.6 181.1 768.8C184.0 754.8 194.4 741.6 207.6 735.0C211.4 733.1 214.6 731.5 214.8 731.5C214.9 731.4 213.9 726.9 212.6 721.4C203.0 681.8 206.9 638.0 223.5 598.5C243.8 550.2 280.0 510.3 329.0 482.5C333.7 479.8 337.7 477.5 337.9 477.4C338.1 477.2 336.4 472.7 334.2 467.3C319.9 432.7 321.2 401.7 338.8 361.4C341.0 356.4 342.4 350.4 344.0 340.0C353.3 276.7 367.5 228.1 379.3 218.6C384.5 214.5 392.7 213.8 399.1 217.0C411.9 223.5 431.2 247.5 454.1 285.5L463.8 301.5L470.7 301.3C485.5 300.7 510.3 303.5 531.2 308.1L536.8 309.4L552.7 293.9C598.0 250.0 620.0 236.7 633.4 244.9C642.0 250.3 644.6 263.3 643.7 298.4C643.0 325.0 641.5 341.3 636.8 369.0L633.7 387.5L635.0 404.3C639.1 459.6 623.7 496.4 586.5 520.1C579.0 524.8 578.0 525.8 578.3 528.0C578.5 529.4 579.7 535.1 580.9 540.6C587.5 572.0 586.5 592.5 575.4 653.1C566.9 700.0 564.5 738.3 568.9 756.6C570.1 761.4 570.4 761.8 576.0 764.3C599.5 775.1 601.8 813.2 579.6 824.5L573.6 827.5L547.3 827.8C532.8 828.0 521.0 827.9 521.0 827.6C521.0 827.4 521.9 825.6 522.9 823.8C530.6 810.8 529.1 792.8 519.2 779.8C508.0 765.0 488.3 757.8 463.8 759.6C458.9 760.0 455.0 759.9 455.0 759.5C455.0 759.1 455.6 756.2 456.4 753.1C466.8 712.6 449.4 665.6 417.2 646.7C404.7 639.4 389.4 635.0 381.5 636.4C376.8 637.3 377.4 637.8 388.6 642.8C418.6 655.9 438.4 679.8 444.6 710.0C446.4 719.1 446.2 744.0 444.1 751.0C443.6 752.9 442.6 756.4 442.0 758.8C441.4 761.1 440.4 763.0 439.7 763.0C439.0 763.0 427.9 765.9 415.0 769.4C385.7 777.3 372.8 780.4 357.5 783.0C324.4 788.7 288.7 787.3 262.5 779.4C251.0 775.9 246.6 775.7 246.2 778.7C245.8 781.7 249.1 784.4 257.4 787.9C276.3 795.8 295.5 798.4 328.0 797.7C358.3 796.9 372.1 794.6 405.5 784.6C446.9 772.3 469.4 769.2 487.3 773.4C513.7 779.6 524.4 803.6 510.0 824.5C503.9 833.4 496.8 835.8 473.5 837.0C459.6 837.7 452.3 838.7 434.0 842.3C406.0 848.0 394.3 849.7 372.0 851.5C353.3 853.1 312.7 853.3 294.5 851.9Z"/><rect x="771" y="164" width="48" height="668" rx="24"/></svg>
     <span class="brand-name">Mari</span>
@@ -536,6 +624,39 @@ footer nav a:hover { color: var(--pink); }
     <span data-i18n="band.1">Free</span><span data-i18n="band.2">No account</span><span data-i18n="band.3">No subscription</span><span data-i18n="band.4">Your files stay yours</span><span data-i18n="band.5">Windows, Mac &amp; Linux</span><span data-i18n="band.6">Comes with a cat</span>
   </div>
 </div>
+
+<section class="rd" id="rewrite" aria-labelledby="rd-h">
+  <div class="wrap">
+    <h2 class="split" id="rd-h" data-i18n="rd.h2">Books aren't written. They're <em>rewritten.</em></h2>
+    <p class="rd-sub" data-i18n="rd.sub">Scroll, and watch a first draft get good.</p>
+  </div>
+  <div class="rd-pin">
+    <div class="wrap rd-stage">
+      <ol class="rd-steps" aria-hidden="true">
+        <li class="on"><b>1</b><span data-i18n="rd.step1">First draft</span></li>
+        <li><b>2</b><span data-i18n="rd.step2">Marked up</span></li>
+        <li><b>3</b><span data-i18n="rd.step3">Rewritten</span></li>
+      </ol>
+      <div class="rd-page">
+        <div class="rd-bar">
+          <span class="rd-file" data-i18n="rd.file">07 · The Body in the Coat</span>
+          <span class="rd-pills">
+            <span class="rd-pill rd-drawer"><span data-i18n="rd.drawer">Drawer</span><span class="odo"><span class="odo-in"><span>0</span><span>1</span><span>2</span></span></span></span>
+            <span class="rd-pill rd-kept"><span data-i18n="rd.kept">Old versions</span><span class="odo"><span class="odo-in"><span>0</span><span>1</span><span>2</span></span></span></span>
+          </span>
+        </div>
+        <div class="rd-lines">
+          <div class="rd-row" data-mark="cut"><span class="rd-old"><span class="rd-t" data-i18n="rd.s1">The rain fell down from the sky above, wetly.</span> <span class="rd-chip" data-i18n="rd.cut">Cut</span></span></div>
+          <div class="rd-row" data-mark="rewrite"><span class="rd-old"><span class="rd-t" data-i18n="rd.s2">Detective Hale stood in the doorway and looked at the body, which was dead.</span> <span class="rd-chip" data-i18n="rd.rewrite">Rewrite</span></span><span class="rd-new"><span class="rd-t rd-fresh" data-i18n="rd.s2new">Detective Hale stopped in the doorway.</span></span></div>
+          <div class="rd-row" data-mark="move"><span class="rd-old"><span class="rd-t" data-i18n="rd.s3">He had seen a lot of bodies in twenty years. None of them had ever been wearing his coat.</span> <span class="rd-chip" data-i18n="rd.move">Move</span></span></div>
+          <div class="rd-row" data-mark="cut"><span class="rd-old"><span class="rd-t" data-i18n="rd.s4">Somewhere a dog barked, or possibly it was a different dog.</span> <span class="rd-chip" data-i18n="rd.cut">Cut</span></span></div>
+          <div class="rd-row" data-mark="rewrite"><span class="rd-old"><span class="rd-t" data-i18n="rd.s5">Then he very slowly and very carefully walked very quietly across the room.</span> <span class="rd-chip" data-i18n="rd.rewrite">Rewrite</span></span><span class="rd-new"><span class="rd-t rd-fresh" data-i18n="rd.s5new">He crossed the room without a sound.</span></span></div>
+          <div class="rd-row" data-mark="good"><span class="rd-old"><span class="rd-t" data-i18n="rd.s6">“Nobody touches anything,” he said, to nobody.</span> <span class="rd-chip" data-i18n="rd.good">Good</span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section class="reasons" id="why">
   <div class="wrap">
@@ -636,7 +757,7 @@ footer nav a:hover { color: var(--pink); }
       </details>
 
       <div class="dl-meta">
-        <span class="beta">BETA</span>
+        <span class="beta" data-i18n="dl.betaTag">BETA</span>
         <span data-i18n="dl.beta">Version <span data-version>0.2.7</span>. Usable every day, with the odd rough edge.</span>
         <a href="https://github.com/spacekestrel/mari/issues" data-i18n="dl.bug">Found one? Tell us</a>
       </div>
@@ -658,7 +779,7 @@ footer nav a:hover { color: var(--pink); }
       <div class="zzz"><span>z</span><span>z</span><span>z</span></div>
       <svg class="mari" viewBox="150 130 720 760"><ellipse class="shadow" cx="420" cy="852" rx="250" ry="14"/><path class="body" d="M294.5 851.9C217.7 846.1 172.0 812.6 181.1 768.8C184.0 754.8 194.4 741.6 207.6 735.0C211.4 733.1 214.6 731.5 214.8 731.5C214.9 731.4 213.9 726.9 212.6 721.4C203.0 681.8 206.9 638.0 223.5 598.5C243.8 550.2 280.0 510.3 329.0 482.5C333.7 479.8 337.7 477.5 337.9 477.4C338.1 477.2 336.4 472.7 334.2 467.3C319.9 432.7 321.2 401.7 338.8 361.4C341.0 356.4 342.4 350.4 344.0 340.0C353.3 276.7 367.5 228.1 379.3 218.6C384.5 214.5 392.7 213.8 399.1 217.0C411.9 223.5 431.2 247.5 454.1 285.5L463.8 301.5L470.7 301.3C485.5 300.7 510.3 303.5 531.2 308.1L536.8 309.4L552.7 293.9C598.0 250.0 620.0 236.7 633.4 244.9C642.0 250.3 644.6 263.3 643.7 298.4C643.0 325.0 641.5 341.3 636.8 369.0L633.7 387.5L635.0 404.3C639.1 459.6 623.7 496.4 586.5 520.1C579.0 524.8 578.0 525.8 578.3 528.0C578.5 529.4 579.7 535.1 580.9 540.6C587.5 572.0 586.5 592.5 575.4 653.1C566.9 700.0 564.5 738.3 568.9 756.6C570.1 761.4 570.4 761.8 576.0 764.3C599.5 775.1 601.8 813.2 579.6 824.5L573.6 827.5L547.3 827.8C532.8 828.0 521.0 827.9 521.0 827.6C521.0 827.4 521.9 825.6 522.9 823.8C530.6 810.8 529.1 792.8 519.2 779.8C508.0 765.0 488.3 757.8 463.8 759.6C458.9 760.0 455.0 759.9 455.0 759.5C455.0 759.1 455.6 756.2 456.4 753.1C466.8 712.6 449.4 665.6 417.2 646.7C404.7 639.4 389.4 635.0 381.5 636.4C376.8 637.3 377.4 637.8 388.6 642.8C418.6 655.9 438.4 679.8 444.6 710.0C446.4 719.1 446.2 744.0 444.1 751.0C443.6 752.9 442.6 756.4 442.0 758.8C441.4 761.1 440.4 763.0 439.7 763.0C439.0 763.0 427.9 765.9 415.0 769.4C385.7 777.3 372.8 780.4 357.5 783.0C324.4 788.7 288.7 787.3 262.5 779.4C251.0 775.9 246.6 775.7 246.2 778.7C245.8 781.7 249.1 784.4 257.4 787.9C276.3 795.8 295.5 798.4 328.0 797.7C358.3 796.9 372.1 794.6 405.5 784.6C446.9 772.3 469.4 769.2 487.3 773.4C513.7 779.6 524.4 803.6 510.0 824.5C503.9 833.4 496.8 835.8 473.5 837.0C459.6 837.7 452.3 838.7 434.0 842.3C406.0 848.0 394.3 849.7 372.0 851.5C353.3 853.1 312.7 853.3 294.5 851.9Z"/><path class="wh wh-l" d="M262.6 459.4C260.5 457.3 260.6 453.7 262.8 451.8C265.6 449.3 297.0 443.0 306.7 443.0C310.9 443.0 313.7 446.7 312.0 449.9C310.5 452.7 308.5 453.6 301.5 454.5C298.2 454.8 289.0 456.5 281.0 458.1C264.2 461.5 264.6 461.5 262.6 459.4ZM297.5 427.0C295.3 426.5 289.2 425.9 284.0 425.5C268.1 424.5 264.1 423.9 262.5 422.4C260.2 420.0 260.7 416.3 263.6 414.4C265.9 412.9 267.5 412.8 280.1 413.9C292.9 414.9 304.9 416.9 309.3 418.5C311.4 419.4 312.6 423.8 311.3 425.9C310.1 427.7 303.6 428.3 297.5 427.0Z"/><path class="wh wh-r" d="M662.5 501.8C659.2 500.0 652.0 496.8 646.6 494.5C635.6 489.9 634.1 488.5 635.6 484.3C637.5 478.8 645.3 480.6 666.3 491.2C676.5 496.5 678.3 498.6 676.0 502.9C674.4 505.9 669.7 505.5 662.5 501.8ZM672.5 469.4C668.6 468.6 661.1 467.6 655.8 467.1C645.2 466.2 643.0 465.2 643.0 461.0C643.0 456.2 644.8 455.6 657.8 456.3C681.4 457.4 691.7 462.3 685.0 469.0C682.7 471.3 682.1 471.3 672.5 469.4Z"/><path class="closed" d="M432 428 q15 12 30 0 M567 444 q15 12 30 0"/><rect class="caret" x="771" y="164" width="48" height="668" rx="24"/></svg>
     </div>
-    <nav aria-label="Footer">
+    <nav aria-label="Footer" data-i18n-aria="nav.footer">
       <a href="https://github.com/spacekestrel/mari" data-i18n="footer.github">GitHub</a>
       <a href="https://github.com/spacekestrel/mari/releases/latest" data-i18n="footer.downloads">All downloads</a>
       <a href="https://github.com/spacekestrel/mari/issues" data-i18n="footer.bug">Report a bug</a>
@@ -679,25 +800,25 @@ window.I18N = (() => {
     "nav.home": "Мари, в\u00a0начало страницы",
     "nav.cta": "Бета",
     "lang.label": "Язык",
-    "hero.sticker": "✍️ Для романистов",
-    "hero.h1": "Мари вообще-то кошка. <em class=\"gold\">А\u00a0ещё так зовут крутую программу для писателей.</em>",
+    "hero.sticker": "✍️ Для\u00a0романистов",
+    "hero.h1": "Мари вообще-то кошка. <em class=\"gold\">А\u00a0ещё так зовут крутую программу для\u00a0писателей.</em>",
     "hero.cta": "Бета",
     "hero.platforms": "Windows · Mac · Linux",
     "hero.petLabel": "Погладить Мари",
     "cat.hello": "Привет, я\u00a0Мари. Погладь меня.",
     "cat.line1": "Мрр?",
     "cat.line2": "У\u00a0тебя дыра в\u00a0сюжете. Прикройся.",
-    "cat.line3": "Это наречие? Под нож.",
+    "cat.line3": "Это наречие? Под\u00a0нож.",
     "cat.line4": "Третья глава сыровата. Уж\u00a0я-то знаю.",
     "cat.line5": "Я\u00a0посидела на\u00a0клавиатуре. Не\u00a0благодари.",
     "cat.line6": "Убей своих любимцев. Кроме меня.",
     "cat.line7": "Делу время, котику час.",
     "shot.alt": "Окно Мари с\u00a0открытой главой: фрагменты размечены цветом, слева список глав, справа карта главы",
-    "shot.s1": "Твоя книга. При параде.",
+    "shot.s1": "Твоя книга. При\u00a0параде.",
     "shot.s2": "100% бесплатно",
     "band.1": "Бесплатно",
-    "band.2": "Без регистрации",
-    "band.3": "Без подписки",
+    "band.2": "Без\u00a0регистрации",
+    "band.3": "Без\u00a0подписки",
     "band.4": "Файлы остаются у\u00a0тебя",
     "band.5": "Windows, Mac и\u00a0Linux",
     "band.6": "Кошка в\u00a0комплекте",
@@ -705,7 +826,7 @@ window.I18N = (() => {
     "b1.h3": "Читай глазами <em>редактора.</em>",
     "b1.p": "Отмечай, где текст поёт, где провисает и\u00a0что стоит не\u00a0на\u00a0своём месте. Прямо на\u00a0странице.",
     "b1.alt": "Фрагменты главы размечаются разными цветами",
-    "b2.h3": "Переписывай <em>без страха.</em>",
+    "b2.h3": "Переписывай <em>без\u00a0страха.</em>",
     "b2.p": "Пробуй новый вариант прямо рядом со\u00a0старым. Ни\u00a0одна заменённая версия не\u00a0пропадёт.",
     "b2.alt": "Два варианта фрагмента рядом, изменённые слова выделены",
     "b3.h3": "Убей своих любимцев. Пусть сыграют <em>в\u00a0ящик.</em>",
@@ -722,15 +843,15 @@ window.I18N = (() => {
     "dl.rec": "Твой компьютер",
     "dl.win.btn": "Скачать установщик",
     "dl.win.alt": "Или <a data-asset=\"msi\" href=\"https://github.com/spacekestrel/mari/releases/latest\">.msi</a>, если на\u00a0работе нужен именно он",
-    "dl.mac.btn": "Apple silicon (M1 и\u00a0новее)",
-    "dl.mac.alt": "Mac постарше? Бери <a data-asset=\"dmg-intel\" href=\"https://github.com/spacekestrel/mari/releases/latest\">версию для Intel</a>",
+    "dl.mac.btn": "Apple silicon (M1\u00a0и\u00a0новее)",
+    "dl.mac.alt": "Mac постарше? Бери <a data-asset=\"dmg-intel\" href=\"https://github.com/spacekestrel/mari/releases/latest\">версию для\u00a0Intel</a>",
     "dl.mac.intelBtn": "Mac на\u00a0Intel",
     "dl.mac.armPrefix": "Mac поновее? Бери ",
-    "dl.mac.armLink": "версию для Apple silicon",
+    "dl.mac.armLink": "версию для\u00a0Apple silicon",
     "dl.linux.btn": ".AppImage, работает везде",
-    "dl.linux.alt": "Или <a data-asset=\"deb\" href=\"https://github.com/spacekestrel/mari/releases/latest\">.deb</a> для Debian и\u00a0Ubuntu, <a data-asset=\"rpm\" href=\"https://github.com/spacekestrel/mari/releases/latest\">.rpm</a> для Fedora",
+    "dl.linux.alt": "Или <a data-asset=\"deb\" href=\"https://github.com/spacekestrel/mari/releases/latest\">.deb</a> для\u00a0Debian и\u00a0Ubuntu, <a data-asset=\"rpm\" href=\"https://github.com/spacekestrel/mari/releases/latest\">.rpm</a> для\u00a0Fedora",
     "dl.mobile": "Мари живёт на\u00a0компьютере, а\u00a0не\u00a0в\u00a0телефоне. Открой эту страницу на\u00a0ноутбуке или ПК\u00a0и\u00a0скачай её.",
-    "dl.warn.summary": "Windows или macOS ворчит при первом запуске? Тебе сюда.",
+    "dl.warn.summary": "Windows или macOS ворчит при\u00a0первом запуске? Тебе сюда.",
     "dl.warn.p1": "Apple и\u00a0Microsoft берут деньги за\u00a0сертификат, который отключает их\u00a0предупреждения. Мари бесплатная и\u00a0платить не\u00a0стала, вот обе системы разок и\u00a0ворчат. С\u00a0файлом всё в\u00a0порядке.",
     "dl.warn.p2": "<strong>Windows</strong> пугает: «Система Windows защитила ваш компьютер». Нажми <em>Подробнее</em>, а\u00a0потом <em>Выполнить в\u00a0любом случае</em>.",
     "dl.warn.p3": "<strong>macOS</strong> уверяет, что Мари повреждена. Не\u00a0верь. Перетащи её\u00a0в\u00a0папку «Программы», открой <em>Терминал</em>, один раз вставь эту строку, а\u00a0потом открывай Мари как обычно:",
@@ -795,6 +916,7 @@ window.I18N = (() => {
     if (sel) sel.value = lang;
     const code = document.querySelector(".lang-code");
     if (code) code.textContent = lang.toUpperCase();
+    if (lang === "ru" && document.fonts) document.fonts.load('600 1em Caveat', "Привет").catch(() => {});
     listeners.forEach((fn) => fn(lang));
   }
 
@@ -827,10 +949,11 @@ window.I18N = (() => {
   let saved = null;
   try { saved = localStorage.getItem("mari-lang"); } catch (e) {}
   const browser = /^ru\b/i.test(navigator.language || "") ? "ru" : "en";
+  let picked = null;  // a choice made in the picker before the lookup answers wins
   const ready = (q ? Promise.resolve(q[1])
     : LANGS.includes(saved) ? Promise.resolve(saved)
     : countryFromIP().then((c) => (c ? (RU_COUNTRIES.includes(c) ? "ru" : "en") : browser))
-  ).then((lang) => { apply(lang); return lang; });
+  ).then((lang) => { lang = picked || lang; apply(lang); return lang; });
 
   document.getElementById("lang").addEventListener("change", (e) => {
     const lang = e.target.value;
@@ -840,6 +963,7 @@ window.I18N = (() => {
       u.searchParams.set("lang", lang);
       history.replaceState(null, "", u);
     } catch (err) {}
+    picked = lang;
     apply(lang);
   });
 
@@ -895,7 +1019,7 @@ window.I18N = (() => {
 
     gsap.timeline()
       .from(".hero h1 .wd > span", { yPercent: 115, rotate: 7, duration: 1, stagger: 0.08, ease: "power4.out" })
-      .from(".hero .sticker", { scale: 0, rotate: -30, duration: 0.6, ease: "back.out(2.5)" }, 0.1)
+      .from(".hero-copy .sticker", { scale: 0, rotate: -30, duration: 0.6, ease: "back.out(2.5)" }, 0.1)
       .from(".hero .cta", { y: 30, opacity: 0, duration: 0.7, stagger: 0.1, ease: "power3.out" }, 0.45)
       .from(".cat-btn", { y: -260, duration: 1.1, ease: "bounce.out" }, 0.25);
 
@@ -926,8 +1050,110 @@ window.I18N = (() => {
       },
     });
 
+    rdMotion();
+
     gsap.from(".dl", { y: 120, rotate: 3, duration: 1, ease: "back.out(1.4)", scrollTrigger: { trigger: ".download", start: "top 80%" } });
     gsap.from(".pixel", { y: 60, opacity: 0, duration: 0.6, ease: "back.out(2)", scrollTrigger: { trigger: ".download", start: "top 60%" } });
+  }
+
+  /* ---------- "Books aren't written": a first draft gets good as you scroll ----------
+     The lines are laid out by hand (absolute tops) so they can be cut, rewritten
+     and moved: rdLayout() measures every line in its old and new wording, and the
+     scrubbed timeline reads those numbers, so a resize or a language switch just
+     measures again. */
+  const rd = $(".rd"), rdPage = $(".rd-page", rd), rdLines = $(".rd-lines", rd);
+  const rdRows = $$(".rd-row", rd), rdSteps = $$(".rd-steps li", rd);
+  const RD_FINAL = [1, 4, 5, 2];  // the lines that survive, in their new order: the coat line moves to the end
+  const rdGeo = { a: [], b: [], hA: 0, hB: 0, from: [], drawer: { x: 0, y: 0 }, kept: { x: 0, y: 0 } };
+  const rdLocal = (el) => { let x = 0, y = 0; for (let n = el; n && n !== rdPage; n = n.offsetParent) { x += n.offsetLeft; y += n.offsetTop; } return { x, y }; };
+  const rdCentre = (el) => { const p = rdLocal(el); return { x: p.x + el.offsetWidth / 2, y: p.y + el.offsetHeight / 2 }; };
+  const rdStep = (n) => rdSteps.forEach((li, i) => li.classList.toggle("on", i === n));
+
+  function rdLayout() {
+    rd.classList.add("rd-live");
+    const gap = parseFloat(getComputedStyle(rdLines).fontSize) * 0.55;
+    const hOld = rdRows.map((r) => $(".rd-old", r).offsetHeight);
+    const hNew = rdRows.map((r) => ($(".rd-new", r) ? $(".rd-new", r).offsetHeight : hOld[rdRows.indexOf(r)]));
+    let y = 0;
+    rdGeo.a = rdRows.map((r, i) => { const top = y; y += hOld[i] + gap; return top; });
+    rdGeo.hA = y - gap;
+    y = 0;
+    RD_FINAL.forEach((i) => { rdGeo.b[i] = y; y += hNew[i] + gap; });
+    rdGeo.hB = y - gap;
+    rdRows.forEach((r, i) => (r.style.top = rdGeo.a[i] + "px"));
+    rdGeo.from = rdRows.map((r) => rdCentre($(".rd-old", r)));
+    rdGeo.drawer = rdCentre($(".rd-drawer", rd));
+    rdGeo.kept = rdCentre($(".rd-kept", rd));
+  }
+
+  function rdTimeline() {
+    const T = (i) => $(".rd-t", rdRows[i]), C = (i) => $(".rd-chip", rdRows[i]);
+    const O = (i) => $(".rd-old", rdRows[i]), N = (i) => $(".rd-new", rdRows[i]);
+    const flyTo = (i, to, rot) => ({
+      x: () => rdGeo[to].x - rdGeo.from[i].x, y: () => rdGeo[to].y - rdGeo.from[i].y,
+      scale: 0.08, rotate: rot, duration: 0.8, ease: "power3.in",
+    });
+    const bump = (pill) => ({ keyframes: [{ scale: 1.25, duration: 0.12 }, { scale: 1, duration: 0.14 }] });
+    const tl = gsap.timeline({ defaults: { ease: "power2.inOut" } });
+
+    // 1. the draft gets marked up, line by line
+    [2, 0, 4, 1, 5, 3].forEach((i, k) => {
+      tl.fromTo(T(i), { "--hl": 0 }, { "--hl": 100, duration: 0.7, ease: "power1.inOut" }, 0.6 + k * 0.45);
+      tl.fromTo(C(i), { scale: 0, rotate: -30 }, { scale: 1, rotate: 0, duration: 0.4, ease: "back.out(3)" }, 1.1 + k * 0.45);
+    });
+    // 2. cuts fly into the drawer
+    [0, 3].forEach((i, k) => {
+      const at = 4.7 + k * 0.7;
+      tl.to(O(i), flyTo(i, "drawer", -14), at).to(O(i), { opacity: 0, duration: 0.15 }, at + 0.65);
+      tl.to($(".rd-drawer .odo-in", rd), { yPercent: (-100 / 3) * (k + 1), duration: 0.25, ease: "back.out(3)" }, at + 0.75);
+      tl.to($(".rd-drawer", rd), bump(), at + 0.75);
+    });
+    // 3. rewrites: the old wording flies off to be kept, the new one takes its place
+    [1, 4].forEach((i, k) => {
+      const at = 6.3 + k * 0.8;
+      tl.to(C(i), { scale: 0, duration: 0.2 }, at - 0.1);
+      tl.to(O(i), flyTo(i, "kept", 12), at).to(O(i), { opacity: 0, duration: 0.15 }, at + 0.65);
+      tl.fromTo(N(i), { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, at + 0.3);
+      tl.fromTo($(".rd-fresh", N(i)), { "--hl": 0 }, { "--hl": 100, duration: 0.5, ease: "power1.inOut" }, at + 0.55);
+      tl.to($(".rd-kept .odo-in", rd), { yPercent: (-100 / 3) * (k + 1), duration: 0.25, ease: "back.out(3)" }, at + 0.75);
+      tl.to($(".rd-kept", rd), bump(), at + 0.75);
+    });
+    // 4. everything closes up into its new order, and the coat line swings round to the end
+    RD_FINAL.forEach((i) => tl.to(rdRows[i], { y: () => rdGeo.b[i] - rdGeo.a[i], duration: 1.1, ease: "power3.inOut" }, i === 2 ? 8.3 : 8));
+    tl.to(rdRows[2], { keyframes: [{ x: 46, rotate: 1.5, duration: 0.55, ease: "power2.out" }, { x: 0, rotate: 0, duration: 0.55, ease: "power2.in" }] }, 8.3);
+    tl.fromTo(rdLines, { height: () => rdGeo.hA }, { height: () => rdGeo.hB, duration: 1.1, ease: "power3.inOut" }, 8);
+    // 5. the marks come off: what's left is just good writing
+    const fresh = [1, 4].map((i) => $(".rd-fresh", rdRows[i]));
+    tl.set([T(2), T(5), ...fresh], { "--hp": "100%" }, 9.4);
+    tl.to([T(2), T(5), ...fresh], { "--hl": 0, duration: 0.6 }, 9.45);
+    tl.to([C(2), C(5)], { scale: 0, duration: 0.3 }, 9.45);
+    tl.to({}, { duration: 0.9 });
+
+    tl.eventCallback("onUpdate", () => { const s = tl.time(); rdStep(s < 0.6 ? 0 : s < 4.6 ? 1 : 2); });
+    return tl;
+  }
+
+  function rdMotion() {
+    ScrollTrigger.addEventListener("refreshInit", rdLayout);
+    rdLayout();
+    const tl = rdTimeline();
+    const fits = () => $(".rd-stage", rd).offsetHeight < innerHeight - 40;
+    ScrollTrigger.matchMedia({
+      // tall enough to hold the page on screen: it stays put while the scroll plays it
+      "(min-height: 560px)": () => {
+        const st = ScrollTrigger.create({
+          animation: tl, trigger: ".rd-pin", pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true,
+          start: () => (fits() ? "center center" : "top top"),
+          end: () => "+=" + Math.round(innerHeight * 2.4),
+        });
+        return () => st.kill();
+      },
+      // a phone on its side: no room to hold it, so it plays as it scrolls past
+      "(max-height: 559px)": () => {
+        const st = ScrollTrigger.create({ animation: tl, trigger: ".rd-page", scrub: 0.6, invalidateOnRefresh: true, start: "top 80%", end: "bottom 20%" });
+        return () => st.kill();
+      },
+    });
   }
 
   // in-page links glide when smooth scroll is on
@@ -971,15 +1197,16 @@ window.I18N = (() => {
 
   /* ---------- pet the cat ---------- */
   const cat = $("#cat"), says = $("#catSays"), hearts = $("#hearts");
-  let li = 0, sayTimer;
-  const say = (text, ms = 2600) => {
-    says.textContent = text;
+  let li = 0, sayTimer, sayKey = null;
+  const say = (key, ms = 2600) => {
+    sayKey = key;
+    says.textContent = t(key);
     says.classList.add("show");
     clearTimeout(sayTimer);
     sayTimer = setTimeout(() => says.classList.remove("show"), ms);
   };
   cat.addEventListener("click", () => {
-    say(t(`cat.line${(li++ % 7) + 1}`));
+    say(`cat.line${(li++ % 7) + 1}`);
     cat.classList.remove("hop"); void cat.offsetWidth; cat.classList.add("hop");
     for (let i = 0; i < 5; i++) {
       const h = document.createElement("span");
@@ -1058,10 +1285,15 @@ window.I18N = (() => {
     macOrder();
     fillRelease();
     startMotion();
+    if (!motion) { rd.classList.add("rd-still"); rdStep(1); }
     document.documentElement.classList.remove("i18n-wait");
-    setTimeout(() => say(t("cat.hello")), 1900);
+    setTimeout(() => {
+      const hello = () => say("cat.hello");
+      document.fonts ? document.fonts.load('600 1em Caveat', t("cat.hello")).then(hello, hello) : hello();
+    }, 1900);
     I18N.onChange(() => {
       resplit();
+      if (sayKey) says.textContent = t(sayKey);
       macOrder();
       fillRelease();
       if (motion) ScrollTrigger.refresh();
