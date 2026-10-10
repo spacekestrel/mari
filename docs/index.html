@@ -295,10 +295,19 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
   border-radius: clamp(28px, 5vw, 56px);
   background: var(--grape); color: var(--paper);
 }
+/* a notebook page: ruled lines and a red margin, with giant proofreader's marks drifting behind */
 .rd::before {
-  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
-  background: radial-gradient(circle at 15% 20%, rgba(255,255,255,.13) 0 2px, transparent 3px) 0 0 / 34px 34px;
+  content: ""; position: absolute; inset: 0; z-index: -2; border-radius: inherit; pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent calc(var(--margin) - 4px), rgba(255, 61, 139, .55) calc(var(--margin) - 4px) calc(var(--margin) - 1px), transparent calc(var(--margin) - 1px) var(--margin), rgba(255, 61, 139, .55) var(--margin) calc(var(--margin) + 2px), transparent calc(var(--margin) + 2px)),
+    repeating-linear-gradient(180deg, transparent 0 38px, rgba(255, 255, 255, .11) 38px 40px);
+  --margin: clamp(10px, 4.5vw, 72px);
 }
+.rd-bg { position: absolute; inset: 0; z-index: -1; overflow: hidden; border-radius: inherit; pointer-events: none; }
+.rd-mk { position: absolute; display: block; height: auto; fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: .5; }
+.rd-mk text { font: 900 260px "Fraunces", Georgia, serif; }
+.rd-mk.lime { stroke: var(--lime); }
+.rd-mk.pink { stroke: var(--pink); }
 .rd h2 { font-size: clamp(3rem, 7.4vw, 7rem); max-width: 11em; }
 .rd h2 em { color: var(--lime); }
 .rd-sub { margin: 1.3rem 0 0; font-size: clamp(1.1rem, 1.6vw, 1.35rem); font-weight: 500; color: #ddd6ff; }
@@ -540,6 +549,11 @@ footer nav a:hover { color: var(--pink); }
   .rd-page { rotate: 0deg; box-shadow: 6px 6px 0 var(--ink); }
   .rd-pill { font-size: .78rem; }
   html:lang(ru) .beat h3 { font-size: min(2.2rem, 10vw); }
+  .rd::before { --margin: 8px; }
+  .rd h2 { font-size: min(3rem, 11.5vw); }
+  html:lang(ru) .rd h2 { font-size: min(2.7rem, 9.4vw); }
+  .rd-steps li { gap: .3rem; padding: .35rem .4rem .35rem .3rem; font-size: .74rem; }
+  .rd-steps b { width: 22px; height: 22px; font-size: .74rem; }
   .cmd { flex-wrap: wrap; overflow: hidden; }
   .cmd code { flex-basis: 100%; white-space: normal; overflow-wrap: anywhere; }
   .cmd button { min-height: 40px; }
@@ -549,6 +563,8 @@ footer nav a:hover { color: var(--pink); }
 }
 @media (max-width: 380px) {
   .brand-name { display: none; }
+  .rd-steps b { display: none; }
+  .rd-steps li { justify-content: center; padding: .4rem .3rem; }
 }
 /* the paper grain is a fixed full-screen blend layer: lovely on a desktop, needless work for a phone */
 @media (pointer: coarse) {
@@ -626,6 +642,14 @@ footer nav a:hover { color: var(--pink); }
 </div>
 
 <section class="rd" id="rewrite" aria-labelledby="rd-h">
+  <div class="rd-bg" aria-hidden="true">
+    <svg class="rd-mk lime" data-d="1.2" style="top: 2%; right: -2%; width: clamp(150px, 22vw, 320px); rotate: 8deg" viewBox="0 0 200 260"><text x="100" y="215" text-anchor="middle" stroke-width="5">¶</text></svg>
+    <svg class="rd-mk pink" data-d="0.8" style="top: 20%; left: 1%; width: clamp(80px, 10vw, 160px); rotate: -10deg" viewBox="0 0 120 100"><path d="M10 90 60 12 110 90" stroke-width="12"/></svg>
+    <svg class="rd-mk pink" data-d="1" style="top: 38%; right: 2%; width: clamp(200px, 28vw, 420px); rotate: -4deg" viewBox="0 0 300 180"><path d="M60 30C150-5 285 15 288 85 292 160 140 178 60 150-5 128 5 45 110 22" stroke-width="9"/></svg>
+    <svg class="rd-mk lime" data-d="1.4" style="top: 57%; left: -3%; width: clamp(220px, 30vw, 440px); rotate: -6deg" viewBox="0 0 320 120"><path d="M5 80C70 78 140 70 190 45 230 25 262 30 255 60 248 90 205 82 215 52 226 20 280 15 315 40" stroke-width="10"/></svg>
+    <svg class="rd-mk pink" data-d="0.9" style="top: 74%; right: 6%; width: clamp(110px, 13vw, 200px); rotate: -12deg" viewBox="0 0 200 260"><text x="100" y="215" text-anchor="middle" stroke-width="6">¶</text></svg>
+    <svg class="rd-mk lime" data-d="1.1" style="top: 88%; left: 12%; width: clamp(80px, 9vw, 140px); rotate: 14deg" viewBox="0 0 120 100"><path d="M10 90 60 12 110 90" stroke-width="12"/></svg>
+  </div>
   <div class="wrap">
     <h2 class="split" id="rd-h" data-i18n="rd.h2">Books aren't written. They're <em>rewritten.</em></h2>
     <p class="rd-sub" data-i18n="rd.sub">Scroll, and watch a first draft get good.</p>
@@ -868,7 +892,7 @@ window.I18N = (() => {
     "rd.h2": "Книги не\u00a0пишут. Их\u00a0<em>переписывают.</em>",
     "rd.sub": "Листай вниз и\u00a0смотри, как черновик берётся за\u00a0ум.",
     "rd.step1": "Черновик",
-    "rd.step2": "С\u00a0пометками",
+    "rd.step2": "Пометки",
     "rd.step3": "Чистовик",
     "rd.file": "07 · Труп в\u00a0пальто",
     "rd.drawer": "Ящик",
@@ -1157,6 +1181,13 @@ window.I18N = (() => {
   }
 
   function rdMotion() {
+    $$(".rd-mk", rd).forEach((m, i) => {
+      const d = parseFloat(m.dataset.d) || 1;
+      gsap.fromTo(m, { y: 160 * d, rotate: `+=${i % 2 ? -6 : 6}` }, {
+        y: -160 * d, rotate: `+=${i % 2 ? 12 : -12}`, ease: "none",
+        scrollTrigger: { trigger: rd, start: "top bottom", end: "bottom top", scrub: 1 },
+      });
+    });
     ScrollTrigger.addEventListener("refreshInit", rdLayout);
     rdLayout();
     const tl = rdTimeline();
