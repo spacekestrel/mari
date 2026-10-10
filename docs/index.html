@@ -1817,9 +1817,12 @@ window.I18N = (() => {
     "dmg-arm": /aarch64\.dmg$/i, "dmg-intel": /x64\.dmg$/i,
     appimage: /\.AppImage$/i, deb: /\.deb$/i, rpm: /\.rpm$/i,
   };
-  // The files of the latest release, straight from GitHub's API. If that can't be
-  // reached (it allows 60 asks an hour per visitor), the release below is used:
-  // update it when a new version comes out.
+  // Where the installers come from, best first:
+  //  1. download/ next to this page, which the Website workflow fills from the
+  //     latest release each time it publishes (download/release.json lists them).
+  //     The file then comes from the site itself.
+  //  2. GitHub's API, if the site was published some other way.
+  //  3. The release below, if neither answers: update it when a version comes out.
   const FALLBACK = {
     version: "0.2.7",
     assets: {
@@ -1835,18 +1838,22 @@ window.I18N = (() => {
     $$("[data-version]").forEach((el) => (el.textContent = version));
     $$("[data-asset]").forEach((a) => { if (assets[a.dataset.asset]) a.href = assets[a.dataset.asset].url; });
   };
-  fetch("https://api.github.com/repos/spacekestrel/mari/releases/latest", { headers: { Accept: "application/vnd.github+json" } })
-    .then((r) => (r.ok ? r.json() : null))
-    .then((rel) => {
-      if (!rel || !rel.assets) return;
-      version = rel.tag_name.replace(/^v/, "");
-      Object.keys(match).forEach((k) => {
-        const a = rel.assets.find((x) => match[k].test(x.name));
-        if (a) assets[k] = { name: a.name, size: a.size, url: a.browser_download_url };
-      });
-      fillRelease();
-      if (dlmOpen) dlmRender();
-    })
+  const useRelease = (tag, list, urlOf, local) => {
+    version = tag.replace(/^v/, "");
+    Object.keys(match).forEach((k) => {
+      const a = list.find((x) => match[k].test(x.name));
+      if (a) assets[k] = { name: a.name, size: a.size, url: urlOf(a), local };
+    });
+    fillRelease();
+    if (dlmOpen) dlmRender();
+  };
+  const json = (r) => (r.ok ? r.json() : Promise.reject(r.status));
+  fetch("download/release.json", { cache: "no-cache" })
+    .then(json)
+    .then((rel) => useRelease(rel.tagName, rel.assets, (a) => "download/" + encodeURIComponent(a.name), true))
+    .catch(() => fetch("https://api.github.com/repos/spacekestrel/mari/releases/latest", { headers: { Accept: "application/vnd.github+json" } })
+      .then(json)
+      .then((rel) => useRelease(rel.tag_name, rel.assets, (a) => a.browser_download_url, false)))
     .catch(() => {});
 
 
@@ -1880,6 +1887,8 @@ window.I18N = (() => {
     const a = assets[dlmOpt];
     const go = $(".dlm-go", dlm);
     go.href = a.url;
+    // a file on the site itself is saved straight away; the page never moves
+    for (const el of [go, $(".dlm-retry", dlm)]) a.local ? el.setAttribute("download", a.name) : el.removeAttribute("download");
     $(".dlm-go-t", go).textContent = t("dm.go").replace("%s", OSES[dlmOs].name);
     $(".dlm-file", dlm).textContent = `${a.name} · ${mb(a.size)}`;
     $(".dlm-phone", dlm).hidden = !mobile;

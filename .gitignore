@@ -19,3 +19,6 @@ vite.config.ts.timestamp-*
 
 # Local editor tooling, not part of the app
 /.claude
+
+# Installers the Website workflow copies next to the page when it publishes
+/docs/download/
