@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Mari · Other writing apps are jealous</title>
+<title>Mari</title>
 <meta name="description" content="Mari is the free writing app that turns messy drafts into books you're proud of. Windows, macOS and Linux.">
 <meta name="theme-color" content="#2440ff">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -1977,7 +1977,7 @@ window.I18N = (() => {
     current = lang;
     root.lang = lang === "zh" ? "zh-Hans" : lang;
     if (window.mariFonts) mariFonts(lang);
-    document.title = t("meta.title");
+    document.title = "Mari";  // the tab always just says Mari
     metaDesc.content = t("meta.description");
     $$("[data-i18n]").forEach((el) => { const v = t(el.dataset.i18n); if (el.innerHTML !== v) el.innerHTML = v; });
     $$("[data-i18n-alt]").forEach((el) => (el.alt = t(el.dataset.i18nAlt)));
