@@ -195,7 +195,7 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 800; }
   position: relative;
   background: var(--cobalt);
   color: var(--paper);
-  padding: calc(126px + env(safe-area-inset-top, 0px)) 0 0;
+  padding: calc(126px + env(safe-area-inset-top, 0px)) 0 clamp(3rem, 6vw, 5.5rem);
   border-radius: 0 0 clamp(36px, 6vw, 80px) clamp(36px, 6vw, 80px);
   isolation: isolate;
 }
@@ -204,7 +204,8 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 800; }
   background: radial-gradient(circle at 15% 20%, rgba(255,255,255,.12) 0 2px, transparent 3px) 0 0 / 34px 34px;
 }
 .hero-grid { display: grid; grid-template-columns: 1.4fr .6fr; gap: 2rem; align-items: end; }
-.hero h1 { font-size: clamp(3.4rem, 8.4vw, 8.6rem); color: var(--paper); }
+.hero h1 { font-size: clamp(3rem, 6.4vw, 6.6rem); color: var(--paper); }
+html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .hero h1 .gold { color: var(--gold); }
 .hero .sticker { --bg: var(--lime); margin-bottom: 1.6rem; font-size: 1rem; }
 .hero .sub { margin: 1.4rem 0 1.8rem; max-width: 30em; font-size: clamp(1.15rem, 1.7vw, 1.4rem); font-weight: 500; color: #dfe3ff; }
@@ -257,7 +258,7 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 800; }
 @keyframes heart { from { opacity: 1; transform: scale(.6); } to { opacity: 0; transform: translate(var(--x), -150px) scale(1.3) rotate(var(--rot)); } }
 
 /* the app itself, as a big tilted card */
-.shot { position: relative; padding: clamp(3.5rem, 7vw, 6rem) 0 0; margin-bottom: calc(clamp(60px, 9vw, 130px) * -1); z-index: 2; }
+.shot { position: relative; padding: clamp(3.5rem, 7vw, 6rem) 0 0; z-index: 2; }
 .shot-card {
   position: relative;
   max-width: 1080px; margin: 0 auto;
@@ -275,19 +276,19 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 800; }
 .band {
   position: relative; z-index: 1;
   margin: 0 -2vw;
-  padding: calc(clamp(60px, 9vw, 130px) + 1.2rem) 0 1.2rem;
+  padding: clamp(.5rem, 1.2vw, 1rem) 0;
   background: var(--lime);
-  border-bottom: var(--line);
+  border-block: var(--line);
   overflow: hidden;
 }
-.band-track { display: flex; width: max-content; animation: marquee 32s linear infinite; }
+.band-track { display: flex; width: max-content; animation: marquee 48s linear infinite; }
 .band-track span {
-  display: inline-flex; align-items: center; gap: 1.4rem; padding-right: 1.4rem;
-  font: 900 clamp(1.5rem, 3vw, 2.4rem)/1 var(--display);
+  display: inline-flex; align-items: center; gap: .3em; padding-right: .3em;
+  font: 900 clamp(2.6rem, 8vw, 7.4rem)/1 var(--display);
   font-variation-settings: "SOFT" 100, "WONK" 1;
   white-space: nowrap;
 }
-.band-track span::after { content: "✶"; color: var(--pink); }
+.band-track span::after { content: "✶"; color: var(--pink); font-size: .6em; }
 @keyframes marquee { to { transform: translateX(-50%); } }
 
 /* ---------- reasons ---------- */
@@ -458,7 +459,7 @@ footer nav a:hover { color: var(--pink); }
         <option value="ru" lang="ru">Русский</option>
       </select>
     </label>
-    <a class="btn" href="#download" data-i18n="nav.cta">Get Mari free</a>
+    <a class="btn" href="#download" data-i18n="nav.cta">Mari beta</a>
   </div>
 </nav>
 
@@ -468,10 +469,10 @@ footer nav a:hover { color: var(--pink); }
   <div class="wrap hero-grid">
     <div class="hero-copy">
       <span class="sticker" data-i18n="hero.sticker">✍️ Made for novelists</span>
-      <h1 class="split" data-i18n="hero.h1">Other writing apps are <em class="gold">jealous.</em></h1>
-      <p class="sub" data-i18n="hero.sub">Mari is the free writing app that turns messy drafts into books you're proud of.</p>
+      <h1 class="split" data-i18n="hero.h1">Marí is a cat. <em class="gold">Mari is also a writing app.</em></h1>
+      <p class="sub" data-i18n="hero.sub">Meet the coolest kid on the block.</p>
       <div class="cta">
-        <a class="btn" href="#download" data-i18n="hero.cta">Get Mari free</a>
+        <a class="btn" href="#download" data-i18n="hero.cta">Mari beta</a>
         <small data-i18n="hero.platforms">Windows · Mac · Linux</small>
       </div>
     </div>
@@ -514,8 +515,8 @@ footer nav a:hover { color: var(--pink); }
 
 <div class="band" aria-hidden="true">
   <div class="band-track">
-    <span data-i18n="band.1">Free forever</span><span data-i18n="band.2">No account</span><span data-i18n="band.3">No subscription</span><span data-i18n="band.4">Your files stay yours</span><span data-i18n="band.5">Windows, Mac &amp; Linux</span><span data-i18n="band.6">Comes with a cat</span>
-    <span data-i18n="band.1">Free forever</span><span data-i18n="band.2">No account</span><span data-i18n="band.3">No subscription</span><span data-i18n="band.4">Your files stay yours</span><span data-i18n="band.5">Windows, Mac &amp; Linux</span><span data-i18n="band.6">Comes with a cat</span>
+    <span data-i18n="band.1">Free</span><span data-i18n="band.2">No account</span><span data-i18n="band.3">No subscription</span><span data-i18n="band.4">Your files stay yours</span><span data-i18n="band.5">Windows, Mac &amp; Linux</span><span data-i18n="band.6">Comes with a cat</span>
+    <span data-i18n="band.1">Free</span><span data-i18n="band.2">No account</span><span data-i18n="band.3">No subscription</span><span data-i18n="band.4">Your files stay yours</span><span data-i18n="band.5">Windows, Mac &amp; Linux</span><span data-i18n="band.6">Comes with a cat</span>
   </div>
 </div>
 
@@ -654,12 +655,12 @@ window.I18N = (() => {
     "meta.title": "Mari · Другие программы нервно курят",
     "meta.description": "Мари превращает сырой черновик в книгу, которой хочется хвастаться. Бесплатная программа для писателей на Windows, macOS и Linux.",
     "nav.home": "Мари, в\u00a0начало страницы",
-    "nav.cta": "Скачать",
+    "nav.cta": "Мари бета",
     "lang.label": "Язык",
     "hero.sticker": "✍️ Для романистов",
-    "hero.h1": "Другие программы <em class=\"gold\">нервно курят.</em>",
-    "hero.sub": "Мари превращает твой сырой черновик в\u00a0книгу, которой хочется хвастаться. И\u00a0не\u00a0берёт за\u00a0это ни\u00a0копейки.",
-    "hero.cta": "Скачать бесплатно",
+    "hero.h1": "Мари вообще-то кошка. <em class=\"gold\">А\u00a0ещё так зовут программу для писателей.</em>",
+    "hero.sub": "Знакомься: самая крутая на\u00a0районе.",
+    "hero.cta": "Мари бета",
     "hero.platforms": "Windows · Mac · Linux",
     "hero.badge": "БЕСПЛАТНО ✶ БЕЗ АККАУНТА ✶",
     "hero.petLabel": "Погладить Мари",
@@ -674,7 +675,7 @@ window.I18N = (() => {
     "shot.alt": "Окно Мари с\u00a0открытой главой: фрагменты размечены цветом, слева список глав, справа карта главы",
     "shot.s1": "Твоя книга. При параде.",
     "shot.s2": "100% бесплатно",
-    "band.1": "Бесплатно навсегда",
+    "band.1": "Бесплатно",
     "band.2": "Без регистрации",
     "band.3": "Без подписки",
     "band.4": "Файлы остаются у\u00a0тебя",
