@@ -434,7 +434,7 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .msg.proof .who { color: #0f7f8c; }
 .msg time { display: block; margin-top: .25rem; text-align: right; font: 500 .68rem/1 var(--sans); opacity: .7; }
 .msg.file { display: flex; align-items: center; gap: .8rem; padding: .6rem .8rem; }
-.file-info b { display: block; font: 700 .95rem/1.2 var(--mono); }
+.file-info b { display: block; font: 700 .95rem/1.2 var(--mono); white-space: nowrap; }
 .file-info small { font: 600 .8rem var(--sans); opacity: .85; }
 /* a tiny page inside the file, with its marks */
 .pg { flex: none; width: 54px; height: 68px; padding: 7px 6px; display: flex; flex-direction: column; gap: 4px; border: 2px solid var(--ink); border-radius: 6px; background: #fff; }
@@ -608,6 +608,8 @@ footer nav a:hover { color: var(--pink); }
 @media (max-width: 960px) {
   .mf-grid { grid-template-columns: minmax(0, 1fr); }
   .mf h2 { padding-right: clamp(70px, 16vw, 110px); }
+  /* the postmark lands on the stamp, clear of the heading */
+  .mf-postmark { top: calc(clamp(14px, 2.5vw, 30px) + clamp(56px, 9vw, 90px)); right: clamp(4px, 2vw, 24px); width: clamp(84px, 14vw, 120px); }
   .rd-stage { grid-template-columns: minmax(0, 1fr); gap: 1.1rem; }
   .rd-steps { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; }
   .rd-steps li { gap: .45rem; padding: .4rem .55rem .4rem .4rem; font-size: .82rem; }
@@ -641,6 +643,7 @@ footer nav a:hover { color: var(--pink); }
   .mf-chips li { font-size: .85rem; }
   .chat { rotate: 0deg; box-shadow: 6px 6px 0 var(--ink); }
   .msg { max-width: 90%; }
+  .file-info b { font-size: .82rem; }
   .rd-steps li { gap: .3rem; padding: .35rem .4rem .35rem .3rem; font-size: .74rem; }
   .rd-steps b { width: 22px; height: 22px; font-size: .74rem; }
   .cmd { flex-wrap: wrap; overflow: hidden; }
@@ -1042,7 +1045,28 @@ window.I18N = (() => {
     "rd.good": "Хорошо",
     "nav.main": "Главное меню",
     "nav.footer": "Нижнее меню",
-    "dl.betaTag": "БЕТА"
+    "dl.betaTag": "БЕТА",
+    "mf.h2": "Отправь главу. Она вернётся <em>вся в\u00a0пометках.</em>",
+    "mf.lede": "В\u00a0одном файле .mari летит глава со\u00a0всеми выделениями, заметками и\u00a0старыми версиями. Бета-ридеры и\u00a0корректоры открывают его в\u00a0Мари, ставят пометки прямо в\u00a0тексте и\u00a0шлют обратно.",
+    "mf.chip1": "Им\u00a0тоже бесплатно",
+    "mf.chip2": "Без\u00a0регистрации",
+    "mf.chip3": "Внутри обычный zip",
+    "mf.chatLabel": "Групповой чат: писатель отправляет chapter-07.mari бета-ридеру и\u00a0корректору, и\u00a0оба присылают файл обратно с\u00a0пометками",
+    "mf.chatName": "Банда седьмой главы",
+    "mf.chatPeople": "Ты, бета-ридер, корректор",
+    "mf.avBeta": "Б",
+    "mf.avProof": "К",
+    "mf.f1": "1 глава · 2 старые версии",
+    "mf.m1": "Глянете седьмую главу? Только без\u00a0жалости.",
+    "mf.beta": "Бета-ридер",
+    "mf.m2": "Уже читаю ☕",
+    "mf.f2": "12 пометок · 5 заметок",
+    "mf.m3": "Пальто в\u00a0финале меня убило. Середина провисает, смотри пометки.",
+    "mf.proof": "Корректор",
+    "mf.f3": "Отмечено 9 опечаток",
+    "mf.m4": "Все опечатки отмечены прямо в\u00a0строках.",
+    "mf.m5": "Вы\u00a0у\u00a0меня лучшие ❤",
+    "mf.postmark": "ГЛАВА 7 · УШЛА"
   };
 
   // English lines that only the script shows (the cat's lines, button states)
