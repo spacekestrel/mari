@@ -1069,18 +1069,20 @@ window.I18N = (() => {
   });
 
   /* ---------- tap or click a picture to see it big ----------
-     The picture flies out of its card to the middle of the screen, as big as
-     the screen allows but never past its real size (so it stays sharp). On a
-     phone held upright it turns sideways to use the long side. */
+     The picture flies out of its card to the middle of the screen and fills
+     it. On a phone held upright it turns sideways to use the long side. */
   const zoom = $("#zoom"), zoomImg = $(".zoom-img", zoom), zoomBack = $(".zoom-back", zoom), zoomClose = $(".zoom-close", zoom);
   const zoomMs = reduced ? 0 : 560;
+  const env = { get top() { return parseFloat(getComputedStyle(zoomClose).top) - 16 || 0; } };
   let zoomFrom = null, zoomL = null;
 
   const zoomLayout = (img) => {
     const nw = img.naturalWidth || img.width, nh = img.naturalHeight || img.height;
-    const roomW = innerWidth - 40, roomH = innerHeight - 150;
+    // fill the screen, leaving a thin edge (the close button may sit over a corner)
+    const edge = Math.max(12, Math.min(60, innerHeight * 0.06));
+    const roomW = innerWidth - 24, roomH = innerHeight - 2 * (env.top + edge);
     const turn = innerWidth < 700 && innerHeight > innerWidth * 1.15 && nw > nh;
-    const s = turn ? Math.min(1, roomH / nw, roomW / nh) : Math.min(1, roomW / nw, roomH / nh);
+    const s = turn ? Math.min(roomH / nw, roomW / nh) : Math.min(roomW / nw, roomH / nh);
     return { w: Math.round(nw * s), h: Math.round(nh * s), rot: turn ? 90 : 0 };
   };
   // where the picture sits in its card, as a transform from the middle of the screen
