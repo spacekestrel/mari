@@ -1,0 +1,42 @@
+<!--
+  The spinning "FREE FOREVER ✶ NO ACCOUNT ✶" badge that sat beside Mari in the
+  hero of docs/index.html. Taken off the page on request and kept here so it
+  can go back. To restore it, put each piece back where its heading says.
+-->
+
+<!-- 1. HTML: inside <div class="hero-art">, as its first child, before the speech bubble -->
+<div class="badge" aria-hidden="true">
+  <svg viewBox="0 0 160 160">
+    <circle cx="80" cy="80" r="76" fill="#ffc93c" stroke="#14120f" stroke-width="3"/>
+    <g class="ring">
+      <path id="ringPath" d="M80 80 m-56 0 a56 56 0 1 1 112 0 a56 56 0 1 1 -112 0" fill="none"/>
+      <text textLength="348" lengthAdjust="spacing"><textPath href="#ringPath" data-i18n="hero.badge">FREE FOREVER ✶ NO ACCOUNT ✶</textPath></text>
+    </g>
+    <path d="M80 56 l7 16 17 1 -13 11 4 17 -15 -9 -15 9 4 -17 -13 -11 17 -1z" fill="#ff3d8b" stroke="#14120f" stroke-width="3" stroke-linejoin="round"/>
+  </svg>
+</div>
+
+<style>
+/* 2. CSS: in the main <style>, after the .mari rules */
+.badge {
+  position: absolute; z-index: 3; left: -8%; top: 40%;
+  width: clamp(110px, 12vw, 150px); aspect-ratio: 1;
+}
+.badge svg { width: 100%; height: 100%; overflow: visible; }
+.badge .ring { animation: spin 14s linear infinite; transform-origin: 50% 50%; transform-box: fill-box; }
+.badge text { font: 800 13.5px var(--sans); letter-spacing: .14em; fill: var(--ink); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* and inside the existing @media (max-width: 560px) block */
+@media (max-width: 560px) {
+  .badge { left: -6%; }
+}
+</style>
+
+<script>
+  // 3. Russian text: add this line to the RU object in the first inline script
+  //    "hero.badge": "БЕСПЛАТНО ✶ БЕЗ АККАУНТА ✶",
+
+  // 4. Intro animation: append to the gsap.timeline() chain in startMotion()
+  //    .from(".badge", { scale: 0, rotate: -120, duration: 0.8, ease: "back.out(2)" }, 0.9);
+</script>
