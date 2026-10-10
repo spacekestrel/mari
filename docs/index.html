@@ -13,17 +13,41 @@
 <meta property="og:description" content="The free writing app that turns messy drafts into books you're proud of.">
 <meta property="og:url" content="https://spacekestrel.github.io/mari/">
 <meta property="og:image" content="https://spacekestrel.github.io/mari/og.png">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ru_RU">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="alternate" hreflang="en" href="https://spacekestrel.github.io/mari/?lang=en">
+<link rel="alternate" hreflang="ru" href="https://spacekestrel.github.io/mari/ru/">
+<link rel="alternate" hreflang="x-default" href="https://spacekestrel.github.io/mari/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Caveat:wght@600&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,0..100,0..1;1,9..144,300..900,0..100,0..1&family=JetBrains+Mono:wght@500&display=swap">
+<!-- Fraunces and Bricolage have no Cyrillic, so Russian is set in Literata (the font Mari itself writes in) and Onest -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Caveat:wght@600&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,0..100,0..1;1,9..144,300..900,0..100,0..1&family=JetBrains+Mono:wght@500&family=Literata:ital,opsz,wght@0,7..72,700..900;1,7..72,700..900&family=Onest:wght@400..800&display=swap">
 <!--
   YOUR OWN MEDIA
   Drop a video at docs/media/trailer.mp4 (and, if you like, a still at
   docs/media/trailer-poster.jpg). A "Watch it" section appears above the
   downloads on its own. Every other picture is a file in docs/, the same
   ones the README uses: replace one and the page follows.
+
+  LANGUAGES
+  English is written into the page below. Russian lives in the RU block in
+  the script at the bottom. A visitor gets, in this order: the language in
+  the link (?lang=ru), the one they picked before, the one for the country
+  their IP address is in, then their browser's language.
 -->
+<script>
+  // Before anything paints: hold the hero's words back until the language is
+  // settled and the intro is ready to play, so nothing flashes in the wrong
+  // language or jumps. A CSS fallback shows them after 2s whatever happens.
+  (function () {
+    var d = document.documentElement, q = /[?&]lang=(en|ru)\b/.exec(location.search), saved = null;
+    try { saved = localStorage.getItem("mari-lang"); } catch (e) {}
+    var lang = q ? q[1] : (saved === "en" || saved === "ru" ? saved : null);
+    if (lang) d.lang = lang;
+    d.classList.add("i18n-wait");
+  })();
+</script>
 <style>
 /* Layout: a stack of full-bleed colour worlds, each with its own pair, held together by ink outlines and hard shadows */
 :root {
@@ -45,6 +69,16 @@
   --line: 3px solid var(--ink);
   color-scheme: light;
 }
+/* Russian: the same soft, heavy feel in faces that carry Cyrillic */
+html:lang(ru) {
+  --display: "Literata", "Fraunces", Georgia, serif;
+  --sans: "Onest", "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+html:lang(ru) h1, html:lang(ru) h2, html:lang(ru) h3 { letter-spacing: -.03em; line-height: .92; }
+
+/* while the language is being worked out, the hero's words wait (never longer than 2s) */
+.i18n-wait .hero-copy, .i18n-wait .nav .btn, .i18n-wait .shot .sticker { visibility: hidden; animation: i18n-show 0s 2s forwards; }
+@keyframes i18n-show { to { visibility: visible; } }
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -96,7 +130,7 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 800; }
   transition: transform .15s, box-shadow .15s;
   cursor: pointer;
 }
-.btn:hover { transform: translateY(-3px) rotate(-1.5deg); box-shadow: 0 9px 0 var(--ink); }
+@media (hover: hover) { .btn:hover { transform: translateY(-3px) rotate(-1.5deg); box-shadow: 0 9px 0 var(--ink); } }
 .btn:active { transform: translateY(5px); box-shadow: 0 1px 0 var(--ink); }
 
 .sticker {
@@ -124,9 +158,34 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 800; }
   transition: transform .35s;
 }
 .nav.hide { transform: translate(-50%, -160%); }
-.brand { display: flex; align-items: center; gap: .5rem; text-decoration: none; font: 900 1.45rem/1 var(--display); font-variation-settings: "SOFT" 100, "WONK" 1; }
+.brand { display: flex; align-items: center; gap: .5rem; flex: none; text-decoration: none; font: 900 1.45rem/1 "Fraunces", Georgia, serif; font-variation-settings: "SOFT" 100, "WONK" 1; }
 .brand svg { width: 30px; height: 30px; fill: var(--ink); }
-.nav .btn { min-height: 46px; padding: .6em 1.3em; font-size: 1rem; box-shadow: 0 4px 0 var(--ink); }
+.nav-end { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.nav .btn { min-height: 46px; padding: .6em 1.3em; font-size: 1rem; box-shadow: 0 4px 0 var(--ink); white-space: nowrap; }
+
+/* language picker: a real <select> laid invisibly over a chunky pill, so phones get their own native picker */
+.lang {
+  position: relative;
+  display: inline-flex; align-items: center; gap: .35rem;
+  height: 46px; padding: 0 .85rem 0 .7rem;
+  border: var(--line); border-radius: 999px;
+  background: var(--gold); color: var(--ink);
+  font: 800 .95rem/1 var(--sans);
+  box-shadow: 0 4px 0 var(--ink);
+  cursor: pointer;
+}
+.lang svg { width: 18px; height: 18px; flex: none; }
+.lang .caret { font-size: .7em; }
+.lang select {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: 0; cursor: pointer;
+  font-size: 16px; /* 16px keeps iOS from zooming in when it opens */
+  border: 0; appearance: none; -webkit-appearance: none;
+}
+.lang:focus-within { outline: 3px solid var(--pink); outline-offset: 3px; }
+@media (hover: hover) { .lang:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--ink); } }
+.lang { transition: transform .15s, box-shadow .15s; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* ---------- hero ---------- */
 .hero {
@@ -308,7 +367,7 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 800; }
 .oses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 2.4rem; }
 .os { position: relative; display: flex; flex-direction: column; gap: .8rem; padding: 1.4rem; border-radius: 20px; background: #fffdf8; border: 2px solid var(--ink); }
 .os.rec { box-shadow: 0 0 0 4px var(--gold), 0 0 0 6px var(--ink); }
-.os.rec::before { content: "Your computer"; position: absolute; top: -13px; right: 16px; padding: .15rem .7rem; border-radius: 999px; background: var(--gold); border: 2px solid var(--ink); font: 700 .75rem var(--sans); }
+.os.rec::before { content: attr(data-rec); position: absolute; top: -13px; right: 16px; padding: .15rem .7rem; border-radius: 999px; background: var(--gold); border: 2px solid var(--ink); font: 700 .75rem var(--sans); }
 .os h3 { display: flex; align-items: center; gap: .6rem; font-size: 1.7rem; letter-spacing: -.02em; }
 .os h3 svg { width: 28px; height: 28px; }
 .os .btn { min-height: 50px; font-size: .98rem; padding: .7em 1.1em; box-shadow: 0 4px 0 var(--ink); }
@@ -364,6 +423,16 @@ footer nav a:hover { color: var(--pink); }
   .beat { box-shadow: 6px 6px 0 var(--ink); }
   .peek { width: 110px; top: -62px; }
   .b3 .media { margin-top: 56px; }
+  .nav { padding-left: 14px; }
+  .nav .btn { padding: .6em 1.05em; font-size: .95rem; }
+  .lang { padding: 0 .7rem 0 .6rem; }
+}
+@media (max-width: 380px) {
+  .brand-name { display: none; }
+}
+/* the paper grain is a fixed full-screen blend layer: lovely on a desktop, needless work for a phone */
+@media (pointer: coarse) {
+  body::after { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -373,24 +442,34 @@ footer nav a:hover { color: var(--pink); }
 <body>
 
 <nav class="nav" aria-label="Main">
-  <a class="brand" href="#top" aria-label="Mari, back to top">
+  <a class="brand" href="#top" aria-label="Mari, back to top" data-i18n-aria="nav.home">
     <svg viewBox="150 140 720 740" aria-hidden="true"><path d="M294.5 851.9C217.7 846.1 172.0 812.6 181.1 768.8C184.0 754.8 194.4 741.6 207.6 735.0C211.4 733.1 214.6 731.5 214.8 731.5C214.9 731.4 213.9 726.9 212.6 721.4C203.0 681.8 206.9 638.0 223.5 598.5C243.8 550.2 280.0 510.3 329.0 482.5C333.7 479.8 337.7 477.5 337.9 477.4C338.1 477.2 336.4 472.7 334.2 467.3C319.9 432.7 321.2 401.7 338.8 361.4C341.0 356.4 342.4 350.4 344.0 340.0C353.3 276.7 367.5 228.1 379.3 218.6C384.5 214.5 392.7 213.8 399.1 217.0C411.9 223.5 431.2 247.5 454.1 285.5L463.8 301.5L470.7 301.3C485.5 300.7 510.3 303.5 531.2 308.1L536.8 309.4L552.7 293.9C598.0 250.0 620.0 236.7 633.4 244.9C642.0 250.3 644.6 263.3 643.7 298.4C643.0 325.0 641.5 341.3 636.8 369.0L633.7 387.5L635.0 404.3C639.1 459.6 623.7 496.4 586.5 520.1C579.0 524.8 578.0 525.8 578.3 528.0C578.5 529.4 579.7 535.1 580.9 540.6C587.5 572.0 586.5 592.5 575.4 653.1C566.9 700.0 564.5 738.3 568.9 756.6C570.1 761.4 570.4 761.8 576.0 764.3C599.5 775.1 601.8 813.2 579.6 824.5L573.6 827.5L547.3 827.8C532.8 828.0 521.0 827.9 521.0 827.6C521.0 827.4 521.9 825.6 522.9 823.8C530.6 810.8 529.1 792.8 519.2 779.8C508.0 765.0 488.3 757.8 463.8 759.6C458.9 760.0 455.0 759.9 455.0 759.5C455.0 759.1 455.6 756.2 456.4 753.1C466.8 712.6 449.4 665.6 417.2 646.7C404.7 639.4 389.4 635.0 381.5 636.4C376.8 637.3 377.4 637.8 388.6 642.8C418.6 655.9 438.4 679.8 444.6 710.0C446.4 719.1 446.2 744.0 444.1 751.0C443.6 752.9 442.6 756.4 442.0 758.8C441.4 761.1 440.4 763.0 439.7 763.0C439.0 763.0 427.9 765.9 415.0 769.4C385.7 777.3 372.8 780.4 357.5 783.0C324.4 788.7 288.7 787.3 262.5 779.4C251.0 775.9 246.6 775.7 246.2 778.7C245.8 781.7 249.1 784.4 257.4 787.9C276.3 795.8 295.5 798.4 328.0 797.7C358.3 796.9 372.1 794.6 405.5 784.6C446.9 772.3 469.4 769.2 487.3 773.4C513.7 779.6 524.4 803.6 510.0 824.5C503.9 833.4 496.8 835.8 473.5 837.0C459.6 837.7 452.3 838.7 434.0 842.3C406.0 848.0 394.3 849.7 372.0 851.5C353.3 853.1 312.7 853.3 294.5 851.9Z"/><rect x="771" y="164" width="48" height="668" rx="24"/></svg>
-    Mari
+    <span class="brand-name">Mari</span>
   </a>
-  <a class="btn" href="#download">Get Mari free</a>
+  <div class="nav-end">
+    <label class="lang">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19M12 2.5c2.6 2.6 3.9 5.8 3.9 9.5s-1.3 6.9-3.9 9.5c-2.6-2.6-3.9-5.8-3.9-9.5s1.3-6.9 3.9-9.5z"/></svg>
+      <span class="lang-code" aria-hidden="true">EN</span><span class="caret" aria-hidden="true">▼</span>
+      <select id="lang" aria-label="Language" data-i18n-aria="lang.label">
+        <option value="en" lang="en">English</option>
+        <option value="ru" lang="ru">Русский</option>
+      </select>
+    </label>
+    <a class="btn" href="#download" data-i18n="nav.cta">Get Mari free</a>
+  </div>
 </nav>
 
 <main id="top">
 
 <header class="hero">
   <div class="wrap hero-grid">
-    <div>
-      <span class="sticker">✍️ Made for novelists</span>
-      <h1 class="split">Other writing apps are <em class="gold">jealous.</em></h1>
-      <p class="sub">Mari is the free writing app that turns messy drafts into books you're proud of.</p>
+    <div class="hero-copy">
+      <span class="sticker" data-i18n="hero.sticker">✍️ Made for novelists</span>
+      <h1 class="split" data-i18n="hero.h1">Other writing apps are <em class="gold">jealous.</em></h1>
+      <p class="sub" data-i18n="hero.sub">Mari is the free writing app that turns messy drafts into books you're proud of.</p>
       <div class="cta">
-        <a class="btn" href="#download">Get Mari free</a>
-        <small>Windows · Mac · Linux</small>
+        <a class="btn" href="#download" data-i18n="hero.cta">Get Mari free</a>
+        <small data-i18n="hero.platforms">Windows · Mac · Linux</small>
       </div>
     </div>
 
@@ -400,13 +479,13 @@ footer nav a:hover { color: var(--pink); }
           <circle cx="80" cy="80" r="76" fill="#ffc93c" stroke="#14120f" stroke-width="3"/>
           <g class="ring">
             <path id="ringPath" d="M80 80 m-56 0 a56 56 0 1 1 112 0 a56 56 0 1 1 -112 0" fill="none"/>
-            <text><textPath href="#ringPath">FREE FOREVER ✶ NO ACCOUNT ✶ </textPath></text>
+            <text textLength="348" lengthAdjust="spacing"><textPath href="#ringPath" data-i18n="hero.badge">FREE FOREVER ✶ NO ACCOUNT ✶</textPath></text>
           </g>
           <path d="M80 56 l7 16 17 1 -13 11 4 17 -15 -9 -15 9 4 -17 -13 -11 17 -1z" fill="#ff3d8b" stroke="#14120f" stroke-width="3" stroke-linejoin="round"/>
         </svg>
       </div>
       <div class="bubble" id="catSays" role="status" aria-live="polite"></div>
-      <button class="cat-btn" id="cat" type="button" aria-label="Pet Mari">
+      <button class="cat-btn" id="cat" type="button" aria-label="Pet Mari" data-i18n-aria="hero.petLabel">
         <svg class="mari" viewBox="150 130 720 760" aria-hidden="true">
           <ellipse class="shadow" cx="420" cy="852" rx="250" ry="14"/>
           <ellipse class="shadow" cx="795" cy="842" rx="50" ry="7"/>
@@ -422,68 +501,68 @@ footer nav a:hover { color: var(--pink); }
   </div>
 
   <div class="wrap shot">
-    <span class="sticker s1">Your book. But gorgeous.</span>
-    <span class="sticker s2">100% free</span>
+    <span class="sticker s1" data-i18n="shot.s1">Your book. But gorgeous.</span>
+    <span class="sticker s2" data-i18n="shot.s2">100% free</span>
     <div class="shot-card">
-      <img src="why-mari.png" width="1849" height="1051" alt="Mari with a chapter open, its passages marked in colour, the chapter list on the left and a map of the chapter on the right" fetchpriority="high">
+      <img src="why-mari.png" width="1849" height="1051" alt="Mari with a chapter open, its passages marked in colour, the chapter list on the left and a map of the chapter on the right" data-i18n-alt="shot.alt" fetchpriority="high">
     </div>
   </div>
 </header>
 
 <div class="band" aria-hidden="true">
   <div class="band-track">
-    <span>Free forever</span><span>No account</span><span>No subscription</span><span>Your files stay yours</span><span>Windows, Mac &amp; Linux</span><span>Comes with a cat</span>
-    <span>Free forever</span><span>No account</span><span>No subscription</span><span>Your files stay yours</span><span>Windows, Mac &amp; Linux</span><span>Comes with a cat</span>
+    <span data-i18n="band.1">Free forever</span><span data-i18n="band.2">No account</span><span data-i18n="band.3">No subscription</span><span data-i18n="band.4">Your files stay yours</span><span data-i18n="band.5">Windows, Mac &amp; Linux</span><span data-i18n="band.6">Comes with a cat</span>
+    <span data-i18n="band.1">Free forever</span><span data-i18n="band.2">No account</span><span data-i18n="band.3">No subscription</span><span data-i18n="band.4">Your files stay yours</span><span data-i18n="band.5">Windows, Mac &amp; Linux</span><span data-i18n="band.6">Comes with a cat</span>
   </div>
 </div>
 
 <section class="reasons" id="why">
   <div class="wrap">
-    <h2 class="reasons-head split">Four reasons you'll <em>never</em> go back.</h2>
+    <h2 class="reasons-head split" data-i18n="reasons.h2">Four reasons you'll <em>never</em> go back.</h2>
 
     <div class="beats">
       <article class="beat b1">
         <div>
           <span class="num">1</span>
-          <h3 class="split">Read it like an <em>editor.</em></h3>
-          <p>Mark what sings, what drags and what's in the wrong place. Right on the page.</p>
+          <h3 class="split" data-i18n="b1.h3">Read it like an <em>editor.</em></h3>
+          <p data-i18n="b1.p">Mark what sings, what drags and what's in the wrong place. Right on the page.</p>
         </div>
         <div class="media">
-          <div class="frame"><img src="highlights.gif" width="900" height="512" alt="Passages in a chapter being marked in different colours" loading="lazy"></div>
+          <div class="frame"><img src="highlights.gif" width="900" height="512" alt="Passages in a chapter being marked in different colours" data-i18n-alt="b1.alt" loading="lazy"></div>
         </div>
       </article>
 
       <article class="beat b2">
         <div>
           <span class="num">2</span>
-          <h3 class="split">Rewrite without <em>fear.</em></h3>
-          <p>Try a new version right beside the old one. Every version you replace is kept.</p>
+          <h3 class="split" data-i18n="b2.h3">Rewrite without <em>fear.</em></h3>
+          <p data-i18n="b2.p">Try a new version right beside the old one. Every version you replace is kept.</p>
         </div>
         <div class="media">
-          <div class="frame"><img src="draft-and-compare.gif" width="900" height="553" alt="Two versions of a passage side by side, with the changed words picked out" loading="lazy"></div>
+          <div class="frame"><img src="draft-and-compare.gif" width="900" height="553" alt="Two versions of a passage side by side, with the changed words picked out" data-i18n-alt="b2.alt" loading="lazy"></div>
         </div>
       </article>
 
       <article class="beat b3">
         <div>
           <span class="num">3</span>
-          <h3 class="split">Kill your darlings. Keep the <em>bodies.</em></h3>
-          <p>Cut scenes go in the drawer, not the bin. Bring them back whenever you like.</p>
+          <h3 class="split" data-i18n="b3.h3">Kill your darlings. Keep the <em>bodies.</em></h3>
+          <p data-i18n="b3.p">Cut scenes go in the drawer, not the bin. Bring them back whenever you like.</p>
         </div>
         <div class="media">
           <div class="peek" aria-hidden="true"><svg class="mari" viewBox="300 205 400 200"><path class="body" d="M294.5 851.9C217.7 846.1 172.0 812.6 181.1 768.8C184.0 754.8 194.4 741.6 207.6 735.0C211.4 733.1 214.6 731.5 214.8 731.5C214.9 731.4 213.9 726.9 212.6 721.4C203.0 681.8 206.9 638.0 223.5 598.5C243.8 550.2 280.0 510.3 329.0 482.5C333.7 479.8 337.7 477.5 337.9 477.4C338.1 477.2 336.4 472.7 334.2 467.3C319.9 432.7 321.2 401.7 338.8 361.4C341.0 356.4 342.4 350.4 344.0 340.0C353.3 276.7 367.5 228.1 379.3 218.6C384.5 214.5 392.7 213.8 399.1 217.0C411.9 223.5 431.2 247.5 454.1 285.5L463.8 301.5L470.7 301.3C485.5 300.7 510.3 303.5 531.2 308.1L536.8 309.4L552.7 293.9C598.0 250.0 620.0 236.7 633.4 244.9C642.0 250.3 644.6 263.3 643.7 298.4C643.0 325.0 641.5 341.3 636.8 369.0L633.7 387.5L635.0 404.3C639.1 459.6 623.7 496.4 586.5 520.1C579.0 524.8 578.0 525.8 578.3 528.0C578.5 529.4 579.7 535.1 580.9 540.6C587.5 572.0 586.5 592.5 575.4 653.1C566.9 700.0 564.5 738.3 568.9 756.6C570.1 761.4 570.4 761.8 576.0 764.3C599.5 775.1 601.8 813.2 579.6 824.5L573.6 827.5L547.3 827.8C532.8 828.0 521.0 827.9 521.0 827.6C521.0 827.4 521.9 825.6 522.9 823.8C530.6 810.8 529.1 792.8 519.2 779.8C508.0 765.0 488.3 757.8 463.8 759.6C458.9 760.0 455.0 759.9 455.0 759.5C455.0 759.1 455.6 756.2 456.4 753.1C466.8 712.6 449.4 665.6 417.2 646.7C404.7 639.4 389.4 635.0 381.5 636.4C376.8 637.3 377.4 637.8 388.6 642.8C418.6 655.9 438.4 679.8 444.6 710.0C446.4 719.1 446.2 744.0 444.1 751.0C443.6 752.9 442.6 756.4 442.0 758.8C441.4 761.1 440.4 763.0 439.7 763.0C439.0 763.0 427.9 765.9 415.0 769.4C385.7 777.3 372.8 780.4 357.5 783.0C324.4 788.7 288.7 787.3 262.5 779.4C251.0 775.9 246.6 775.7 246.2 778.7C245.8 781.7 249.1 784.4 257.4 787.9C276.3 795.8 295.5 798.4 328.0 797.7C358.3 796.9 372.1 794.6 405.5 784.6C446.9 772.3 469.4 769.2 487.3 773.4C513.7 779.6 524.4 803.6 510.0 824.5C503.9 833.4 496.8 835.8 473.5 837.0C459.6 837.7 452.3 838.7 434.0 842.3C406.0 848.0 394.3 849.7 372.0 851.5C353.3 853.1 312.7 853.3 294.5 851.9Z"/><path class="wh wh-l" d="M262.6 459.4C260.5 457.3 260.6 453.7 262.8 451.8C265.6 449.3 297.0 443.0 306.7 443.0C310.9 443.0 313.7 446.7 312.0 449.9C310.5 452.7 308.5 453.6 301.5 454.5C298.2 454.8 289.0 456.5 281.0 458.1C264.2 461.5 264.6 461.5 262.6 459.4ZM297.5 427.0C295.3 426.5 289.2 425.9 284.0 425.5C268.1 424.5 264.1 423.9 262.5 422.4C260.2 420.0 260.7 416.3 263.6 414.4C265.9 412.9 267.5 412.8 280.1 413.9C292.9 414.9 304.9 416.9 309.3 418.5C311.4 419.4 312.6 423.8 311.3 425.9C310.1 427.7 303.6 428.3 297.5 427.0Z"/><path class="wh wh-r" d="M662.5 501.8C659.2 500.0 652.0 496.8 646.6 494.5C635.6 489.9 634.1 488.5 635.6 484.3C637.5 478.8 645.3 480.6 666.3 491.2C676.5 496.5 678.3 498.6 676.0 502.9C674.4 505.9 669.7 505.5 662.5 501.8ZM672.5 469.4C668.6 468.6 661.1 467.6 655.8 467.1C645.2 466.2 643.0 465.2 643.0 461.0C643.0 456.2 644.8 455.6 657.8 456.3C681.4 457.4 691.7 462.3 685.0 469.0C682.7 471.3 682.1 471.3 672.5 469.4Z"/><g class="eyes"><ellipse class="eye" cx="446.8" cy="425" rx="14.5" ry="22.5"/><ellipse class="eye" cx="581.7" cy="440.5" rx="14" ry="23"/></g></svg></div>
-          <div class="frame"><img src="drawer.gif" width="900" height="506" alt="A cut passage going into the drawer and being read back" loading="lazy"></div>
+          <div class="frame"><img src="drawer.gif" width="900" height="506" alt="A cut passage going into the drawer and being read back" data-i18n-alt="b3.alt" loading="lazy"></div>
         </div>
       </article>
 
       <article class="beat b4">
         <div>
           <span class="num">4</span>
-          <h3 class="split">Then just <em>write.</em></h3>
-          <p>One key, and everything disappears except your words.</p>
+          <h3 class="split" data-i18n="b4.h3">Then just <em>write.</em></h3>
+          <p data-i18n="b4.p">One key, and everything disappears except your words.</p>
         </div>
         <div class="media">
-          <div class="frame"><img src="focus-mode.png" width="1920" height="1080" alt="Focus mode, with nothing on screen but the writing" loading="lazy"></div>
+          <div class="frame"><img src="focus-mode.png" width="1920" height="1080" alt="Focus mode, with nothing on screen but the writing" data-i18n-alt="b4.alt" loading="lazy"></div>
         </div>
       </article>
     </div>
@@ -492,7 +571,7 @@ footer nav a:hover { color: var(--pink); }
 
 <section class="trailer" id="trailer" hidden>
   <div class="wrap">
-    <h2 class="split">Watch it <em>go.</em></h2>
+    <h2 class="split" data-i18n="trailer.h2">Watch it <em>go.</em></h2>
     <div class="vid"><video controls playsinline preload="metadata" data-slot="trailer"></video></div>
   </div>
 </section>
@@ -500,45 +579,45 @@ footer nav a:hover { color: var(--pink); }
 <section class="download" id="download">
   <div class="wrap">
     <div class="dl">
-      <img class="pixel" src="mari-pixel.png" width="160" height="185" alt="Mari the cat, blinking and licking her paw" loading="lazy">
-      <p class="kick">Download</p>
-      <h2>Your second draft is waiting.</h2>
-      <p class="lede">Mari runs on Windows, macOS and Linux. Pick yours and start writing.</p>
+      <img class="pixel" src="mari-pixel.png" width="160" height="185" alt="Mari the cat, blinking and licking her paw" data-i18n-alt="dl.pixelAlt" loading="lazy">
+      <p class="kick" data-i18n="dl.kick">Download</p>
+      <h2 data-i18n="dl.h2">Your second draft is waiting.</h2>
+      <p class="lede" data-i18n="dl.lede">Mari runs on Windows, macOS and Linux. Pick yours and start writing.</p>
 
       <div class="oses">
         <div class="os" data-os="win">
           <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5 10.5 4.4v7.1H3zm0 13L10.5 19.6v-7H3zm8.4 1.2L21 21V12.6h-9.6zM11.4 4.3 21 3v8.4h-9.6z"/></svg>Windows</h3>
-          <a class="btn" data-asset="exe" href="https://github.com/spacekestrel/mari/releases/latest">Download installer</a>
-          <div class="alt">Or the <a data-asset="msi" href="https://github.com/spacekestrel/mari/releases/latest">.msi</a> if your workplace prefers it</div>
+          <a class="btn" data-asset="exe" href="https://github.com/spacekestrel/mari/releases/latest" data-i18n="dl.win.btn">Download installer</a>
+          <div class="alt" data-i18n="dl.win.alt">Or the <a data-asset="msi" href="https://github.com/spacekestrel/mari/releases/latest">.msi</a> if your workplace prefers it</div>
         </div>
         <div class="os" data-os="mac">
           <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8s1.9.8 3.2.7c1.3 0 2.1-1.2 2.9-2.4.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.4-.9-2.4-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4z"/></svg>macOS</h3>
-          <a class="btn" data-asset="dmg-arm" href="https://github.com/spacekestrel/mari/releases/latest">Apple silicon (M1 and later)</a>
-          <div class="alt">Older Mac? Get the <a data-asset="dmg-intel" href="https://github.com/spacekestrel/mari/releases/latest">Intel version</a></div>
+          <a class="btn" data-asset="dmg-arm" href="https://github.com/spacekestrel/mari/releases/latest" data-i18n="dl.mac.btn">Apple silicon (M1 and later)</a>
+          <div class="alt" data-i18n="dl.mac.alt">Older Mac? Get the <a data-asset="dmg-intel" href="https://github.com/spacekestrel/mari/releases/latest">Intel version</a></div>
         </div>
         <div class="os" data-os="linux">
           <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c-2.2 0-3.6 1.9-3.6 4.6 0 1.4.3 2.3-.6 3.6C6.5 12 5 14.1 5 16.6c0 .5.1 1 .2 1.4-.8.4-1.7 1-1.7 1.8 0 1.2 2 1.4 3.2 2 .9.5 1.6.7 2.3.2.4-.3.6-.7.8-1.1h4.4c.2.4.4.8.8 1.1.7.5 1.4.3 2.3-.2 1.2-.6 3.2-.8 3.2-2 0-.8-.9-1.4-1.7-1.8.1-.4.2-.9.2-1.4 0-2.5-1.5-4.6-2.8-6.4-.9-1.3-.6-2.2-.6-3.6C15.6 3.9 14.2 2 12 2zm-1.6 4.2c.4 0 .7.5.7 1.1 0 .6-.3 1.1-.7 1.1s-.7-.5-.7-1.1c0-.6.3-1.1.7-1.1zm3.2 0c.4 0 .7.5.7 1.1 0 .6-.3 1.1-.7 1.1s-.7-.5-.7-1.1c0-.6.3-1.1.7-1.1zM12 9.2c.9 0 2 .6 2 1s-1.1 1-2 1-2-.6-2-1 1.1-1 2-1z"/></svg>Linux</h3>
-          <a class="btn" data-asset="appimage" href="https://github.com/spacekestrel/mari/releases/latest">.AppImage, runs anywhere</a>
-          <div class="alt">Or <a data-asset="deb" href="https://github.com/spacekestrel/mari/releases/latest">.deb</a> for Debian and Ubuntu, <a data-asset="rpm" href="https://github.com/spacekestrel/mari/releases/latest">.rpm</a> for Fedora</div>
+          <a class="btn" data-asset="appimage" href="https://github.com/spacekestrel/mari/releases/latest" data-i18n="dl.linux.btn">.AppImage, runs anywhere</a>
+          <div class="alt" data-i18n="dl.linux.alt">Or <a data-asset="deb" href="https://github.com/spacekestrel/mari/releases/latest">.deb</a> for Debian and Ubuntu, <a data-asset="rpm" href="https://github.com/spacekestrel/mari/releases/latest">.rpm</a> for Fedora</div>
         </div>
       </div>
 
-      <p class="mobile-note">Mari is a desktop app. Open this page on your computer to download it.</p>
+      <p class="mobile-note" data-i18n="dl.mobile">Mari is a desktop app. Open this page on your computer to download it.</p>
 
       <details class="warn">
-        <summary>Windows or macOS grumbling the first time? Read this.</summary>
+        <summary data-i18n="dl.warn.summary">Windows or macOS grumbling the first time? Read this.</summary>
         <div class="in-warn">
-          <p>Apple and Microsoft charge for the certificate that stops their warnings. Mari is free and hasn't paid, so both complain once. The file is fine.</p>
-          <p><strong>Windows</strong> says "unrecognised app". Click <em>More info</em>, then <em>Run anyway</em>.</p>
-          <p><strong>macOS</strong> says Mari is damaged. It isn't. Drag Mari to Applications, open <em>Terminal</em>, paste this line once, then open Mari normally:</p>
-          <div class="cmd"><code id="xattr">xattr -dr com.apple.quarantine /Applications/Mari.app</code><button type="button" id="copyCmd">Copy</button></div>
+          <p data-i18n="dl.warn.p1">Apple and Microsoft charge for the certificate that stops their warnings. Mari is free and hasn't paid, so both complain once. The file is fine.</p>
+          <p data-i18n="dl.warn.p2"><strong>Windows</strong> says "unrecognised app". Click <em>More info</em>, then <em>Run anyway</em>.</p>
+          <p data-i18n="dl.warn.p3"><strong>macOS</strong> says Mari is damaged. It isn't. Drag Mari to Applications, open <em>Terminal</em>, paste this line once, then open Mari normally:</p>
+          <div class="cmd"><code id="xattr">xattr -dr com.apple.quarantine /Applications/Mari.app</code><button type="button" id="copyCmd" data-i18n="dl.copy">Copy</button></div>
         </div>
       </details>
 
       <div class="dl-meta">
         <span class="beta">BETA</span>
-        <span>Version <span data-version>0.2.7</span>. Usable every day, with the odd rough edge.</span>
-        <a href="https://github.com/spacekestrel/mari/issues">Found one? Tell us</a>
+        <span data-i18n="dl.beta">Version <span data-version>0.2.7</span>. Usable every day, with the odd rough edge.</span>
+        <a href="https://github.com/spacekestrel/mari/issues" data-i18n="dl.bug">Found one? Tell us</a>
       </div>
     </div>
   </div>
@@ -552,16 +631,126 @@ footer nav a:hover { color: var(--pink); }
       <div class="zzz"><span>z</span><span>z</span><span>z</span></div>
       <svg class="mari" viewBox="150 130 720 760"><ellipse class="shadow" cx="420" cy="852" rx="250" ry="14"/><path class="body" d="M294.5 851.9C217.7 846.1 172.0 812.6 181.1 768.8C184.0 754.8 194.4 741.6 207.6 735.0C211.4 733.1 214.6 731.5 214.8 731.5C214.9 731.4 213.9 726.9 212.6 721.4C203.0 681.8 206.9 638.0 223.5 598.5C243.8 550.2 280.0 510.3 329.0 482.5C333.7 479.8 337.7 477.5 337.9 477.4C338.1 477.2 336.4 472.7 334.2 467.3C319.9 432.7 321.2 401.7 338.8 361.4C341.0 356.4 342.4 350.4 344.0 340.0C353.3 276.7 367.5 228.1 379.3 218.6C384.5 214.5 392.7 213.8 399.1 217.0C411.9 223.5 431.2 247.5 454.1 285.5L463.8 301.5L470.7 301.3C485.5 300.7 510.3 303.5 531.2 308.1L536.8 309.4L552.7 293.9C598.0 250.0 620.0 236.7 633.4 244.9C642.0 250.3 644.6 263.3 643.7 298.4C643.0 325.0 641.5 341.3 636.8 369.0L633.7 387.5L635.0 404.3C639.1 459.6 623.7 496.4 586.5 520.1C579.0 524.8 578.0 525.8 578.3 528.0C578.5 529.4 579.7 535.1 580.9 540.6C587.5 572.0 586.5 592.5 575.4 653.1C566.9 700.0 564.5 738.3 568.9 756.6C570.1 761.4 570.4 761.8 576.0 764.3C599.5 775.1 601.8 813.2 579.6 824.5L573.6 827.5L547.3 827.8C532.8 828.0 521.0 827.9 521.0 827.6C521.0 827.4 521.9 825.6 522.9 823.8C530.6 810.8 529.1 792.8 519.2 779.8C508.0 765.0 488.3 757.8 463.8 759.6C458.9 760.0 455.0 759.9 455.0 759.5C455.0 759.1 455.6 756.2 456.4 753.1C466.8 712.6 449.4 665.6 417.2 646.7C404.7 639.4 389.4 635.0 381.5 636.4C376.8 637.3 377.4 637.8 388.6 642.8C418.6 655.9 438.4 679.8 444.6 710.0C446.4 719.1 446.2 744.0 444.1 751.0C443.6 752.9 442.6 756.4 442.0 758.8C441.4 761.1 440.4 763.0 439.7 763.0C439.0 763.0 427.9 765.9 415.0 769.4C385.7 777.3 372.8 780.4 357.5 783.0C324.4 788.7 288.7 787.3 262.5 779.4C251.0 775.9 246.6 775.7 246.2 778.7C245.8 781.7 249.1 784.4 257.4 787.9C276.3 795.8 295.5 798.4 328.0 797.7C358.3 796.9 372.1 794.6 405.5 784.6C446.9 772.3 469.4 769.2 487.3 773.4C513.7 779.6 524.4 803.6 510.0 824.5C503.9 833.4 496.8 835.8 473.5 837.0C459.6 837.7 452.3 838.7 434.0 842.3C406.0 848.0 394.3 849.7 372.0 851.5C353.3 853.1 312.7 853.3 294.5 851.9Z"/><path class="wh wh-l" d="M262.6 459.4C260.5 457.3 260.6 453.7 262.8 451.8C265.6 449.3 297.0 443.0 306.7 443.0C310.9 443.0 313.7 446.7 312.0 449.9C310.5 452.7 308.5 453.6 301.5 454.5C298.2 454.8 289.0 456.5 281.0 458.1C264.2 461.5 264.6 461.5 262.6 459.4ZM297.5 427.0C295.3 426.5 289.2 425.9 284.0 425.5C268.1 424.5 264.1 423.9 262.5 422.4C260.2 420.0 260.7 416.3 263.6 414.4C265.9 412.9 267.5 412.8 280.1 413.9C292.9 414.9 304.9 416.9 309.3 418.5C311.4 419.4 312.6 423.8 311.3 425.9C310.1 427.7 303.6 428.3 297.5 427.0Z"/><path class="wh wh-r" d="M662.5 501.8C659.2 500.0 652.0 496.8 646.6 494.5C635.6 489.9 634.1 488.5 635.6 484.3C637.5 478.8 645.3 480.6 666.3 491.2C676.5 496.5 678.3 498.6 676.0 502.9C674.4 505.9 669.7 505.5 662.5 501.8ZM672.5 469.4C668.6 468.6 661.1 467.6 655.8 467.1C645.2 466.2 643.0 465.2 643.0 461.0C643.0 456.2 644.8 455.6 657.8 456.3C681.4 457.4 691.7 462.3 685.0 469.0C682.7 471.3 682.1 471.3 672.5 469.4Z"/><path class="closed" d="M432 428 q15 12 30 0 M567 444 q15 12 30 0"/><rect class="caret" x="771" y="164" width="48" height="668" rx="24"/></svg>
     </div>
-    <p class="tagline">Marí is a cat. <em>Mari is also a writing app.</em></p>
+    <p class="tagline" data-i18n="footer.tagline">Marí is a cat. <em>Mari is also a writing app.</em></p>
     <nav aria-label="Footer">
-      <a href="https://github.com/spacekestrel/mari">GitHub</a>
-      <a href="https://github.com/spacekestrel/mari/releases/latest">All downloads</a>
-      <a href="https://github.com/spacekestrel/mari/issues">Report a bug</a>
-      <a href="https://github.com/spacekestrel/mari/blob/main/LICENSE">AGPL-3.0</a>
+      <a href="https://github.com/spacekestrel/mari" data-i18n="footer.github">GitHub</a>
+      <a href="https://github.com/spacekestrel/mari/releases/latest" data-i18n="footer.downloads">All downloads</a>
+      <a href="https://github.com/spacekestrel/mari/issues" data-i18n="footer.bug">Report a bug</a>
+      <a href="https://github.com/spacekestrel/mari/blob/main/LICENSE" data-i18n="footer.license">AGPL-3.0</a>
     </nav>
   </div>
 </footer>
 
+<script>
+/* ---------- languages ----------
+   English is the text written into the page above. Russian is RU below,
+   keyed the same way as the data-i18n attributes. To change a Russian line,
+   change it here. */
+window.I18N = (() => {
+  const RU = {
+
+  };
+
+  // English lines that only the script shows (the cat's lines, button states)
+  const EN_EXTRA = {
+    "cat.hello": "Hi. I'm Mari. Pet me.",
+    "cat.line1": "Mrrp?",
+    "cat.line2": "Your plot hole is showing.",
+    "cat.line3": "That adverb? Cut it.",
+    "cat.line4": "Chapter three needs work. Trust me.",
+    "cat.line5": "I sat on your keyboard. You're welcome.",
+    "cat.line6": "Kill your darlings. Not me.",
+    "cat.line7": "Write first. Pet later.",
+    "dl.rec": "Your computer",
+    "dl.copied": "Copied",
+    "dl.mac.intelBtn": "Intel Mac",
+    "dl.mac.armPrefix": "Newer Mac? Get the ",
+    "dl.mac.armLink": "Apple silicon version",
+  };
+
+  const LANGS = ["en", "ru"];
+  // Countries where a visitor gets Russian unless they pick otherwise
+  const RU_COUNTRIES = ["RU", "BY", "KZ", "KG"];
+
+  const root = document.documentElement;
+  const $$ = (s) => [...document.querySelectorAll(s)];
+  const metaDesc = document.querySelector('meta[name="description"]');
+
+  // English as written in the page, read once before anything changes it
+  const EN = { ...EN_EXTRA, "meta.title": document.title, "meta.description": metaDesc.content };
+  $$("[data-i18n]").forEach((el) => (EN[el.dataset.i18n] = el.innerHTML));
+  $$("[data-i18n-alt]").forEach((el) => (EN[el.dataset.i18nAlt] = el.alt));
+  $$("[data-i18n-aria]").forEach((el) => (EN[el.dataset.i18nAria] = el.getAttribute("aria-label")));
+  const DICT = { en: EN, ru: RU };
+
+  let current = "en";
+  const listeners = [];
+  const t = (key) => DICT[current][key] ?? EN[key] ?? "";
+
+  function apply(lang) {
+    current = lang;
+    root.lang = lang;
+    document.title = t("meta.title");
+    metaDesc.content = t("meta.description");
+    $$("[data-i18n]").forEach((el) => { const v = t(el.dataset.i18n); if (el.innerHTML !== v) el.innerHTML = v; });
+    $$("[data-i18n-alt]").forEach((el) => (el.alt = t(el.dataset.i18nAlt)));
+    $$("[data-i18n-aria]").forEach((el) => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
+    $$(".os").forEach((el) => (el.dataset.rec = t("dl.rec")));
+    const sel = document.getElementById("lang");
+    if (sel) sel.value = lang;
+    const code = document.querySelector(".lang-code");
+    if (code) code.textContent = lang.toUpperCase();
+    listeners.forEach((fn) => fn(lang));
+  }
+
+  // Which country the visitor's IP address is in. Two free services race;
+  // the first answer wins, and after 1.2s we stop waiting. Remembered a week.
+  function countryFromIP() {
+    try {
+      const c = JSON.parse(localStorage.getItem("mari-country") || "null");
+      if (c && Date.now() - c.t < 7 * 864e5) return Promise.resolve(c.c);
+    } catch (e) {}
+    const ask = (url, pick) => fetch(url, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((j) => pick(j) || Promise.reject());
+    return new Promise((resolve) => {
+      let left = 2;
+      const miss = () => { if (--left === 0) resolve(null); };
+      ask("https://api.country.is/", (j) => j.country).then(resolve, miss);
+      ask("https://get.geojs.io/v1/ip/country.json", (j) => j.country).then(resolve, miss);
+      setTimeout(() => resolve(null), 1200);
+    }).then((c) => {
+      c = c ? String(c).toUpperCase() : null;
+      if (c) try { localStorage.setItem("mari-country", JSON.stringify({ c, t: Date.now() })); } catch (e) {}
+      return c;
+    });
+  }
+
+  // Order: the language in the link, the one picked before, the visitor's
+  // country, their browser's language.
+  const q = /[?&]lang=(en|ru)\b/.exec(location.search);
+  let saved = null;
+  try { saved = localStorage.getItem("mari-lang"); } catch (e) {}
+  const browser = /^ru\b/i.test(navigator.language || "") ? "ru" : "en";
+  const ready = (q ? Promise.resolve(q[1])
+    : LANGS.includes(saved) ? Promise.resolve(saved)
+    : countryFromIP().then((c) => (c ? (RU_COUNTRIES.includes(c) ? "ru" : "en") : browser))
+  ).then((lang) => { apply(lang); return lang; });
+
+  document.getElementById("lang").addEventListener("change", (e) => {
+    const lang = e.target.value;
+    try { localStorage.setItem("mari-lang", lang); } catch (err) {}
+    try {
+      const u = new URL(location.href);
+      u.searchParams.set("lang", lang);
+      history.replaceState(null, "", u);
+    } catch (err) {}
+    apply(lang);
+  });
+
+  return { ready, t, onChange: (fn) => listeners.push(fn), get lang() { return current; } };
+})();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
@@ -570,15 +759,18 @@ footer nav a:hover { color: var(--pink); }
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const { t } = I18N;
+  const motion = !!(window.gsap && window.ScrollTrigger && !reduced);
 
   /* ---------- split headings into words for the reveal ---------- */
   const split = (el) => {
     for (const n of [...el.childNodes]) {
       if (n.nodeType === 3) {
         const frag = document.createDocumentFragment();
-        n.textContent.split(/(\s+)/).forEach((part) => {
+        // ordinary spaces only: a no-break space keeps «в ящик» together as one word
+        n.textContent.split(/([ \t\n\r\f]+)/).forEach((part) => {
           if (!part) return;
-          if (/^\s+$/.test(part)) { frag.append(part); return; }
+          if (/^[ \t\n\r\f]+$/.test(part)) { frag.append(part); return; }
           const outer = document.createElement("span"); outer.className = "wd";
           const inner = document.createElement("span"); inner.textContent = part;
           outer.append(inner); frag.append(outer);
@@ -587,16 +779,22 @@ footer nav a:hover { color: var(--pink); }
       } else if (n.nodeType === 1) split(n);
     }
   };
-  $$(".split").forEach(split);
+  // after a language change the headings hold fresh text: split it again and show it as it is
+  const resplit = () => $$(".split").forEach((h) => {
+    if (h.querySelector(".wd")) return;
+    split(h);
+    if (motion) gsap.set(h.querySelectorAll(".wd > span"), { clearProps: "all" });
+  });
 
   /* ---------- smooth scroll + motion ---------- */
   let lenis = null;
-  if (window.gsap && window.ScrollTrigger && !reduced) {
+  function startMotion() {
+    if (!motion) return;
     gsap.registerPlugin(ScrollTrigger);
     if (window.Lenis) {
       lenis = new Lenis({ lerp: 0.11 });
       lenis.on("scroll", ScrollTrigger.update);
-      gsap.ticker.add((t) => lenis.raf(t * 1000));
+      gsap.ticker.add((time) => lenis.raf(time * 1000));
       gsap.ticker.lagSmoothing(0);
     }
 
@@ -640,11 +838,11 @@ footer nav a:hover { color: var(--pink); }
 
   // in-page links glide when smooth scroll is on
   $$('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
-    const t = a.getAttribute("href");
-    const el = t === "#top" ? document.body : $(t);
+    const target = a.getAttribute("href");
+    const el = target === "#top" ? document.body : $(target);
     if (!el) return;
     e.preventDefault();
-    if (lenis) lenis.scrollTo(el, { offset: t === "#top" ? 0 : -110 });
+    if (lenis) lenis.scrollTo(el, { offset: target === "#top" ? 0 : -110 });
     else el.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
   }));
 
@@ -679,15 +877,6 @@ footer nav a:hover { color: var(--pink); }
 
   /* ---------- pet the cat ---------- */
   const cat = $("#cat"), says = $("#catSays"), hearts = $("#hearts");
-  const lines = [
-    "Mrrp?",
-    "Your plot hole is showing.",
-    "That adverb? Cut it.",
-    "Chapter three needs work. Trust me.",
-    "I sat on your keyboard. You're welcome.",
-    "Kill your darlings. Not me.",
-    "Write first. Pet later.",
-  ];
   let li = 0, sayTimer;
   const say = (text, ms = 2600) => {
     says.textContent = text;
@@ -696,7 +885,7 @@ footer nav a:hover { color: var(--pink); }
     sayTimer = setTimeout(() => says.classList.remove("show"), ms);
   };
   cat.addEventListener("click", () => {
-    say(lines[li++ % lines.length]);
+    say(t(`cat.line${(li++ % 7) + 1}`));
     cat.classList.remove("hop"); void cat.offsetWidth; cat.classList.add("hop");
     for (let i = 0; i < 5; i++) {
       const h = document.createElement("span");
@@ -710,7 +899,6 @@ footer nav a:hover { color: var(--pink); }
       setTimeout(() => h.remove(), 1500);
     }
   });
-  setTimeout(() => say("Hi. I'm Mari. Pet me."), 1900);
 
   /* ---------- downloads ---------- */
   const ua = navigator.userAgent;
@@ -728,40 +916,62 @@ footer nav a:hover { color: var(--pink); }
     card.classList.add("rec");
     card.parentElement.prepend(card);
   }
+  let intelMac = false;
   if (os === "mac") {
     try {
       const gl = document.createElement("canvas").getContext("webgl");
       const info = gl && gl.getExtension("WEBGL_debug_renderer_info");
-      const gpu = info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : "";
-      if (/Intel|AMD|Radeon/i.test(gpu)) {
-        const main = $('[data-asset="dmg-arm"]'), alt = $('[data-asset="dmg-intel"]');
-        main.dataset.asset = "dmg-intel"; main.textContent = "Intel Mac";
-        alt.dataset.asset = "dmg-arm"; alt.textContent = "Apple silicon version";
-        alt.parentElement.firstChild.textContent = "Newer Mac? Get the ";
-      }
-    } catch {}
+      intelMac = /Intel|AMD|Radeon/i.test(info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : "");
+    } catch (e) {}
   }
+  // Intel Macs get the Intel build up front (and again after a language change)
+  const macOrder = () => {
+    if (!intelMac) return;
+    const main = $('.os[data-os="mac"] .btn'), line = $('.os[data-os="mac"] .alt');
+    main.dataset.asset = "dmg-intel";
+    main.textContent = t("dl.mac.intelBtn");
+    line.innerHTML = `${t("dl.mac.armPrefix")}<a data-asset="dmg-arm" href="https://github.com/spacekestrel/mari/releases/latest">${t("dl.mac.armLink")}</a>`;
+  };
   const match = {
     exe: /-setup\.exe$/i, msi: /\.msi$/i,
     "dmg-arm": /aarch64\.dmg$/i, "dmg-intel": /x64\.dmg$/i,
     appimage: /\.AppImage$/i, deb: /\.deb$/i, rpm: /\.rpm$/i,
   };
+  let release = null;
+  const fillRelease = () => {
+    if (!release) return;
+    $$("[data-version]").forEach((el) => (el.textContent = release.tag_name.replace(/^v/, "")));
+    $$("[data-asset]").forEach((a) => {
+      const asset = release.assets.find((x) => match[a.dataset.asset].test(x.name));
+      if (asset) a.href = asset.browser_download_url;
+    });
+  };
   fetch("https://api.github.com/repos/spacekestrel/mari/releases/latest", { headers: { Accept: "application/vnd.github+json" } })
     .then((r) => (r.ok ? r.json() : null))
-    .then((rel) => {
-      if (!rel) return;
-      $$("[data-version]").forEach((el) => (el.textContent = rel.tag_name.replace(/^v/, "")));
-      $$("[data-asset]").forEach((a) => {
-        const asset = rel.assets.find((x) => match[a.dataset.asset].test(x.name));
-        if (asset) a.href = asset.browser_download_url;
-      });
-    })
+    .then((rel) => { release = rel; fillRelease(); })
     .catch(() => {});
 
   $("#copyCmd").addEventListener("click", (e) => {
-    const done = () => { e.target.textContent = "Copied"; setTimeout(() => (e.target.textContent = "Copy"), 1800); };
+    const btn = e.currentTarget;
+    const done = () => { btn.textContent = t("dl.copied"); setTimeout(() => (btn.textContent = t("dl.copy")), 1800); };
     const pick = () => { const r = document.createRange(); r.selectNodeContents($("#xattr")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
-    try { navigator.clipboard.writeText($("#xattr").textContent).then(done, pick); } catch { pick(); }
+    try { navigator.clipboard.writeText($("#xattr").textContent).then(done, pick); } catch (err) { pick(); }
+  });
+
+  /* ---------- once the language is settled, bring the page to life ---------- */
+  I18N.ready.then(() => {
+    $$(".split").forEach(split);
+    macOrder();
+    fillRelease();
+    startMotion();
+    document.documentElement.classList.remove("i18n-wait");
+    setTimeout(() => say(t("cat.hello")), 1900);
+    I18N.onChange(() => {
+      resplit();
+      macOrder();
+      fillRelease();
+      if (motion) ScrollTrigger.refresh();
+    });
   });
 
   /* ---------- your own trailer, when it's there ---------- */
@@ -771,7 +981,7 @@ footer nav a:hover { color: var(--pink); }
     v.src = "media/trailer.mp4";
     fetch("media/trailer-poster.jpg", { method: "HEAD" }).then((p) => p.ok && (v.poster = "media/trailer-poster.jpg")).catch(() => {});
     $("#trailer").hidden = false;
-    window.ScrollTrigger && ScrollTrigger.refresh();
+    if (motion) ScrollTrigger.refresh();
   }).catch(() => {});
 })();
 </script>
