@@ -430,7 +430,7 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .plan li.done::before { content: "✓"; display: grid; place-items: center; font: 900 .7rem/1 var(--sans); background: var(--lime); }
 .plan li.done { opacity: .7; text-decoration: line-through; }
 .drawer { position: relative; height: 100%; min-height: 92px; }
-.drawer .cut { position: absolute; left: 6%; right: 10%; top: 0; padding: .4rem .55rem; border: 2px solid var(--ink); border-radius: 4px; background: #fff; rotate: -3deg; font: 400 .78rem/1.35 "Literata", Georgia, serif; }
+.drawer .cut { position: absolute; left: 6%; right: 10%; top: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; padding: .4rem .55rem; border: 2px solid var(--ink); border-radius: 4px; background: #fff; rotate: -3deg; font: 400 .78rem/1.35 "Literata", Georgia, serif; }
 .drawer .box { position: absolute; left: 0; right: 0; bottom: 0; height: 48%; border: 3px solid var(--ink); border-radius: 8px; background: color-mix(in srgb, var(--hl-cut) 30%, var(--paper)); box-shadow: inset 0 6px 0 rgba(20, 18, 15, .12); }
 .drawer .box::after { content: ""; position: absolute; left: 50%; top: 50%; width: 34%; height: 9px; translate: -50% -50%; border: 2px solid var(--ink); border-radius: 999px; background: var(--paper); }
 .lay.send { background: var(--pink); color: #fff; justify-content: center; }
@@ -446,7 +446,7 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .env-front::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to top right, transparent calc(50% - 2px), var(--ink) calc(50% - 2px) calc(50% + 1px), transparent calc(50% + 1px)) left top / 50% 66% no-repeat, linear-gradient(to top left, transparent calc(50% - 2px), var(--ink) calc(50% - 2px) calc(50% + 1px), transparent calc(50% + 1px)) right top / 50% 66% no-repeat; }
 .env-flap { z-index: 4; inset: 0 0 auto; height: 62%; border: 0; border-radius: 14px 14px 0 0; background: #f3e7d3; clip-path: polygon(0 0, 100% 0, 50% 100%); transform-origin: 50% 0; }
 .env-flap::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom left, transparent calc(50% - 2px), var(--ink) calc(50% - 2px) calc(50% + 1px), transparent calc(50% + 1px)) left top / 50% 100% no-repeat, linear-gradient(to bottom right, transparent calc(50% - 2px), var(--ink) calc(50% - 2px) calc(50% + 1px), transparent calc(50% + 1px)) right top / 50% 100% no-repeat; }
-.env-label { position: absolute; z-index: 5; left: 7%; bottom: 12%; display: grid; gap: .1rem; }
+.env-label { position: absolute; z-index: 5; left: 7%; right: 30%; bottom: 12%; display: grid; gap: .1rem; }
 .env-label span { font: 600 clamp(1.2rem, 2vw, 1.6rem)/1 var(--hand); }
 .env-label b { font: 700 clamp(.85rem, 1.2vw, 1rem)/1.2 var(--mono); }
 .mf-stamp {
@@ -660,9 +660,13 @@ footer nav a:hover { color: var(--pink); }
   .sticky { font-size: .95rem; padding: .3rem .4rem; }
   .mmap .strip { width: 38px; }
   .mmap p, .plan, .plan em { font-size: .7rem; }
-  .lay.send b { font-size: 1.5rem; }
+  .lay.send { justify-content: flex-end; padding-top: 2.6rem; }
+  .lay.send b { font-size: clamp(1.1rem, 6.4vw, 1.5rem); }
+  html:lang(ru) .lay.send b { font-size: clamp(.95rem, 4.7vw, 1.4rem); }
   .lay.send p { font-size: .8rem; }
-  .lay.send svg { width: 32px; }
+  .lay.send svg { width: 30px; right: 10px; top: 10px; }
+  .env-label span { font-size: 1.05rem; }
+  .env-label b { font-size: .78rem; }
   .vers span { width: 70%; height: 56px; }
   .rd-steps li { gap: .3rem; padding: .35rem .4rem .35rem .3rem; font-size: .74rem; }
   .rd-steps b { width: 22px; height: 22px; font-size: .74rem; }
@@ -1069,7 +1073,25 @@ window.I18N = (() => {
     "nav.main": "Главное меню",
     "nav.footer": "Нижнее меню",
     "dl.betaTag": "БЕТА",
-    "mf.postmark": "ГЛАВА 7 · УШЛА"
+    "mf.postmark": "ГЛАВА 7 · УШЛА",
+    "mf.h2": "Мари хранит всё. <em>Кошки такие.</em>",
+    "mf.lede": "Каждая глава живёт в\u00a0своём файле .mari: текст, выделения, заметки, старые версии, план и\u00a0«Ящик». Отправь файл бета-ридерам, и\u00a0они откроют ровно то, что видишь ты.",
+    "mf.c1": "Твоя глава",
+    "mf.c2": "Выделения",
+    "mf.c3": "Заметки",
+    "mf.c4": "Миникарта",
+    "mf.c4t": "Выделения едут с\u00a0файлом. У\u00a0читателей та\u00a0же\u00a0карта.",
+    "mf.c5": "Старые версии",
+    "mf.c6": "Содержание и\u00a0план",
+    "mf.syn": "Хейл находит труп. В\u00a0его собственном пальто.",
+    "mf.b1": "Хейл на\u00a0месте",
+    "mf.b2": "Пальто",
+    "mf.b3": "У\u00a0кого его ключи?",
+    "mf.c7": "Ящик",
+    "mf.note": "Оставь, но\u00a0сверь хронологию.",
+    "mf.c8": "Отправляй.",
+    "mf.c8t": "Они откроют ровно то, что видишь ты.",
+    "mf.to": "Кому: моим бета-ридерам"
   };
 
   // English lines that only the script shows (the cat's lines, button states)
