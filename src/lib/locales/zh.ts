@@ -221,4 +221,9 @@ export const zh: Strings = {
     next: "下一个匹配",
     close: "关闭查找",
   },
+
+  news: {
+    more: "了解更多",
+    close: "隐藏",
+  },
 };

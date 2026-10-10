@@ -231,6 +231,12 @@ export const en = {
     next: "Next match",
     close: "Close search",
   },
+
+  /** The small card at the foot of the sidebar, when Mari has news. */
+  news: {
+    more: "Read more",
+    close: "Hide this",
+  },
 };
 
 export type Strings = typeof en;

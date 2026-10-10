@@ -12,6 +12,7 @@
   import MarkdownHelp from "$lib/components/MarkdownHelp.svelte";
   import Preview from "$lib/components/Preview.svelte";
   import Sidebar from "$lib/components/Sidebar.svelte";
+  import { appNews } from "$lib/appNews.svelte";
   import Terminal from "$lib/components/Terminal.svelte";
   import TitleBar from "$lib/components/TitleBar.svelte";
   import { basename, getFileSystemAdapter, type FsEntry, type OpenedFile } from "$lib/platform";
@@ -101,6 +102,9 @@
 
   onMount(async () => {
     canUseTerminal = await isLinuxDesktop();
+    // Not awaited: the session is what the writer is waiting for, and the
+    // news card can arrive a moment later or not at all.
+    appNews.refresh();
     await restoreLastSession();
   });
 

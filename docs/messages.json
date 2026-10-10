@@ -1,0 +1,25 @@
+{
+  "_readme": "The news card at the foot of Mari's sidebar. Edit this file, push to main, and every copy of Mari picks it up the next time someone opens it. See docs/messages.md for what each field does.",
+  "messages": [
+    {
+      "id": "0-2-7-welcome",
+      "title": {
+        "en": "Mari is new",
+        "ru": "Mari только начинается",
+        "de": "Mari ist neu",
+        "es": "Mari acaba de empezar",
+        "zh": "Mari 刚刚起步"
+      },
+      "body": {
+        "en": "Found something broken, or want something it doesn't do? Say so.",
+        "ru": "Что-то сломалось или чего-то не хватает? Напишите.",
+        "de": "Etwas kaputt, oder fehlt etwas? Sag es.",
+        "es": "¿Algo roto, o algo que falta? Dilo.",
+        "zh": "发现问题，或想要某个功能？告诉我。"
+      },
+      "link": {
+        "url": "https://github.com/spacekestrel/mari/issues/new/choose"
+      }
+    }
+  ]
+}

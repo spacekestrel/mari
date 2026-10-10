@@ -220,4 +220,9 @@ export const de: Strings = {
     next: "Nächster Treffer",
     close: "Suche schließen",
   },
+
+  news: {
+    more: "Mehr erfahren",
+    close: "Ausblenden",
+  },
 };

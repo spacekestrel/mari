@@ -232,4 +232,9 @@ export const ru: Strings = {
     next: "Следующее совпадение",
     close: "Закрыть поиск",
   },
+
+  news: {
+    more: "Подробнее",
+    close: "Скрыть",
+  },
 };

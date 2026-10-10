@@ -219,4 +219,9 @@ export const es: Strings = {
     next: "Coincidencia siguiente",
     close: "Cerrar la búsqueda",
   },
+
+  news: {
+    more: "Saber más",
+    close: "Ocultar",
+  },
 };

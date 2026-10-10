@@ -3,6 +3,7 @@
   import ContextMenu, { type ContextMenuItem } from "./ContextMenu.svelte";
   import Icon from "./Icon.svelte";
   import InlineNameInput from "./InlineNameInput.svelte";
+  import NewsCard from "./NewsCard.svelte";
   import TreeItem from "./TreeItem.svelte";
   import type { FsEntry } from "$lib/platform";
   import { sidebarWidth } from "$lib/sidebarWidth.svelte";
@@ -223,6 +224,7 @@
       {/each}
     {/if}
   </div>
+  <NewsCard />
   <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
   <div
     class="resize-handle"

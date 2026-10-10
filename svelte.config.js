@@ -20,7 +20,8 @@ const config = {
      * terminal. DOMPurify strips anything dangerous out of that Markdown, but
      * it is one library standing between a document and a shell. This is the
      * second lock: even if something got past the sanitiser, the browser
-     * refuses to execute it or send anything anywhere.
+     * refuses to execute it, and the only host it could reach is Mari's own
+     * website.
      *
      * Owned here rather than in tauri.conf.json because the app has two inline
      * scripts it genuinely needs — SvelteKit's own bootstrap and the theme
@@ -44,7 +45,18 @@ const config = {
         // ipc: is Tauri's bridge to the Rust side. The dev-server socket is
         // named exactly rather than allowing ws: generally, which would let
         // anything that did run open a socket to any host it liked.
-        "connect-src": ["self", "ipc:", "http://ipc.localhost", "ws://localhost:1420"],
+        //
+        // meowmari.ink is Mari's own website, and the one host the app is
+        // allowed to reach: it asks for messages.json at launch to fill the
+        // news card. Named exactly for the same reason as the socket above,
+        // so this is a door to one public file rather than to the internet.
+        "connect-src": [
+          "self",
+          "ipc:",
+          "http://ipc.localhost",
+          "ws://localhost:1420",
+          "https://meowmari.ink",
+        ],
         "object-src": ["none"],
         "base-uri": ["self"],
         "form-action": ["none"],
