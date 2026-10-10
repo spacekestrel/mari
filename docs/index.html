@@ -2693,7 +2693,11 @@ window.I18N = (() => {
     const opt = e.target.closest(".dlm-opt");
     if (opt) { dlmOpt = opt.dataset.opt; dlmRender(); return $(`[data-opt="${dlmOpt}"]`, dlm).focus(); }
     // the link itself downloads the file (GitHub sends it as an attachment, so the page stays put)
-    if (e.target.closest(".dlm-go")) return void setTimeout(celebrate, 350);
+    if (e.target.closest(".dlm-go")) {
+      // visitor stats: count which file was downloaded (GoatCounter, no cookies)
+      if (window.goatcounter && goatcounter.count) goatcounter.count({ path: `download-${dlmOpt}`, title: assets[dlmOpt].name, event: true });
+      return void setTimeout(celebrate, 350);
+    }
     if (e.target.closest(".dlm-again")) { dlmShow("pick"); return $(".dlm-go", dlm).focus(); }
     const copy = e.target.closest("[data-copy]");
     if (copy) {
@@ -2761,5 +2765,8 @@ window.I18N = (() => {
   }).catch(() => {});
 })();
 </script>
+<!-- visitor stats: page views by country, and downloads (GoatCounter, no cookies) -->
+<script data-goatcounter="https://spacekestrel.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
