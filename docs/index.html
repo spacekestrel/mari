@@ -547,7 +547,7 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .fz-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .8rem 1.6rem; text-align: center; }
 .fz h2 { font-size: clamp(2.6rem, 6vw, 5.6rem); }
 .fz h2 em { color: var(--paper); }
-.fz-head p { margin: 0; max-width: 20em; font-size: clamp(1.05rem, 1.5vw, 1.3rem); font-weight: 600; text-align: left; }
+.fz-head p { flex-basis: 100%; margin: 0; font-size: clamp(1.05rem, 1.5vw, 1.3rem); font-weight: 600; text-align: center; text-wrap: balance; }
 .fz-key {
   display: inline-grid; place-items: center; min-width: 76px; height: 64px; padding: 0 .8rem;
   border: var(--line); border-radius: 14px; background: var(--paper);
@@ -928,9 +928,9 @@ footer nav a:hover { color: var(--pink); }
 <section class="fz" id="focus" aria-labelledby="fz-h">
   <div class="wrap fz-stage">
     <div class="fz-head">
-      <h2 class="split" id="fz-h" data-i18n="b4.h3">Then just <em>write.</em></h2>
+      <h2 class="split" id="fz-h" data-i18n="fz.h2">Now make it all <em>disappear.</em></h2>
       <span class="fz-key" aria-hidden="true">F11</span>
-      <p data-i18n="b4.p">One key, and everything disappears except your words.</p>
+      <p data-i18n="fz.p">Press F11, and concentrate on pure writing experience.</p>
     </div>
     <div class="fz-win" aria-hidden="true">
       <div class="fz-bar"><span class="dots"><i></i><i></i><i></i></span><span data-i18n="rd.file">07 · The Body in the Coat</span><span class="fz-tools"><b>B</b><b><em>I</em></b><b><s>S</s></b><b>H</b><b>”</b></span></div>
@@ -1164,7 +1164,9 @@ window.I18N = (() => {
     "fz.ch6": "06 · Ключи",
     "fz.words": "2\u00a0431 слово",
     "fz.saved": "Сохранено",
-    "fz.typed": "На\u00a0бирке под\u00a0воротником значилось: Хейл."
+    "fz.typed": "На\u00a0бирке под\u00a0воротником значилось: Хейл.",
+    "fz.h2": "А\u00a0теперь фокус: всё <em>исчезает.</em>",
+    "fz.p": "Жми F11 и\u00a0оставайся с\u00a0текстом один на\u00a0один."
   };
 
   // English lines that only the script shows (the cat's lines, button states)
