@@ -366,10 +366,11 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 /* still (no motion): the draft shown marked up */
 .rd-still .rd-t { --hl: 100; }
 
-/* ---------- send it out: the .mari file goes to beta readers and comes back marked ----------
-   An airmail envelope: striped edge, a stamp with Mari on it, a postmark, and a group chat inside. */
+/* ---------- the .mari file: an airmail envelope opens, and everything in the file slides out ----------
+   The cards sit in a plain grid (that is the finished state); the script starts them
+   inside the envelope and the scroll brings them out. */
 .mf {
-  --hl-good: #5cb85c; --hl-cut: #eb5757; --hl-rew: #f2994a; --hl-tw: #f2c94c; --hl-mov: #26c6da;
+  --hl-good: #5cb85c; --hl-cut: #eb5757; --hl-rew: #f2994a; --hl-tw: #f2c94c; --hl-mov: #26c6da; --hl-ok: #5b9bd5;
   position: relative;
   margin: clamp(3rem, 6vw, 5rem) clamp(6px, 1.5vw, 20px) 0;
   padding: clamp(10px, 1.4vw, 16px);
@@ -380,68 +381,85 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 }
 .mf-in {
   position: relative; overflow: hidden;
-  padding: clamp(3rem, 6vw, 5.5rem) 0;
+  padding: clamp(3rem, 6vw, 5.5rem) 0 clamp(2.5rem, 5vw, 4.5rem);
   border: var(--line); border-radius: clamp(20px, 4vw, 44px);
   background: var(--gold); color: var(--ink);
 }
-.mf-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(2rem, 5vw, 5rem); }
-.mf h2 { font-size: clamp(2.8rem, 6vw, 5.8rem); max-width: 9em; }
+.mf h2 { font-size: clamp(2.8rem, 6.4vw, 6rem); max-width: 12em; }
 .mf h2 em { color: var(--grape); }
-.mf-lede { margin: 1.4rem 0 0; max-width: 27em; font-size: clamp(1.1rem, 1.6vw, 1.35rem); font-weight: 500; text-wrap: pretty; }
+.mf-lede { margin: 1.3rem 0 0; max-width: 34em; font-size: clamp(1.1rem, 1.6vw, 1.35rem); font-weight: 500; text-wrap: pretty; }
 
-/* stamp and postmark, top right of the envelope */
+.mf-stage { position: relative; isolation: isolate; padding-block: clamp(2rem, 4vw, 3.2rem) .5rem; }
+.mf-cards { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(12px, 1.6vw, 22px); }
+.lay {
+  --r: 0deg;
+  position: relative; z-index: 2; display: flex; flex-direction: column; gap: .7rem; min-width: 0;
+  min-height: clamp(160px, 14vw, 200px);
+  padding: .85rem 1rem 1rem;
+  border: var(--line); border-radius: 18px;
+  background: var(--paper);
+  box-shadow: 6px 6px 0 var(--ink);
+  rotate: var(--r);
+}
+.lay:nth-child(odd) { --r: -1.2deg; }
+.lay:nth-child(3n) { --r: 1.4deg; }
+.mf .lay h3 { display: flex; align-items: center; gap: .5rem; font: 800 1rem/1.15 var(--sans); letter-spacing: 0; }
+.lay h3 i { flex: none; width: 12px; height: 12px; border: 2px solid var(--ink); border-radius: 50%; background: var(--c, var(--pink)); }
+.art { position: relative; flex: 1; min-height: 0; font: 400 .84rem/1.5 "Literata", Georgia, serif; }
+.art mark { color: inherit; padding: .05em 0; border-radius: 2px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.art .g { background: color-mix(in srgb, var(--hl-good) 45%, transparent); }
+.art .y { background: color-mix(in srgb, var(--hl-tw) 55%, transparent); }
+.art .c { background: color-mix(in srgb, var(--hl-cut) 40%, transparent); }
+.art .m { background: color-mix(in srgb, var(--hl-mov) 45%, transparent); }
+.sticky { position: absolute; right: -6px; bottom: -6px; max-width: 70%; padding: .45rem .6rem; border: 2px solid var(--ink); background: #fff36b; box-shadow: 3px 3px 0 var(--ink); rotate: -4deg; font: 600 1.15rem/1 var(--hand); }
+.mmap { display: flex; gap: 12px; height: 100%; }
+.mmap .strip { flex: none; width: 52px; display: flex; flex-direction: column; gap: 4px; padding: 6px 5px; border: 2px solid var(--ink); border-radius: 6px; background: #fff; }
+.mmap .strip i { display: block; height: 4px; border-radius: 2px; background: rgba(20, 18, 15, .2); }
+.mmap .strip i:nth-child(4n+2) { width: 70%; }
+.mmap .strip i.g { background: var(--hl-good); } .mmap .strip i.y { background: var(--hl-tw); } .mmap .strip i.c { background: var(--hl-cut); } .mmap .strip i.m { background: var(--hl-mov); } .mmap .strip i.o { background: var(--hl-rew); }
+.mmap p { margin: 0; align-self: center; font: 600 .82rem/1.35 var(--sans); }
+.vers { position: relative; height: 100%; min-height: 92px; }
+.vers span { position: absolute; left: calc(var(--i) * 14px); top: calc(var(--i) * 10px); width: 66%; height: 72px; padding: 6px 8px; border: 2px solid var(--ink); border-radius: 6px; background: #fff; font: 700 .7rem/1 var(--mono); box-shadow: 2px 2px 0 rgba(20, 18, 15, .25); }
+.vers span::after { content: ""; position: absolute; left: 8px; right: 14px; top: 24px; height: 30px; background: repeating-linear-gradient(180deg, rgba(20, 18, 15, .2) 0 4px, transparent 4px 10px); }
+.vers span:last-child { background: var(--paper); }
+.plan { display: grid; gap: .3rem; font: 500 .82rem/1.3 var(--sans); }
+.plan em { font: italic 400 .84rem/1.35 "Literata", Georgia, serif; }
+.plan ul { list-style: none; margin: .2rem 0 0; padding: 0; display: grid; gap: .25rem; }
+.plan li { display: flex; gap: .45rem; align-items: center; }
+.plan li::before { content: ""; flex: none; width: 13px; height: 13px; border: 2px solid var(--ink); border-radius: 3px; background: #fff; }
+.plan li.done::before { content: "✓"; display: grid; place-items: center; font: 900 .7rem/1 var(--sans); background: var(--lime); }
+.plan li.done { opacity: .7; text-decoration: line-through; }
+.drawer { position: relative; height: 100%; min-height: 92px; }
+.drawer .cut { position: absolute; left: 6%; right: 10%; top: 0; padding: .4rem .55rem; border: 2px solid var(--ink); border-radius: 4px; background: #fff; rotate: -3deg; font: 400 .78rem/1.35 "Literata", Georgia, serif; }
+.drawer .box { position: absolute; left: 0; right: 0; bottom: 0; height: 48%; border: 3px solid var(--ink); border-radius: 8px; background: color-mix(in srgb, var(--hl-cut) 30%, var(--paper)); box-shadow: inset 0 6px 0 rgba(20, 18, 15, .12); }
+.drawer .box::after { content: ""; position: absolute; left: 50%; top: 50%; width: 34%; height: 9px; translate: -50% -50%; border: 2px solid var(--ink); border-radius: 999px; background: var(--paper); }
+.lay.send { background: var(--pink); color: #fff; justify-content: center; }
+.lay.send b { font: 900 clamp(1.8rem, 2.6vw, 2.5rem)/1 var(--display); font-variation-settings: "SOFT" 100, "WONK" 1; }
+.lay.send p { margin: 0; font: 600 .98rem/1.35 var(--sans); }
+.lay.send svg { position: absolute; right: 12px; top: 12px; width: 46px; fill: var(--paper); stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; }
+
+/* the envelope: back, contents, front pocket, flap, in that order of depth */
+.env { position: relative; width: min(440px, 86%); aspect-ratio: 1.75; margin: clamp(2rem, 4vw, 3rem) auto 0; perspective: 900px; }
+.env-back, .env-front, .env-flap { position: absolute; inset: 0; border: var(--line); border-radius: 14px; }
+.env-back { z-index: 1; background: #e9dcc6; }
+.env-front { z-index: 3; background: var(--paper); clip-path: polygon(0 34%, 50% 66%, 100% 34%, 100% 100%, 0 100%); border: 0; box-shadow: inset 0 -3px 0 var(--ink), inset 3px 0 0 var(--ink), inset -3px 0 0 var(--ink); }
+.env-front::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to top right, transparent calc(50% - 2px), var(--ink) calc(50% - 2px) calc(50% + 1px), transparent calc(50% + 1px)) left top / 50% 66% no-repeat, linear-gradient(to top left, transparent calc(50% - 2px), var(--ink) calc(50% - 2px) calc(50% + 1px), transparent calc(50% + 1px)) right top / 50% 66% no-repeat; }
+.env-flap { z-index: 4; inset: 0 0 auto; height: 62%; border: 0; border-radius: 14px 14px 0 0; background: #f3e7d3; clip-path: polygon(0 0, 100% 0, 50% 100%); transform-origin: 50% 0; }
+.env-flap::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom left, transparent calc(50% - 2px), var(--ink) calc(50% - 2px) calc(50% + 1px), transparent calc(50% + 1px)) left top / 50% 100% no-repeat, linear-gradient(to bottom right, transparent calc(50% - 2px), var(--ink) calc(50% - 2px) calc(50% + 1px), transparent calc(50% + 1px)) right top / 50% 100% no-repeat; }
+.env-label { position: absolute; z-index: 5; left: 7%; bottom: 12%; display: grid; gap: .1rem; }
+.env-label span { font: 600 clamp(1.2rem, 2vw, 1.6rem)/1 var(--hand); }
+.env-label b { font: 700 clamp(.85rem, 1.2vw, 1rem)/1.2 var(--mono); }
 .mf-stamp {
-  position: absolute; z-index: 2; top: clamp(14px, 2.5vw, 30px); right: clamp(14px, 2.5vw, 34px);
-  width: clamp(78px, 9vw, 112px); aspect-ratio: 4 / 5; padding: 7px;
-  background: radial-gradient(circle, transparent 0 4px, var(--paper) 4.6px) -6px -6px / 12px 12px;
-  rotate: 6deg; filter: drop-shadow(3px 3px 0 rgba(20, 18, 15, .9));
+  position: absolute; z-index: 5; right: 6%; bottom: 10%;
+  width: clamp(58px, 6.5vw, 78px); aspect-ratio: 4 / 5; padding: 6px;
+  background: radial-gradient(circle, transparent 0 3.5px, var(--paper) 4px) -5px -5px / 10px 10px;
+  rotate: 6deg; filter: drop-shadow(2px 2px 0 rgba(20, 18, 15, .9));
 }
 .mf-stamp > div { height: 100%; display: grid; place-items: center; background: var(--pink); border: 2px solid var(--paper); outline: 2px solid var(--pink); }
-.mf-stamp svg { width: 72%; fill: var(--ink); }
-.mf-stamp b { position: absolute; left: 0; right: 0; bottom: 12px; text-align: center; font: 800 .62rem/1 var(--mono); color: var(--paper); letter-spacing: .08em; }
-.mf-postmark { position: absolute; z-index: 3; top: clamp(30px, 4vw, 54px); right: clamp(70px, 9vw, 128px); width: clamp(110px, 12vw, 150px); rotate: -14deg; opacity: .8; pointer-events: none; }
+.mf-stamp svg { width: 70%; fill: var(--ink); }
+.mf-postmark { position: absolute; z-index: 6; right: 15%; bottom: 20%; width: clamp(80px, 9vw, 110px); rotate: -14deg; opacity: .8; pointer-events: none; }
 .mf-postmark text { font: 800 11px var(--mono); letter-spacing: .12em; fill: var(--ink); }
-
-/* the chat */
-.chat {
-  position: relative;
-  border: var(--line); border-radius: 26px;
-  background: var(--paper);
-  box-shadow: 12px 12px 0 var(--ink);
-  rotate: 1.2deg;
-  overflow: hidden;
-}
-.chat-bar { display: flex; align-items: center; gap: .8rem; padding: .85rem 1.1rem; border-bottom: var(--line); background: #fff; }
-.chat-av { display: flex; }
-.chat-av i { display: grid; place-items: center; width: 34px; height: 34px; margin-left: -9px; border: 2px solid var(--ink); border-radius: 50%; font: 800 .85rem/1 var(--sans); font-style: normal; }
-.chat-av i:first-child { margin-left: 0; }
-.av-me { background: var(--pink); } .av-me svg { width: 20px; fill: var(--ink); }
-.av-beta { background: var(--lime); }
-.av-proof { background: var(--mov, #26c6da); }
-.chat-title { font: 800 1rem/1.15 var(--sans); }
-.chat-title small { display: block; font: 500 .78rem var(--sans); color: #6c665a; }
-.chat-body { position: relative; display: flex; flex-direction: column; gap: .55rem; padding: 1.2rem 1rem 1.4rem; background: radial-gradient(circle at 20% 30%, rgba(20,18,15,.05) 0 1.5px, transparent 2px) 0 0 / 22px 22px, var(--paper); }
-.msg { position: relative; max-width: 84%; padding: .6rem .9rem; border: 2px solid var(--ink); border-radius: 20px; font: 500 clamp(.95rem, 1.2vw, 1.05rem)/1.35 var(--sans); box-shadow: 3px 3px 0 var(--ink); transform-origin: 0 100%; }
-.msg.me { align-self: flex-end; background: var(--pink); color: #fff; border-bottom-right-radius: 6px; transform-origin: 100% 100%; }
-.msg.them { align-self: flex-start; background: #fff; border-bottom-left-radius: 6px; }
-.msg .who { display: block; margin-bottom: .2rem; font: 800 .75rem/1 var(--sans); }
-.msg.beta .who { color: #5f7a00; }
-.msg.proof .who { color: #0f7f8c; }
-.msg time { display: block; margin-top: .25rem; text-align: right; font: 500 .68rem/1 var(--sans); opacity: .7; }
-.msg.file { display: flex; align-items: center; gap: .8rem; padding: .6rem .8rem; }
-.file-info b { display: block; font: 700 .95rem/1.2 var(--mono); white-space: nowrap; }
-.file-info small { font: 600 .8rem var(--sans); opacity: .85; }
-/* a tiny page inside the file, with its marks */
-.pg { flex: none; width: 54px; height: 68px; padding: 7px 6px; display: flex; flex-direction: column; gap: 4px; border: 2px solid var(--ink); border-radius: 6px; background: #fff; }
-.pg i { display: block; height: 4px; border-radius: 2px; background: rgba(20, 18, 15, .18); }
-.pg i:nth-child(3n) { width: 70%; }
-.pg i.g { background: var(--hl-good); } .pg i.c { background: var(--hl-cut); } .pg i.r { background: var(--hl-rew); } .pg i.t { background: var(--hl-tw); } .pg i.m { background: var(--hl-mov); }
-.pg .note { position: absolute; width: 12px; height: 12px; background: #fff36b; border: 1.5px solid var(--ink); rotate: 8deg; }
-.pg { position: relative; }
-.typing { position: absolute; display: inline-flex; gap: 5px; padding: .75rem .9rem; border: 2px solid var(--ink); border-radius: 20px; border-bottom-left-radius: 6px; background: #fff; }
-.typing i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink); opacity: .5; animation: dot 1s infinite; }
-.typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
-@keyframes dot { 30% { transform: translateY(-5px); opacity: 1; } }
+.mf-open .env-flap { transform: rotateX(180deg); z-index: 1; }
 
 /* ---------- reasons ---------- */
 .reasons { padding: clamp(5rem, 11vw, 9rem) 0 clamp(3rem, 6vw, 5rem); }
@@ -601,10 +619,10 @@ footer nav a:hover { color: var(--pink); }
 
 /* ---------- small screens ---------- */
 @media (max-width: 960px) {
-  .mf-grid { grid-template-columns: minmax(0, 1fr); }
-  .mf h2 { padding-right: clamp(70px, 16vw, 110px); }
-  /* the postmark lands on the stamp, clear of the heading */
-  .mf-postmark { top: calc(clamp(14px, 2.5vw, 30px) + clamp(56px, 9vw, 90px)); right: clamp(4px, 2vw, 24px); width: clamp(84px, 14vw, 120px); }
+  .mf-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* narrow: the envelope comes first, and its contents drop into place below it */
+  .mf-stage { display: flex; flex-direction: column; padding-top: calc(min(440px, 86%) / 1.75 * .62 + 1.5rem); }
+  .env { order: -1; margin: 0 auto clamp(1.6rem, 5vw, 2.4rem); }
   .rd-stage { grid-template-columns: minmax(0, 1fr); gap: 1.1rem; }
   .rd-steps { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; }
   .rd-steps li { gap: .45rem; padding: .4rem .55rem .4rem .4rem; font-size: .82rem; }
@@ -635,9 +653,17 @@ footer nav a:hover { color: var(--pink); }
   html:lang(ru) .rd h2 { font-size: min(2.7rem, 9.4vw); }
   .mf h2 { font-size: min(2.8rem, 11vw); }
   html:lang(ru) .mf h2 { font-size: min(2.5rem, 9vw); }
-    .chat { rotate: 0deg; box-shadow: 6px 6px 0 var(--ink); }
-  .msg { max-width: 90%; }
-  .file-info b { font-size: .82rem; }
+  .mf-cards { gap: 10px; }
+  .lay { min-height: 128px; padding: .6rem .65rem .7rem; gap: .45rem; box-shadow: 4px 4px 0 var(--ink); }
+  .mf .lay h3 { font-size: .82rem; }
+  .art { font-size: .72rem; }
+  .sticky { font-size: .95rem; padding: .3rem .4rem; }
+  .mmap .strip { width: 38px; }
+  .mmap p, .plan, .plan em { font-size: .7rem; }
+  .lay.send b { font-size: 1.5rem; }
+  .lay.send p { font-size: .8rem; }
+  .lay.send svg { width: 32px; }
+  .vers span { width: 70%; height: 56px; }
   .rd-steps li { gap: .3rem; padding: .35rem .4rem .35rem .3rem; font-size: .74rem; }
   .rd-steps b { width: 22px; height: 22px; font-size: .74rem; }
   .cmd { flex-wrap: wrap; overflow: hidden; }
@@ -770,35 +796,43 @@ footer nav a:hover { color: var(--pink); }
 
 <section class="mf" id="share" aria-labelledby="mf-h">
   <div class="mf-in">
-    <div class="mf-stamp" aria-hidden="true"><div><svg viewBox="150 140 720 740" aria-hidden="true"><path d="M294.5 851.9C217.7 846.1 172.0 812.6 181.1 768.8C184.0 754.8 194.4 741.6 207.6 735.0C211.4 733.1 214.6 731.5 214.8 731.5C214.9 731.4 213.9 726.9 212.6 721.4C203.0 681.8 206.9 638.0 223.5 598.5C243.8 550.2 280.0 510.3 329.0 482.5C333.7 479.8 337.7 477.5 337.9 477.4C338.1 477.2 336.4 472.7 334.2 467.3C319.9 432.7 321.2 401.7 338.8 361.4C341.0 356.4 342.4 350.4 344.0 340.0C353.3 276.7 367.5 228.1 379.3 218.6C384.5 214.5 392.7 213.8 399.1 217.0C411.9 223.5 431.2 247.5 454.1 285.5L463.8 301.5L470.7 301.3C485.5 300.7 510.3 303.5 531.2 308.1L536.8 309.4L552.7 293.9C598.0 250.0 620.0 236.7 633.4 244.9C642.0 250.3 644.6 263.3 643.7 298.4C643.0 325.0 641.5 341.3 636.8 369.0L633.7 387.5L635.0 404.3C639.1 459.6 623.7 496.4 586.5 520.1C579.0 524.8 578.0 525.8 578.3 528.0C578.5 529.4 579.7 535.1 580.9 540.6C587.5 572.0 586.5 592.5 575.4 653.1C566.9 700.0 564.5 738.3 568.9 756.6C570.1 761.4 570.4 761.8 576.0 764.3C599.5 775.1 601.8 813.2 579.6 824.5L573.6 827.5L547.3 827.8C532.8 828.0 521.0 827.9 521.0 827.6C521.0 827.4 521.9 825.6 522.9 823.8C530.6 810.8 529.1 792.8 519.2 779.8C508.0 765.0 488.3 757.8 463.8 759.6C458.9 760.0 455.0 759.9 455.0 759.5C455.0 759.1 455.6 756.2 456.4 753.1C466.8 712.6 449.4 665.6 417.2 646.7C404.7 639.4 389.4 635.0 381.5 636.4C376.8 637.3 377.4 637.8 388.6 642.8C418.6 655.9 438.4 679.8 444.6 710.0C446.4 719.1 446.2 744.0 444.1 751.0C443.6 752.9 442.6 756.4 442.0 758.8C441.4 761.1 440.4 763.0 439.7 763.0C439.0 763.0 427.9 765.9 415.0 769.4C385.7 777.3 372.8 780.4 357.5 783.0C324.4 788.7 288.7 787.3 262.5 779.4C251.0 775.9 246.6 775.7 246.2 778.7C245.8 781.7 249.1 784.4 257.4 787.9C276.3 795.8 295.5 798.4 328.0 797.7C358.3 796.9 372.1 794.6 405.5 784.6C446.9 772.3 469.4 769.2 487.3 773.4C513.7 779.6 524.4 803.6 510.0 824.5C503.9 833.4 496.8 835.8 473.5 837.0C459.6 837.7 452.3 838.7 434.0 842.3C406.0 848.0 394.3 849.7 372.0 851.5C353.3 853.1 312.7 853.3 294.5 851.9Z"/><rect x="771" y="164" width="48" height="668" rx="24"/></svg><b>.MARI</b></div></div>
-    <svg class="mf-postmark" viewBox="0 0 160 110" aria-hidden="true">
-      <circle cx="55" cy="55" r="42" fill="none" stroke="#14120f" stroke-width="3"/>
-      <circle cx="55" cy="55" r="33" fill="none" stroke="#14120f" stroke-width="1.5"/>
-      <path id="pmArc" d="M55 55 m-37 0 a37 37 0 1 1 74 0" fill="none"/>
-      <text><textPath href="#pmArc" startOffset="50%" text-anchor="middle" data-i18n="mf.postmark">SENT · CH. 7</textPath></text>
-      <text x="55" y="63" text-anchor="middle" style="font-size: 15px">21:04</text>
-      <path d="M100 30 q10-8 20 0 t20 0 t20 0 M100 48 q10-8 20 0 t20 0 t20 0 M100 66 q10-8 20 0 t20 0 t20 0 M100 84 q10-8 20 0 t20 0 t20 0" fill="none" stroke="#14120f" stroke-width="3" stroke-linecap="round"/>
-    </svg>
-    <div class="wrap mf-grid">
-      <div>
-        <h2 class="split" id="mf-h" data-i18n="mf.h2">Send it out. Get it back <em>marked.</em></h2>
-        <p class="mf-lede" data-i18n="mf.lede">One .mari file carries your chapter with every highlight, note and old version. Your beta readers and proofreaders open it in Mari, mark it right on the text, and send it back.</p>
-      </div>
+    <div class="wrap">
+      <h2 class="split" id="mf-h" data-i18n="mf.h2">Mari keeps everything. <em>Cats do.</em></h2>
+      <p class="mf-lede" data-i18n="mf.lede">Every chapter lives in its own .mari file: your prose, highlights, notes, old versions, plan and drawer. Send it to your beta readers, and they open exactly what you see.</p>
 
-      <div class="chat" role="img" aria-label="A group chat: the writer sends chapter-07.mari to a beta reader and a proofreader, and both send it back marked up" data-i18n-aria="mf.chatLabel">
-        <div class="chat-bar">
-          <span class="chat-av" aria-hidden="true"><i class="av-me"><svg viewBox="150 140 720 740" aria-hidden="true"><path d="M294.5 851.9C217.7 846.1 172.0 812.6 181.1 768.8C184.0 754.8 194.4 741.6 207.6 735.0C211.4 733.1 214.6 731.5 214.8 731.5C214.9 731.4 213.9 726.9 212.6 721.4C203.0 681.8 206.9 638.0 223.5 598.5C243.8 550.2 280.0 510.3 329.0 482.5C333.7 479.8 337.7 477.5 337.9 477.4C338.1 477.2 336.4 472.7 334.2 467.3C319.9 432.7 321.2 401.7 338.8 361.4C341.0 356.4 342.4 350.4 344.0 340.0C353.3 276.7 367.5 228.1 379.3 218.6C384.5 214.5 392.7 213.8 399.1 217.0C411.9 223.5 431.2 247.5 454.1 285.5L463.8 301.5L470.7 301.3C485.5 300.7 510.3 303.5 531.2 308.1L536.8 309.4L552.7 293.9C598.0 250.0 620.0 236.7 633.4 244.9C642.0 250.3 644.6 263.3 643.7 298.4C643.0 325.0 641.5 341.3 636.8 369.0L633.7 387.5L635.0 404.3C639.1 459.6 623.7 496.4 586.5 520.1C579.0 524.8 578.0 525.8 578.3 528.0C578.5 529.4 579.7 535.1 580.9 540.6C587.5 572.0 586.5 592.5 575.4 653.1C566.9 700.0 564.5 738.3 568.9 756.6C570.1 761.4 570.4 761.8 576.0 764.3C599.5 775.1 601.8 813.2 579.6 824.5L573.6 827.5L547.3 827.8C532.8 828.0 521.0 827.9 521.0 827.6C521.0 827.4 521.9 825.6 522.9 823.8C530.6 810.8 529.1 792.8 519.2 779.8C508.0 765.0 488.3 757.8 463.8 759.6C458.9 760.0 455.0 759.9 455.0 759.5C455.0 759.1 455.6 756.2 456.4 753.1C466.8 712.6 449.4 665.6 417.2 646.7C404.7 639.4 389.4 635.0 381.5 636.4C376.8 637.3 377.4 637.8 388.6 642.8C418.6 655.9 438.4 679.8 444.6 710.0C446.4 719.1 446.2 744.0 444.1 751.0C443.6 752.9 442.6 756.4 442.0 758.8C441.4 761.1 440.4 763.0 439.7 763.0C439.0 763.0 427.9 765.9 415.0 769.4C385.7 777.3 372.8 780.4 357.5 783.0C324.4 788.7 288.7 787.3 262.5 779.4C251.0 775.9 246.6 775.7 246.2 778.7C245.8 781.7 249.1 784.4 257.4 787.9C276.3 795.8 295.5 798.4 328.0 797.7C358.3 796.9 372.1 794.6 405.5 784.6C446.9 772.3 469.4 769.2 487.3 773.4C513.7 779.6 524.4 803.6 510.0 824.5C503.9 833.4 496.8 835.8 473.5 837.0C459.6 837.7 452.3 838.7 434.0 842.3C406.0 848.0 394.3 849.7 372.0 851.5C353.3 853.1 312.7 853.3 294.5 851.9Z"/><rect x="771" y="164" width="48" height="668" rx="24"/></svg></i><i class="av-beta" data-i18n="mf.avBeta">B</i><i class="av-proof" data-i18n="mf.avProof">P</i></span>
-          <span class="chat-title"><span data-i18n="mf.chatName">Chapter 7 crew</span><small data-i18n="mf.chatPeople">You, beta reader, proofreader</small></span>
+      <div class="mf-stage">
+        <div class="mf-cards">
+          <article class="lay" style="--c: var(--paper)"><h3><i></i><span data-i18n="mf.c1">Your chapter</span></h3>
+            <div class="art"><span data-i18n="rd.s2new">Detective Hale stopped in the doorway.</span> <span data-i18n="rd.s5new">He crossed the room without a sound.</span></div></article>
+          <article class="lay" style="--c: var(--hl-good)"><h3><i></i><span data-i18n="mf.c2">Highlights</span></h3>
+            <div class="art"><mark class="g" data-i18n="rd.s2new">Detective Hale stopped in the doorway.</mark> <mark class="y" data-i18n="rd.s5new">He crossed the room without a sound.</mark></div></article>
+          <article class="lay" style="--c: #fff36b"><h3><i></i><span data-i18n="mf.c3">Notes</span></h3>
+            <div class="art"><mark class="m" data-i18n="rd.s3">He had seen a lot of bodies in twenty years. None of them had ever been wearing his coat.</mark><span class="sticky" data-i18n="mf.note">Keep, but check the timeline.</span></div></article>
+          <article class="lay" style="--c: var(--hl-ok)"><h3><i></i><span data-i18n="mf.c4">Minimap</span></h3>
+            <div class="art mmap"><span class="strip" aria-hidden="true"><i></i><i class="g"></i><i class="g"></i><i></i><i class="y"></i><i></i><i></i><i class="c"></i><i></i><i class="m"></i><i class="m"></i><i></i><i class="o"></i><i></i></span><p data-i18n="mf.c4t">Your marks travel, so their map looks like yours.</p></div></article>
+          <article class="lay" style="--c: var(--hl-rew)"><h3><i></i><span data-i18n="mf.c5">Old versions</span></h3>
+            <div class="art vers" aria-hidden="true"><span style="--i: 0">v1</span><span style="--i: 1">v2</span><span style="--i: 2">v3</span></div></article>
+          <article class="lay" style="--c: var(--grape)"><h3><i></i><span data-i18n="mf.c6">Synopsis and plan</span></h3>
+            <div class="art plan"><em data-i18n="mf.syn">Hale finds a body wearing his coat.</em><ul><li class="done" data-i18n="mf.b1">Hale arrives</li><li class="done" data-i18n="mf.b2">The coat</li><li data-i18n="mf.b3">Who has his keys?</li></ul></div></article>
+          <article class="lay" style="--c: var(--hl-cut)"><h3><i></i><span data-i18n="mf.c7">The drawer</span></h3>
+            <div class="art drawer"><span class="cut" data-i18n="rd.s1">The rain fell down from the sky above, wetly.</span><span class="box" aria-hidden="true"></span></div></article>
+          <article class="lay send"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M4 22 44 5 34 43 23 30 4 22Zm19 8L44 5"/></svg><b data-i18n="mf.c8">Send it.</b><p data-i18n="mf.c8t">They open exactly what you see.</p></article>
         </div>
-        <div class="chat-body">
-          <div class="msg me file"><span class="pg" aria-hidden="true"><i></i><i class="g"></i><i></i><i></i><i></i><i></i><i></i></span><span class="file-info"><b>chapter-07.mari</b><small data-i18n="mf.f1">1 chapter · 2 old versions</small></span></div>
-          <div class="msg me"><span data-i18n="mf.m1">Could you read chapter 7? Be brutal.</span><time>21:04</time></div>
-          <div class="msg them beta"><span class="who" data-i18n="mf.beta">Beta reader</span><span data-i18n="mf.m2">On it ☕</span><time>21:06</time></div>
-          <div class="msg them beta file"><span class="pg" aria-hidden="true"><i class="g"></i><i class="c"></i><i></i><i class="r"></i><i class="g"></i><i class="c"></i><i class="m"></i><span class="note" style="right: -5px; top: 10px"></span><span class="note" style="right: -6px; top: 38px"></span></span><span class="file-info"><span class="who" data-i18n="mf.beta">Beta reader</span><b>chapter-07.mari</b><small data-i18n="mf.f2">12 marks · 5 notes</small></span></div>
-          <div class="msg them beta"><span class="who" data-i18n="mf.beta">Beta reader</span><span data-i18n="mf.m3">The coat line killed me. The middle drags, I marked where.</span><time>23:41</time></div>
-          <div class="msg them proof file"><span class="pg" aria-hidden="true"><i class="t"></i><i></i><i class="t"></i><i></i><i class="t"></i><i class="t"></i><i></i><span class="note" style="right: -5px; top: 24px"></span></span><span class="file-info"><span class="who" data-i18n="mf.proof">Proofreader</span><b>chapter-07.mari</b><small data-i18n="mf.f3">9 typos marked</small></span></div>
-          <div class="msg them proof"><span class="who" data-i18n="mf.proof">Proofreader</span><span data-i18n="mf.m4">Every typo is marked on its line.</span><time>08:15</time></div>
-          <div class="msg me"><span data-i18n="mf.m5">You two are the best ❤</span><time>08:16</time></div>
+
+        <div class="env" aria-hidden="true">
+          <div class="env-back"></div>
+          <div class="env-front"></div>
+          <div class="env-flap"></div>
+          <div class="env-label"><span data-i18n="mf.to">To: my beta readers</span><b>chapter-07.mari</b></div>
+          <div class="mf-stamp"><div><svg viewBox="150 140 720 740" aria-hidden="true"><path d="M294.5 851.9C217.7 846.1 172.0 812.6 181.1 768.8C184.0 754.8 194.4 741.6 207.6 735.0C211.4 733.1 214.6 731.5 214.8 731.5C214.9 731.4 213.9 726.9 212.6 721.4C203.0 681.8 206.9 638.0 223.5 598.5C243.8 550.2 280.0 510.3 329.0 482.5C333.7 479.8 337.7 477.5 337.9 477.4C338.1 477.2 336.4 472.7 334.2 467.3C319.9 432.7 321.2 401.7 338.8 361.4C341.0 356.4 342.4 350.4 344.0 340.0C353.3 276.7 367.5 228.1 379.3 218.6C384.5 214.5 392.7 213.8 399.1 217.0C411.9 223.5 431.2 247.5 454.1 285.5L463.8 301.5L470.7 301.3C485.5 300.7 510.3 303.5 531.2 308.1L536.8 309.4L552.7 293.9C598.0 250.0 620.0 236.7 633.4 244.9C642.0 250.3 644.6 263.3 643.7 298.4C643.0 325.0 641.5 341.3 636.8 369.0L633.7 387.5L635.0 404.3C639.1 459.6 623.7 496.4 586.5 520.1C579.0 524.8 578.0 525.8 578.3 528.0C578.5 529.4 579.7 535.1 580.9 540.6C587.5 572.0 586.5 592.5 575.4 653.1C566.9 700.0 564.5 738.3 568.9 756.6C570.1 761.4 570.4 761.8 576.0 764.3C599.5 775.1 601.8 813.2 579.6 824.5L573.6 827.5L547.3 827.8C532.8 828.0 521.0 827.9 521.0 827.6C521.0 827.4 521.9 825.6 522.9 823.8C530.6 810.8 529.1 792.8 519.2 779.8C508.0 765.0 488.3 757.8 463.8 759.6C458.9 760.0 455.0 759.9 455.0 759.5C455.0 759.1 455.6 756.2 456.4 753.1C466.8 712.6 449.4 665.6 417.2 646.7C404.7 639.4 389.4 635.0 381.5 636.4C376.8 637.3 377.4 637.8 388.6 642.8C418.6 655.9 438.4 679.8 444.6 710.0C446.4 719.1 446.2 744.0 444.1 751.0C443.6 752.9 442.6 756.4 442.0 758.8C441.4 761.1 440.4 763.0 439.7 763.0C439.0 763.0 427.9 765.9 415.0 769.4C385.7 777.3 372.8 780.4 357.5 783.0C324.4 788.7 288.7 787.3 262.5 779.4C251.0 775.9 246.6 775.7 246.2 778.7C245.8 781.7 249.1 784.4 257.4 787.9C276.3 795.8 295.5 798.4 328.0 797.7C358.3 796.9 372.1 794.6 405.5 784.6C446.9 772.3 469.4 769.2 487.3 773.4C513.7 779.6 524.4 803.6 510.0 824.5C503.9 833.4 496.8 835.8 473.5 837.0C459.6 837.7 452.3 838.7 434.0 842.3C406.0 848.0 394.3 849.7 372.0 851.5C353.3 853.1 312.7 853.3 294.5 851.9Z"/><rect x="771" y="164" width="48" height="668" rx="24"/></svg></div></div>
+          <svg class="mf-postmark" viewBox="0 0 160 110">
+            <circle cx="55" cy="55" r="42" fill="none" stroke="#14120f" stroke-width="3"/>
+            <circle cx="55" cy="55" r="33" fill="none" stroke="#14120f" stroke-width="1.5"/>
+            <path id="pmArc" d="M55 55 m-37 0 a37 37 0 1 1 74 0" fill="none"/>
+            <text><textPath href="#pmArc" startOffset="50%" text-anchor="middle" data-i18n="mf.postmark">SENT · CH. 7</textPath></text>
+            <text x="55" y="63" text-anchor="middle" style="font-size: 15px">21:04</text>
+            <path d="M100 30 q10-8 20 0 t20 0 t20 0 M100 48 q10-8 20 0 t20 0 t20 0 M100 66 q10-8 20 0 t20 0 t20 0 M100 84 q10-8 20 0 t20 0 t20 0" fill="none" stroke="#14120f" stroke-width="3" stroke-linecap="round"/>
+          </svg>
         </div>
       </div>
     </div>
@@ -1035,23 +1069,6 @@ window.I18N = (() => {
     "nav.main": "Главное меню",
     "nav.footer": "Нижнее меню",
     "dl.betaTag": "БЕТА",
-    "mf.h2": "Отправь главу. Она вернётся <em>вся в\u00a0пометках.</em>",
-    "mf.lede": "В\u00a0одном файле .mari летит глава со\u00a0всеми выделениями, заметками и\u00a0старыми версиями. Бета-ридеры и\u00a0корректоры открывают его в\u00a0Мари, ставят пометки прямо в\u00a0тексте и\u00a0шлют обратно.",
-    "mf.chatLabel": "Групповой чат: писатель отправляет chapter-07.mari бета-ридеру и\u00a0корректору, и\u00a0оба присылают файл обратно с\u00a0пометками",
-    "mf.chatName": "Банда седьмой главы",
-    "mf.chatPeople": "Ты, бета-ридер, корректор",
-    "mf.avBeta": "Б",
-    "mf.avProof": "К",
-    "mf.f1": "1 глава · 2 старые версии",
-    "mf.m1": "Глянете седьмую главу? Только без\u00a0жалости.",
-    "mf.beta": "Бета-ридер",
-    "mf.m2": "Уже читаю ☕",
-    "mf.f2": "12 пометок · 5 заметок",
-    "mf.m3": "Пальто в\u00a0финале меня убило. Середина провисает, смотри пометки.",
-    "mf.proof": "Корректор",
-    "mf.f3": "Отмечено 9 опечаток",
-    "mf.m4": "Все опечатки отмечены прямо в\u00a0строках.",
-    "mf.m5": "Вы\u00a0у\u00a0меня лучшие ❤",
     "mf.postmark": "ГЛАВА 7 · УШЛА"
   };
 
@@ -1352,35 +1369,51 @@ window.I18N = (() => {
     });
   }
 
-  /* ---------- the group chat plays out once, as it comes into view ---------- */
+  /* ---------- the .mari file: the envelope opens and its contents slide out ----------
+     The cards' grid is the finished state. Each card starts tucked into the envelope
+     (an offset measured by mfLayout) and the scroll brings it out to its place. */
+  const mf = $(".mf"), mfStage = $(".mf-stage", mf), mfEnv = $(".env", mf), mfCards = $$(".lay", mf);
+  const mfGeo = { d: [] };
+  const mfLocal = (el) => { let x = 0, y = 0; for (let n = el; n && n !== mfStage; n = n.offsetParent) { x += n.offsetLeft; y += n.offsetTop; } return { x, y }; };
+  function mfLayout() {
+    const e = mfLocal(mfEnv);
+    const mouth = { x: e.x + mfEnv.offsetWidth / 2, y: e.y + mfEnv.offsetHeight * 0.55 };
+    mfGeo.d = mfCards.map((c) => { const p = mfLocal(c); return { x: mouth.x - (p.x + c.offsetWidth / 2), y: mouth.y - (p.y + c.offsetHeight / 2) }; });
+    mfGeo.lift = mfEnv.offsetHeight * 0.75;
+  }
   function mfMotion() {
-    const body = $(".chat-body"), msgs = $$(".msg", body);
-    const typing = document.createElement("div");
-    typing.className = "typing"; typing.setAttribute("aria-hidden", "true");
-    typing.innerHTML = "<i></i><i></i><i></i>";
-    body.append(typing);
-    typing.style.display = "none";
-    gsap.set(msgs, { autoAlpha: 0, scale: 0.6, y: 20 });
-    const tl = gsap.timeline({ paused: true });
-    let at = 0.2;
-    msgs.forEach((m) => {
-      if (m.classList.contains("them")) {
-        // the other side types first
-        tl.call(() => { typing.style.top = m.offsetTop + "px"; typing.style.left = m.offsetLeft + "px"; typing.style.display = ""; }, null, at);
-        tl.fromTo(typing, { autoAlpha: 0, scale: 0.7 }, { autoAlpha: 1, scale: 1, duration: 0.2 }, at);
-        at += 0.6;
-        tl.call(() => (typing.style.display = "none"), null, at);
-      }
-      tl.to(m, { autoAlpha: 1, scale: 1, y: 0, duration: 0.45, ease: "back.out(2.2)" }, at);
-      // a file that comes back: its marks land one by one
-      if (m.classList.contains("them") && m.classList.contains("file")) {
-        tl.from($$(".pg i:not(:empty), .pg i[class], .pg .note", m), { scaleX: 0, transformOrigin: "0 50%", duration: 0.2, stagger: 0.06 }, at + 0.25);
-      }
-      at += m.classList.contains("me") ? 0.45 : 0.55;
+    mfLayout();
+    ScrollTrigger.addEventListener("refreshInit", mfLayout);
+    const flap = $(".env-flap", mf);
+    const tl = gsap.timeline();
+    tl.fromTo(flap, { rotateX: 0, zIndex: 4 }, { rotateX: 180, duration: 0.8, ease: "power2.inOut" }, 0.1)
+      .set(flap, { zIndex: 1 }, 0.5)
+      .fromTo(mfEnv, { rotate: 0 }, { keyframes: [{ rotate: -2.5, duration: 0.12 }, { rotate: 2, duration: 0.12 }, { rotate: 0, duration: 0.12 }] }, 0.85);
+    // out they come, one after another: up out of the envelope, then off to their place
+    mfCards.forEach((c, i) => {
+      const at = 1 + i * 0.42;
+      tl.fromTo(c,
+        { x: () => mfGeo.d[i].x, y: () => mfGeo.d[i].y, scale: 0.32, rotate: (i % 2 ? 1 : -1) * 18, autoAlpha: 0, zIndex: 2 },
+        { keyframes: [
+            { autoAlpha: 1, duration: 0.05 },
+            { y: () => mfGeo.d[i].y - mfGeo.lift, scale: 0.5, rotate: (i % 2 ? -1 : 1) * 8, duration: 0.35, ease: "power2.out" },
+            { zIndex: 5, duration: 0.01 },
+            { x: 0, y: 0, scale: 1, rotate: 0, duration: 0.75, ease: "power3.inOut" },
+          ] }, at);
     });
-    ScrollTrigger.create({ trigger: ".chat", start: "top 72%", once: true, onEnter: () => tl.play() });
-    gsap.from(".mf-stamp", { scale: 1.6, rotate: -20, autoAlpha: 0, duration: 0.6, ease: "back.out(2)", scrollTrigger: { trigger: ".mf", start: "top 70%" } });
-    gsap.from(".mf-postmark", { scale: 1.8, autoAlpha: 0, duration: 0.35, ease: "power4.in", delay: 0.45, scrollTrigger: { trigger: ".mf", start: "top 70%" } });
+    tl.to({}, { duration: 0.5 });
+    ScrollTrigger.matchMedia({
+      // a big screen holds the whole stage: it stays put while the scroll plays it
+      "(min-width: 961px) and (min-height: 740px)": () => {
+        const st = ScrollTrigger.create({ animation: tl, trigger: mfStage, pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true, start: "center center", end: () => "+=" + Math.round(innerHeight * 1.6) });
+        return () => st.kill();
+      },
+      // otherwise it plays as it scrolls past, envelope first
+      "(max-width: 960px), (max-height: 739px)": () => {
+        const st = ScrollTrigger.create({ animation: tl, trigger: mfStage, scrub: 0.6, invalidateOnRefresh: true, start: "top 75%", end: "bottom 85%" });
+        return () => st.kill();
+      },
+    });
   }
 
   // in-page links glide when smooth scroll is on
@@ -1512,7 +1545,7 @@ window.I18N = (() => {
     macOrder();
     fillRelease();
     startMotion();
-    if (!motion) { rd.classList.add("rd-still"); rdStep(1); }
+    if (!motion) { rd.classList.add("rd-still"); rdStep(1); mf.classList.add("mf-open"); }
     document.documentElement.classList.remove("i18n-wait");
     setTimeout(() => {
       const hello = () => say("cat.hello");
