@@ -204,6 +204,7 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 800; }
   content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
   background: radial-gradient(circle at 15% 20%, rgba(255,255,255,.12) 0 2px, transparent 3px) 0 0 / 34px 34px;
 }
+.hero-copy { min-width: 0; }
 .hero-grid { display: grid; grid-template-columns: 1.4fr .6fr; gap: 2rem; align-items: end; }
 .hero h1 { font-size: clamp(3rem, 6.4vw, 6.6rem); color: var(--paper); }
 html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
@@ -342,7 +343,7 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .rd-lines { position: relative; font: 400 clamp(1.1rem, 2vw, 1.8rem)/1.5 "Literata", Georgia, serif; }
 .rd-row { display: grid; }
 .rd-row + .rd-row { margin-top: .55em; }
-.rd-row > * { grid-area: 1 / 1; min-width: 0; }
+.rd-row > * { grid-area: 1 / 1; min-width: 0; align-self: start; }
 .rd-old, .rd-new { display: block; }
 .rd-new { display: none; }
 .rd-row[data-mark="cut"] { --m: var(--cut); }
@@ -410,7 +411,7 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .art .y { background: color-mix(in srgb, var(--hl-tw) 55%, transparent); }
 .art .c { background: color-mix(in srgb, var(--hl-cut) 40%, transparent); }
 .art .m { background: color-mix(in srgb, var(--hl-mov) 45%, transparent); }
-.sticky { position: absolute; right: -6px; bottom: -6px; max-width: 70%; padding: .45rem .6rem; border: 2px solid var(--ink); background: #fff36b; box-shadow: 3px 3px 0 var(--ink); rotate: -4deg; font: 600 1.15rem/1 var(--hand); }
+.sticky { position: relative; display: block; width: fit-content; margin: .5rem -6px -6px auto; max-width: 85%; padding: .45rem .6rem; border: 2px solid var(--ink); background: #fff36b; box-shadow: 3px 3px 0 var(--ink); rotate: -4deg; font: 600 1.15rem/1 var(--hand); }
 .mmap { display: flex; gap: 12px; height: 100%; }
 .mmap .strip { flex: none; width: 52px; display: flex; flex-direction: column; gap: 4px; padding: 6px 5px; border: 2px solid var(--ink); border-radius: 6px; background: #fff; }
 .mmap .strip i { display: block; height: 4px; border-radius: 2px; background: rgba(20, 18, 15, .2); }
@@ -437,6 +438,10 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .lay.send p { margin: 0; font: 600 .98rem/1.35 var(--sans); }
 .lay.send svg { position: absolute; right: 12px; top: 12px; width: 46px; fill: var(--paper); stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; }
 
+@media (min-width: 961px) {
+  html:lang(ru) .lay.send b { font-size: clamp(1.3rem, 2vw, 2.3rem); }
+  .lay.send { padding-top: 2.4rem; }
+}
 /* the envelope: back, contents, front pocket, flap, in that order of depth */
 .env { position: relative; width: min(440px, 86%); aspect-ratio: 1.75; margin: clamp(2rem, 4vw, 3rem) auto 0; perspective: 900px; }
 .env-back, .env-front, .env-flap { position: absolute; inset: 0; border: var(--line); border-radius: 14px; }
@@ -459,6 +464,7 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .mf-postmark { position: absolute; z-index: 6; right: 15%; bottom: 20%; width: clamp(80px, 9vw, 110px); rotate: -14deg; opacity: .8; pointer-events: none; }
 .mf-postmark text { font: 800 11px var(--mono); letter-spacing: .12em; fill: var(--ink); }
 .mf-open .env-flap { transform: rotateX(180deg); z-index: 1; }
+.mf-armed .lay { visibility: hidden; }
 
 /* ---------- the receipt: everything else, on the house ----------
    A till receipt on a dark counter. As you scroll it unrolls line by line,
@@ -472,7 +478,8 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
   color: var(--paper);
   overflow: clip;
 }
-.rc-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 470px); align-items: start; gap: clamp(2rem, 5vw, 5rem); }
+.rc-grid { padding-right: 14px; }
+.rc-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, min(470px, 44vw)); align-items: start; gap: clamp(2rem, 5vw, 5rem); }
 .rc h2 { font-size: clamp(2.8rem, 6.4vw, 6rem); max-width: 8em; position: sticky; top: 120px; }
 .rc h2 em { color: var(--lime); }
 .receipt-wrap { position: relative; rotate: 1.5deg; filter: drop-shadow(12px 12px 0 var(--pink)); }
@@ -546,6 +553,7 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .fz-stage { position: relative; min-height: 100vh; min-height: 100svh; display: grid; align-content: center; justify-items: center; gap: clamp(1.4rem, 3vw, 2.2rem); padding-block: clamp(4rem, 8vw, 6rem); }
 .fz-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .8rem 1.6rem; text-align: center; }
 .fz h2 { font-size: clamp(2.6rem, 6vw, 5.6rem); }
+html:lang(ru) .fz h2 { font-size: clamp(2.4rem, 4.2vw, 4.2rem); }
 .fz h2 em { color: var(--paper); }
 .fz-head p { flex-basis: 100%; margin: 0; font-size: clamp(1.05rem, 1.5vw, 1.3rem); font-weight: 600; text-align: center; text-wrap: balance; }
 .fz-key {
@@ -576,7 +584,7 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .fz-text { display: grid; align-content: center; padding: clamp(1.2rem, 3vw, 2.6rem) clamp(1.2rem, 4vw, 3.4rem); transform-origin: 50% 50%; }
 .fz-text p { margin: 0; max-width: 34em; font: 400 clamp(1rem, 1.55vw, 1.32rem)/1.75 "Literata", Georgia, serif; }
 .fz-text mark { color: inherit; border-radius: 3px; -webkit-box-decoration-break: clone; box-decoration-break: clone; transition: background-color .2s; }
-.fz { --ma: 1; }
+.fz { --ma: 1; --noise: 1; }
 .fz-text mark.g { background: rgba(92, 184, 92, calc(.3 * var(--ma))); } .fz-text mark.y { background: rgba(242, 201, 76, calc(.4 * var(--ma))); } .fz-text mark.m { background: rgba(38, 198, 218, calc(.3 * var(--ma))); }
 .fz-caret { display: inline-block; width: 3px; height: 1.15em; margin-left: 2px; vertical-align: -.2em; background: var(--ink); animation: caret 1.1s steps(1) infinite; }
 .fz-map { display: flex; flex-direction: column; gap: 4px; padding: .9rem 9px; border-left: 2px solid rgba(20, 18, 15, .15); background: #f7f0e3; }
@@ -731,6 +739,8 @@ footer nav a:hover { color: var(--pink); }
 @media (max-width: 960px) {
   .mf-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .rc-grid { grid-template-columns: minmax(0, 1fr); }
+  .rc h2 { position: static; }
+  .receipt-wrap { width: min(100% - 24px, 520px); justify-self: center; }
   .fz-body { grid-template-columns: minmax(0, 1fr) 30px; }
   .fz-side { display: none; }
   .fz-map { padding: .7rem 6px; }
@@ -763,7 +773,7 @@ footer nav a:hover { color: var(--pink); }
   .mf h2 { font-size: min(2.8rem, 11vw); }
   html:lang(ru) .mf h2 { font-size: min(2.5rem, 9vw); }
   .mf-cards { gap: 10px; }
-  .rc h2 { position: static; font-size: min(2.8rem, 11vw); }
+  .rc h2 { font-size: min(2.8rem, 11vw); }
   html:lang(ru) .rc h2 { font-size: min(2.5rem, 9vw); }
   .receipt-wrap { rotate: 0deg; filter: drop-shadow(6px 6px 0 var(--pink)); }
   .receipt { font-size: .8rem; }
@@ -800,6 +810,12 @@ footer nav a:hover { color: var(--pink); }
   .brand-name { display: none; }
 }
 @media (max-width: 380px) {
+  html:lang(ru) .hero h1 { font-size: 2.2rem; }
+  .mmap { gap: 6px; }
+  .mmap .strip { width: 24px; }
+  .mmap p { min-width: 0; }
+  html:lang(ru) .sticky { font-size: .8rem; }
+  html:lang(ru) .mf .lay h3 { font-size: .76rem; }
   .nav .btn { padding: .6em .85em; font-size: .88rem; }
   .nav-end { gap: 6px; }
   .rd-steps b { display: none; }
@@ -808,6 +824,10 @@ footer nav a:hover { color: var(--pink); }
 /* the paper grain is a fixed full-screen blend layer: lovely on a desktop, needless work for a phone */
 @media (pointer: coarse) {
   body::after { display: none; }
+  /* fingers need 44px */
+  .nav .brand { min-width: 44px; min-height: 44px; justify-content: center; }
+  footer nav a { display: inline-flex; align-items: center; min-height: 44px; }
+  .cmd button { min-height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -1242,7 +1262,7 @@ window.I18N = (() => {
     "mf.note": "Оставь, но\u00a0сверь хронологию.",
     "mf.c8": "Отправляй.",
     "mf.c8t": "Они откроют ровно то, что видишь ты.",
-    "mf.to": "Кому: моим бета-ридерам",
+    "mf.to": "Кому: бета-ридерам",
     "rc.h2": "Всё остальное <em>за\u00a0счёт заведения.</em>",
     "rc.shop": "Всё для\u00a0письма и\u00a0одна кошка",
     "rc.order": "Заказ #0007 · 03:12",
@@ -1476,6 +1496,12 @@ window.I18N = (() => {
   function startMotion() {
     if (!motion) return;
     gsap.registerPlugin(ScrollTrigger);
+    // lines and cards are measured in whatever font has arrived; when the real
+    // ones land (Russian faces come later), measure again
+    if (document.fonts) {
+      let ft;
+      document.fonts.addEventListener("loadingdone", () => { clearTimeout(ft); ft = setTimeout(() => ScrollTrigger.refresh(), 80); });
+    }
     if (window.Lenis) {
       lenis = new Lenis({ lerp: 0.11 });
       lenis.on("scroll", ScrollTrigger.update);
@@ -1535,6 +1561,13 @@ window.I18N = (() => {
     rdGeo.from = rdRows.map((r) => rdCentre($(".rd-old", r)));
     rdGeo.drawer = rdCentre($(".rd-drawer", rd));
     rdGeo.kept = rdCentre($(".rd-kept", rd));
+    // When the page is taller than the screen, the view glides to the line in play.
+    const docTop = (el) => { let y = 0; for (let n = el; n; n = n.offsetParent) y += n.offsetTop; return y; };
+    const rest = rdPage.offsetHeight - rdLines.offsetHeight;
+    rdGeo.pageY = docTop(rdPage) - docTop($(".rd-pin", rd));
+    rdGeo.pageH = rest + rdGeo.hA;
+    rdGeo.pageHF = rest + rdGeo.hB;
+    rdGeo.pan = $(".rd-stage", rd).offsetHeight >= innerHeight - 40;
   }
 
   function rdTimeline() {
@@ -1547,14 +1580,28 @@ window.I18N = (() => {
     const bump = (pill) => ({ keyframes: [{ scale: 1.25, duration: 0.12 }, { scale: 1, duration: 0.14 }] });
     const tl = gsap.timeline({ defaults: { ease: "power2.inOut" } });
 
-    // 1. the draft gets marked up, line by line
-    [2, 0, 4, 1, 5, 3].forEach((i, k) => {
+    // the view: on a screen shorter than the page, centre the line in play (never past the page's ends)
+    const stage = $(".rd-stage", rd);
+    const look = (yOf, at, duration = 0.35) => tl.to(stage, {
+      y: () => {
+        if (!rdGeo.pan) return 0;
+        const vh = innerHeight;
+        return Math.round(Math.min(0, Math.max(vh / 2 - yOf(), vh - 12 - (rdGeo.pageY + rdGeo.pageH))));
+      },
+      duration, ease: "power2.inOut",
+    }, at);
+    const lineAt = (i) => () => rdGeo.pageY + rdGeo.from[i].y;
+
+    // 1. the draft gets marked up, line by line, top to bottom like an editor reading
+    [0, 1, 2, 3, 4, 5].forEach((i, k) => {
+      look(lineAt(i), Math.max(0, 0.3 + k * 0.45));
       tl.fromTo(T(i), { "--hl": 0 }, { "--hl": 100, duration: 0.7, ease: "power1.inOut" }, 0.6 + k * 0.45);
       tl.fromTo(C(i), { scale: 0, rotate: -30 }, { scale: 1, rotate: 0, duration: 0.4, ease: "back.out(3)" }, 1.1 + k * 0.45);
     });
     // 2. cuts fly into the drawer
     [0, 3].forEach((i, k) => {
       const at = 4.7 + k * 0.7;
+      look(lineAt(i), at - 0.35);
       tl.to(O(i), flyTo(i, "drawer", -14), at).to(O(i), { opacity: 0, duration: 0.15 }, at + 0.65);
       tl.to($(".rd-drawer .odo-in", rd), { yPercent: (-100 / 3) * (k + 1), duration: 0.25, ease: "back.out(3)" }, at + 0.75);
       tl.to($(".rd-drawer", rd), bump(), at + 0.75);
@@ -1562,6 +1609,7 @@ window.I18N = (() => {
     // 3. rewrites: the old wording flies off to be kept, the new one takes its place
     [1, 4].forEach((i, k) => {
       const at = 6.3 + k * 0.8;
+      look(lineAt(i), at - 0.4);
       tl.to(C(i), { scale: 0, duration: 0.2 }, at - 0.1);
       tl.to(O(i), flyTo(i, "kept", 12), at).to(O(i), { opacity: 0, duration: 0.15 }, at + 0.65);
       tl.fromTo(N(i), { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, at + 0.3);
@@ -1569,9 +1617,18 @@ window.I18N = (() => {
       tl.to($(".rd-kept .odo-in", rd), { yPercent: (-100 / 3) * (k + 1), duration: 0.25, ease: "back.out(3)" }, at + 0.75);
       tl.to($(".rd-kept", rd), bump(), at + 0.75);
     });
-    // 4. everything closes up into its new order, and the coat line swings round to the end
+    // 4. everything closes up into its new order, and the coat line swings round to the end;
+    //    on a short screen the view settles on the finished page (whole, if it now fits)
+    tl.to(stage, {
+      y: () => {
+        if (!rdGeo.pan) return 0;
+        const vh = innerHeight, top = rdGeo.pageY, h = rdGeo.pageHF;
+        return Math.round(Math.min(0, h + 24 <= vh ? vh / 2 - (top + h / 2) : 12 - top));
+      },
+      duration: 1.1, ease: "power3.inOut",
+    }, 8);
     RD_FINAL.forEach((i) => tl.to(rdRows[i], { y: () => rdGeo.b[i] - rdGeo.a[i], duration: 1.1, ease: "power3.inOut" }, i === 2 ? 8.3 : 8));
-    tl.to(rdRows[2], { keyframes: [{ x: 46, rotate: 1.5, duration: 0.55, ease: "power2.out" }, { x: 0, rotate: 0, duration: 0.55, ease: "power2.in" }] }, 8.3);
+    tl.to(rdRows[2], { keyframes: [{ x: () => (innerWidth < 600 ? 10 : 46), rotate: 1.5, duration: 0.55, ease: "power2.out" }, { x: 0, rotate: 0, duration: 0.55, ease: "power2.in" }] }, 8.3);
     tl.fromTo(rdLines, { height: () => rdGeo.hA }, { height: () => rdGeo.hB, duration: 1.1, ease: "power3.inOut" }, 8);
     // 5. the marks come off: what's left is just good writing
     const fresh = [1, 4].map((i) => $(".rd-fresh", rdRows[i]));
@@ -1592,25 +1649,18 @@ window.I18N = (() => {
         scrollTrigger: { trigger: rd, start: "top bottom", end: "bottom top", scrub: 1 },
       });
     });
-    ScrollTrigger.addEventListener("refreshInit", rdLayout);
+    // "revert" comes inside every refresh, after pins are undone and before
+    // anything is measured again, so the layout is read at the real width
+    ScrollTrigger.addEventListener("revert", rdLayout);
     rdLayout();
     const tl = rdTimeline();
-    const fits = () => $(".rd-stage", rd).offsetHeight < innerHeight - 40;
-    ScrollTrigger.matchMedia({
-      // tall enough to hold the page on screen: it stays put while the scroll plays it
-      "(min-height: 560px)": () => {
-        const st = ScrollTrigger.create({
-          animation: tl, trigger: ".rd-pin", pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true,
-          start: () => (fits() ? "center center" : "top top"),
-          end: () => "+=" + Math.round(innerHeight * 2.4),
-        });
-        return () => st.kill();
-      },
-      // a phone on its side: no room to hold it, so it plays as it scrolls past
-      "(max-height: 559px)": () => {
-        const st = ScrollTrigger.create({ animation: tl, trigger: ".rd-page", scrub: 0.6, invalidateOnRefresh: true, start: "top 80%", end: "bottom 20%" });
-        return () => st.kill();
-      },
+    // The block holds still while the scroll plays the scene. If the page is
+    // taller than the screen, it starts at the top and the view glides to each
+    // line in play (see look() in rdTimeline), with a bit more scroll to do it in.
+    ScrollTrigger.create({
+      animation: tl, trigger: ".rd-pin", pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true,
+      start: () => (rdGeo.pan ? "top top" : "center center"),
+      end: () => "+=" + Math.round(innerHeight * (rdGeo.pan ? 3.2 : 2.4)),
     });
   }
 
@@ -1628,7 +1678,8 @@ window.I18N = (() => {
   }
   function mfMotion() {
     mfLayout();
-    ScrollTrigger.addEventListener("refreshInit", mfLayout);
+    ScrollTrigger.addEventListener("revert", mfLayout);
+    mf.classList.add("mf-armed");  // cards stay hidden until their turn; each one's animation reveals it
     const flap = $(".env-flap", mf);
     const tl = gsap.timeline();
     tl.fromTo(flap, { rotateX: 0, zIndex: 4 }, { rotateX: 180, duration: 0.8, ease: "power2.inOut" }, 0.1)
@@ -1700,19 +1751,20 @@ window.I18N = (() => {
       .to(".fz-text", { x: () => -($(".fz-side").offsetWidth - $(".fz-map").offsetWidth) / 2, duration: 0.6 }, 1.1)
       .to(fz, { backgroundColor: "#fff4e4", "--noise": 0, duration: 0.9 }, 1.1)
       .to(".fz-head", { autoAlpha: 0, y: -30, duration: 0.6 }, 1.6)
-      .to(".fz-text", { scale: () => (innerWidth > 960 ? 1.3 : 1.06), duration: 0.8 }, 1.6)
+      .to(".fz-text", { scale: () => (innerWidth > 960 ? 1.3 : innerHeight < 700 ? 1 : 1.06), duration: 0.8 }, 1.6)
+      // on a short screen the window rises into the room the heading leaves: centred if it fits, else near the top
+      .to(".fz-win", {
+        y: () => {
+          if (innerHeight >= 760) return 0;
+          const win = $(".fz-win"), h = win.offsetHeight, vh = innerHeight;
+          return Math.round((h + 16 <= vh ? (vh - h) / 2 : 8) - win.offsetTop);
+        },
+        duration: 0.8,
+      }, 1.6)
       .to(typing, { n: 60, duration: 1.4, ease: "none", onUpdate: () => fzType(Math.round(typing.n)) }, 2.3)
       .to({}, { duration: 0.6 });
-    ScrollTrigger.matchMedia({
-      "(min-height: 560px)": () => {
-        const st = ScrollTrigger.create({ animation: tl, trigger: fz, pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true, start: "top top", end: () => "+=" + Math.round(innerHeight * 1.8) });
-        return () => st.kill();
-      },
-      "(max-height: 559px)": () => {
-        const st = ScrollTrigger.create({ animation: tl, trigger: fz, scrub: 0.6, invalidateOnRefresh: true, start: "top 60%", end: "bottom 40%" });
-        return () => st.kill();
-      },
-    });
+    // held still on every screen while the scroll plays it
+    ScrollTrigger.create({ animation: tl, trigger: fz, pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true, start: "top top", end: () => "+=" + Math.round(innerHeight * 1.8) });
   }
 
   // in-page links glide when smooth scroll is on
@@ -1730,6 +1782,7 @@ window.I18N = (() => {
   let lastY = scrollY;
   addEventListener("scroll", () => {
     const y = scrollY;
+    if (window.ScrollTrigger && ScrollTrigger.getAll().some((s) => s.pin && s.isActive)) { nav.classList.add("hide"); lastY = y; return; }
     if (y > 500 && y > lastY + 4) nav.classList.add("hide");
     else if (y < lastY - 4 || y < 500) nav.classList.remove("hide");
     lastY = y;
@@ -2024,7 +2077,10 @@ window.I18N = (() => {
       fzType(fzShown);
       macOrder();
       fillRelease();
-      if (motion) ScrollTrigger.refresh();
+      if (motion) {
+        ScrollTrigger.refresh();
+        if (document.fonts) Promise.all(["400 1em Literata", "400 1em Onest", "600 1em Caveat"].map((f) => document.fonts.load(f, "Дж"))).then(() => ScrollTrigger.refresh(), () => {});
+      }
     });
   });
 
