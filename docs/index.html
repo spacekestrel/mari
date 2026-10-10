@@ -75,6 +75,9 @@ html:lang(ru) {
   --sans: "Onest", "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 html:lang(ru) h1, html:lang(ru) h2, html:lang(ru) h3 { letter-spacing: -.03em; line-height: .92; }
+/* Russian words run long («Переписывай», «программы»): headings step down a size so every word fits its column */
+html:lang(ru) .beat h3 { font-size: clamp(2.3rem, 4.4vw, 4.2rem); }
+html:lang(ru) .reasons-head { font-size: clamp(2.6rem, 7vw, 6.4rem); }
 
 /* while the language is being worked out, the hero's words wait (never longer than 2s) */
 .i18n-wait .hero-copy, .i18n-wait .nav .btn, .i18n-wait .shot .sticker { visibility: hidden; animation: i18n-show 0s 2s forwards; }
@@ -230,7 +233,7 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 800; }
 @keyframes twR { 50% { transform: rotate(9deg); } }
 
 .badge {
-  position: absolute; z-index: 3; left: -6%; top: 2%;
+  position: absolute; z-index: 3; left: -8%; top: 40%;
   width: clamp(110px, 12vw, 150px); aspect-ratio: 1;
 }
 .badge svg { width: 100%; height: 100%; overflow: visible; }
@@ -238,7 +241,7 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 800; }
 .badge text { font: 800 13.5px var(--sans); letter-spacing: .14em; fill: var(--ink); }
 @keyframes spin { to { transform: rotate(360deg); } }
 .bubble {
-  position: absolute; z-index: 4; right: 2%; top: -2%;
+  position: absolute; z-index: 4; right: -2%; top: -4%;
   max-width: 13em; padding: .6rem 1rem;
   border: var(--line); border-radius: 20px 20px 4px 20px;
   background: var(--paper); color: var(--ink);
@@ -418,7 +421,7 @@ footer nav a:hover { color: var(--pink); }
   .cta .btn { width: 100%; }
   .hero-art { max-width: 300px; }
   .bubble { font-size: 1.3rem; }
-  .badge { left: -4%; }
+  .badge { left: -6%; }
   .shot .sticker { display: none; }
   .beat { box-shadow: 6px 6px 0 var(--ink); }
   .peek { width: 110px; top: -62px; }
@@ -648,7 +651,77 @@ footer nav a:hover { color: var(--pink); }
    change it here. */
 window.I18N = (() => {
   const RU = {
-
+    "meta.title": "Mari · Другие программы нервно курят",
+    "meta.description": "Мари превращает сырой черновик в книгу, которой хочется хвастаться. Бесплатная программа для писателей на Windows, macOS и Linux.",
+    "nav.home": "Мари, в\u00a0начало страницы",
+    "nav.cta": "Скачать",
+    "lang.label": "Язык",
+    "hero.sticker": "✍️ Для романистов",
+    "hero.h1": "Другие программы <em class=\"gold\">нервно курят.</em>",
+    "hero.sub": "Мари превращает твой сырой черновик в\u00a0книгу, которой хочется хвастаться. И\u00a0не\u00a0берёт за\u00a0это ни\u00a0копейки.",
+    "hero.cta": "Скачать бесплатно",
+    "hero.platforms": "Windows · Mac · Linux",
+    "hero.badge": "БЕСПЛАТНО ✶ БЕЗ АККАУНТА ✶",
+    "hero.petLabel": "Погладить Мари",
+    "cat.hello": "Привет, я\u00a0Мари. Погладь меня.",
+    "cat.line1": "Мрр?",
+    "cat.line2": "У\u00a0тебя дыра в\u00a0сюжете. Прикройся.",
+    "cat.line3": "Это наречие? Под нож.",
+    "cat.line4": "Третья глава сыровата. Уж\u00a0я-то знаю.",
+    "cat.line5": "Я\u00a0посидела на\u00a0клавиатуре. Не\u00a0благодари.",
+    "cat.line6": "Убей своих любимцев. Кроме меня.",
+    "cat.line7": "Делу время, котику час.",
+    "shot.alt": "Окно Мари с\u00a0открытой главой: фрагменты размечены цветом, слева список глав, справа карта главы",
+    "shot.s1": "Твоя книга. При параде.",
+    "shot.s2": "100% бесплатно",
+    "band.1": "Бесплатно навсегда",
+    "band.2": "Без регистрации",
+    "band.3": "Без подписки",
+    "band.4": "Файлы остаются у\u00a0тебя",
+    "band.5": "Windows, Mac и\u00a0Linux",
+    "band.6": "Кошка в\u00a0комплекте",
+    "reasons.h2": "Четыре причины сжечь <em>мосты.</em>",
+    "b1.h3": "Читай глазами <em>редактора.</em>",
+    "b1.p": "Отмечай, где текст поёт, где провисает и\u00a0что стоит не\u00a0на\u00a0своём месте. Прямо на\u00a0странице.",
+    "b1.alt": "Фрагменты главы размечаются разными цветами",
+    "b2.h3": "Переписывай <em>без страха.</em>",
+    "b2.p": "Пробуй новый вариант прямо рядом со\u00a0старым. Ни\u00a0одна заменённая версия не\u00a0пропадёт.",
+    "b2.alt": "Два варианта фрагмента рядом, изменённые слова выделены",
+    "b3.h3": "Убей своих любимцев. Пусть сыграют <em>в\u00a0ящик.</em>",
+    "b3.p": "Вырезанные сцены летят в\u00a0«Ящик», а\u00a0не\u00a0в\u00a0корзину. Достанешь, когда захочешь.",
+    "b3.alt": "Вырезанный фрагмент уходит в\u00a0«Ящик», а\u00a0потом его достают и\u00a0перечитывают",
+    "b4.h3": "А\u00a0теперь просто <em>пиши.</em>",
+    "b4.p": "Одна клавиша, и\u00a0исчезает всё, кроме твоих слов.",
+    "b4.alt": "Режим фокусировки: на\u00a0экране ничего, кроме текста",
+    "trailer.h2": "Мари <em>в\u00a0деле.</em>",
+    "dl.pixelAlt": "Кошка Мари моргает и\u00a0вылизывает лапку",
+    "dl.kick": "Скачать",
+    "dl.h2": "Второй черновик тебя заждался.",
+    "dl.lede": "Мари работает на\u00a0Windows, macOS и\u00a0Linux. Выбирай свою систему и\u00a0садись писать.",
+    "dl.rec": "Твой компьютер",
+    "dl.win.btn": "Скачать установщик",
+    "dl.win.alt": "Или <a data-asset=\"msi\" href=\"https://github.com/spacekestrel/mari/releases/latest\">.msi</a>, если на\u00a0работе нужен именно он",
+    "dl.mac.btn": "Apple silicon (M1 и\u00a0новее)",
+    "dl.mac.alt": "Mac постарше? Бери <a data-asset=\"dmg-intel\" href=\"https://github.com/spacekestrel/mari/releases/latest\">версию для Intel</a>",
+    "dl.mac.intelBtn": "Mac на\u00a0Intel",
+    "dl.mac.armPrefix": "Mac поновее? Бери ",
+    "dl.mac.armLink": "версию для Apple silicon",
+    "dl.linux.btn": ".AppImage, работает везде",
+    "dl.linux.alt": "Или <a data-asset=\"deb\" href=\"https://github.com/spacekestrel/mari/releases/latest\">.deb</a> для Debian и\u00a0Ubuntu, <a data-asset=\"rpm\" href=\"https://github.com/spacekestrel/mari/releases/latest\">.rpm</a> для Fedora",
+    "dl.mobile": "Мари живёт на\u00a0компьютере, а\u00a0не\u00a0в\u00a0телефоне. Открой эту страницу на\u00a0ноутбуке или ПК\u00a0и\u00a0скачай её.",
+    "dl.warn.summary": "Windows или macOS ворчит при первом запуске? Тебе сюда.",
+    "dl.warn.p1": "Apple и\u00a0Microsoft берут деньги за\u00a0сертификат, который отключает их\u00a0предупреждения. Мари бесплатная и\u00a0платить не\u00a0стала, вот обе системы разок и\u00a0ворчат. С\u00a0файлом всё в\u00a0порядке.",
+    "dl.warn.p2": "<strong>Windows</strong> пугает: «Система Windows защитила ваш компьютер». Нажми <em>Подробнее</em>, а\u00a0потом <em>Выполнить в\u00a0любом случае</em>.",
+    "dl.warn.p3": "<strong>macOS</strong> уверяет, что Мари повреждена. Не\u00a0верь. Перетащи её\u00a0в\u00a0папку «Программы», открой <em>Терминал</em>, один раз вставь эту строку, а\u00a0потом открывай Мари как обычно:",
+    "dl.copy": "Копировать",
+    "dl.copied": "Скопировано",
+    "dl.beta": "Версия <span data-version>0.2.7</span>. Можно работать каждый день, но\u00a0кое-где ещё попадаются шероховатости.",
+    "dl.bug": "Попалась? Напиши нам",
+    "footer.tagline": "Мари вообще-то кошка. <em>А\u00a0ещё так зовут программу для писателей.</em>",
+    "footer.github": "GitHub",
+    "footer.downloads": "Все загрузки",
+    "footer.bug": "Сообщить об\u00a0ошибке",
+    "footer.license": "AGPL-3.0"
   };
 
   // English lines that only the script shows (the cat's lines, button states)
