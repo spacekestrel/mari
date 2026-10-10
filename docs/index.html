@@ -586,7 +586,8 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 .rc-items li span:first-child, .rc-sum span:first-child { min-width: 0; font: 700 1em/1.5 var(--sans); }
 .rc-items li i, .rc-sum i { flex: 1; min-width: 1.5rem; border-bottom: 2px dotted rgba(20, 18, 15, .35); translate: 0 -.35em; }
 .rc-items li span:last-child, .rc-sum span:last-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
-.rc-sum div { color: #4a463e; }
+.rc-items .tick { flex: none; font: 900 1.1em/1 var(--sans); color: #2e9b4f; }
+.rc-items li.cat span:first-child { font: 600 1.7em/1.1 var(--hand); }
 .rc-sum .total { align-items: center; margin-top: .6rem; color: var(--ink); }
 .rc-sum .total > span:first-child { font: 900 1.9em/1 var(--display); font-variation-settings: "SOFT" 100, "WONK" 1; }
 .tot-v { position: relative; display: inline-block; padding: 0 .12em; font: 900 clamp(2.6rem, 4.6vw, 3.6rem)/1 var(--display); font-variation-settings: "SOFT" 100, "WONK" 1; letter-spacing: -.03em; isolation: isolate; }
@@ -600,7 +601,7 @@ html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
 /* a coffee ring: writers' receipts have them */
 .ring { position: absolute; right: -8%; top: 28%; width: 46%; aspect-ratio: 1; opacity: .2; pointer-events: none; fill: none; stroke: #6b3f1d; rotate: 20deg; }
 .paid {
-  position: absolute; z-index: 4; right: 8%; bottom: 29%;
+  position: absolute; z-index: 4; right: 8%; bottom: 9%;
   padding: .2rem .9rem;
   border: 5px solid var(--pink); border-radius: 12px;
   color: var(--pink);
@@ -846,7 +847,7 @@ footer nav a:hover { color: var(--pink); }
   html:lang(ru) .rc h2 { font-size: min(2.5rem, 9vw); }
   .receipt-wrap { rotate: 0deg; filter: drop-shadow(6px 6px 0 var(--pink)); }
   .receipt { font-size: .8rem; }
-  .paid { right: 6%; bottom: 33%; font-size: 1.9rem; }
+  .paid { right: 6%; bottom: 9%; font-size: 1.9rem; }
   .fz h2 { font-size: min(2.8rem, 11vw); }
   html:lang(ru) .fz h2 { font-size: min(2.5rem, 9.4vw); }
   .fz-key { min-width: 60px; height: 52px; font-size: 1.2rem; }
@@ -1062,38 +1063,33 @@ footer nav a:hover { color: var(--pink); }
 
 <section class="rc" id="free" aria-labelledby="rc-h">
   <div class="wrap rc-grid">
-    <h2 class="split" id="rc-h" data-i18n="rc.h2">Everything else is <em>on the house.</em></h2>
+    <h2 class="split" id="rc-h" data-i18n="rc.h2">What's <em>in the box.</em></h2>
     <div class="receipt-wrap">
     <div class="receipt" role="group" aria-labelledby="rc-h">
       <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="41" stroke-width="5"/><circle cx="50" cy="50" r="37" stroke-width="1.5"/><path d="M14 38a40 40 0 0 1 20-24" stroke-width="7" stroke-linecap="round"/></svg>
       <div class="rc-head"><svg viewBox="150 140 720 740" aria-hidden="true"><path d="M294.5 851.9C217.7 846.1 172.0 812.6 181.1 768.8C184.0 754.8 194.4 741.6 207.6 735.0C211.4 733.1 214.6 731.5 214.8 731.5C214.9 731.4 213.9 726.9 212.6 721.4C203.0 681.8 206.9 638.0 223.5 598.5C243.8 550.2 280.0 510.3 329.0 482.5C333.7 479.8 337.7 477.5 337.9 477.4C338.1 477.2 336.4 472.7 334.2 467.3C319.9 432.7 321.2 401.7 338.8 361.4C341.0 356.4 342.4 350.4 344.0 340.0C353.3 276.7 367.5 228.1 379.3 218.6C384.5 214.5 392.7 213.8 399.1 217.0C411.9 223.5 431.2 247.5 454.1 285.5L463.8 301.5L470.7 301.3C485.5 300.7 510.3 303.5 531.2 308.1L536.8 309.4L552.7 293.9C598.0 250.0 620.0 236.7 633.4 244.9C642.0 250.3 644.6 263.3 643.7 298.4C643.0 325.0 641.5 341.3 636.8 369.0L633.7 387.5L635.0 404.3C639.1 459.6 623.7 496.4 586.5 520.1C579.0 524.8 578.0 525.8 578.3 528.0C578.5 529.4 579.7 535.1 580.9 540.6C587.5 572.0 586.5 592.5 575.4 653.1C566.9 700.0 564.5 738.3 568.9 756.6C570.1 761.4 570.4 761.8 576.0 764.3C599.5 775.1 601.8 813.2 579.6 824.5L573.6 827.5L547.3 827.8C532.8 828.0 521.0 827.9 521.0 827.6C521.0 827.4 521.9 825.6 522.9 823.8C530.6 810.8 529.1 792.8 519.2 779.8C508.0 765.0 488.3 757.8 463.8 759.6C458.9 760.0 455.0 759.9 455.0 759.5C455.0 759.1 455.6 756.2 456.4 753.1C466.8 712.6 449.4 665.6 417.2 646.7C404.7 639.4 389.4 635.0 381.5 636.4C376.8 637.3 377.4 637.8 388.6 642.8C418.6 655.9 438.4 679.8 444.6 710.0C446.4 719.1 446.2 744.0 444.1 751.0C443.6 752.9 442.6 756.4 442.0 758.8C441.4 761.1 440.4 763.0 439.7 763.0C439.0 763.0 427.9 765.9 415.0 769.4C385.7 777.3 372.8 780.4 357.5 783.0C324.4 788.7 288.7 787.3 262.5 779.4C251.0 775.9 246.6 775.7 246.2 778.7C245.8 781.7 249.1 784.4 257.4 787.9C276.3 795.8 295.5 798.4 328.0 797.7C358.3 796.9 372.1 794.6 405.5 784.6C446.9 772.3 469.4 769.2 487.3 773.4C513.7 779.6 524.4 803.6 510.0 824.5C503.9 833.4 496.8 835.8 473.5 837.0C459.6 837.7 452.3 838.7 434.0 842.3C406.0 848.0 394.3 849.7 372.0 851.5C353.3 853.1 312.7 853.3 294.5 851.9Z"/><rect x="771" y="164" width="48" height="668" rx="24"/></svg><b>MARI</b><span data-i18n="rc.shop">Writing supplies and one cat</span><span data-i18n="rc.order">Order #0007 · 03:12 a.m.</span></div>
       <div class="rc-rule"></div>
       <ul class="rc-items">
-            <li><span data-i18n="rc.i1">Focus mode</span><i></i><span data-i18n="rc.price">0.00</span></li>
-            <li><span data-i18n="rc.i2">Book fonts × 5</span><i></i><span data-i18n="rc.price">0.00</span></li>
-            <li><span data-i18n="rc.i3">Light and dark</span><i></i><span data-i18n="rc.price">0.00</span></li>
-            <li><span data-i18n="rc.i4">Project folders</span><i></i><span data-i18n="rc.price">0.00</span></li>
-            <li><span data-i18n="rc.i5">Opens where you left off</span><i></i><span data-i18n="rc.price">0.00</span></li>
-            <li><span data-i18n="rc.i6">Unsaved work, kept safe</span><i></i><span data-i18n="rc.price">0.00</span></li>
-            <li><span data-i18n="rc.i7">Live word count</span><i></i><span data-i18n="rc.price">0.00</span></li>
-            <li><span data-i18n="rc.i8">Opens .docx, .md, .txt</span><i></i><span data-i18n="rc.price">0.00</span></li>
-            <li><span data-i18n="rc.i9">Reading view for Markdown</span><i></i><span data-i18n="rc.price">0.00</span></li>
-            <li><span data-i18n="rc.i10">5 languages</span><i></i><span data-i18n="rc.price">0.00</span></li>
+            <li><span data-i18n="rc.i1">Focus mode</span><i></i><b class="tick" aria-hidden="true">✓</b></li>
+            <li><span data-i18n="rc.i2">Book fonts × 5</span><i></i><b class="tick" aria-hidden="true">✓</b></li>
+            <li><span data-i18n="rc.i3">Light and dark</span><i></i><b class="tick" aria-hidden="true">✓</b></li>
+            <li><span data-i18n="rc.i4">Project folders</span><i></i><b class="tick" aria-hidden="true">✓</b></li>
+            <li><span data-i18n="rc.i5">Opens where you left off</span><i></i><b class="tick" aria-hidden="true">✓</b></li>
+            <li><span data-i18n="rc.i6">Unsaved work, kept safe</span><i></i><b class="tick" aria-hidden="true">✓</b></li>
+            <li><span data-i18n="rc.i7">Live word count</span><i></i><b class="tick" aria-hidden="true">✓</b></li>
+            <li><span data-i18n="rc.i8">Opens .docx, .md, .txt</span><i></i><b class="tick" aria-hidden="true">✓</b></li>
+            <li><span data-i18n="rc.i9">Reading view for Markdown</span><i></i><b class="tick" aria-hidden="true">✓</b></li>
+            <li><span data-i18n="rc.i10">5 languages</span><i></i><b class="tick" aria-hidden="true">✓</b></li>
+            <li class="cat"><span data-i18n="rc.i11">1 × cat</span><i></i><b class="tick" aria-hidden="true">✓</b></li>
       </ul>
       <div class="rc-rule"></div>
-      <div class="rc-sum">
-        <div><span data-i18n="rc.sub">Subtotal</span><i></i><span data-i18n="rc.price">0.00</span></div>
-        <div><span data-i18n="rc.tax">Subscription</span><i></i><span data-i18n="rc.price">0.00</span></div>
-        <div class="total"><span data-i18n="rc.total">Total</span><i></i><span class="tot-v"><span class="swipe" aria-hidden="true"></span><span data-i18n="rc.price">0.00</span><svg class="pen" viewBox="0 0 200 100" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M150 14C108 0 36 6 16 36 2 58 30 86 92 90 160 94 196 72 190 44 184 18 126 6 70 14"/></svg></span></div>
-      </div>
-      <div class="rc-rule"></div>
       <div class="rc-foot">
-        <strong data-i18n="rc.paidby">Paid by: nobody</strong>
+        <strong data-i18n="rc.paidby">Packed by: Mari</strong>
         <span data-i18n="rc.thanks">Thank you for writing!</span>
         <span class="barcode" aria-hidden="true"></span>
         <small aria-hidden="true">0 0 0 0 0 7</small>
       </div>
-      <span class="paid" aria-hidden="true" data-i18n="rc.stamp">PAID</span>
+      <span class="paid" aria-hidden="true" data-i18n="rc.stamp">PACKED</span>
       <svg class="paw" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="42" rx="14" ry="12"/><ellipse cx="14" cy="26" rx="6" ry="8"/><ellipse cx="25" cy="16" rx="6" ry="8"/><ellipse cx="39" cy="16" rx="6" ry="8"/><ellipse cx="50" cy="26" rx="6" ry="8"/></svg>
     </div>
     </div>
@@ -1337,7 +1333,7 @@ window.I18N = (() => {
     "mf.c8": "Отправляй.",
     "mf.c8t": "Они откроют ровно то, что видишь ты.",
     "mf.to": "Кому: бета-ридерам",
-    "rc.h2": "Всё остальное <em>за\u00a0счёт заведения.</em>",
+    "rc.h2": "Что <em>в\u00a0коробке.</em>",
     "rc.shop": "Всё для\u00a0письма и\u00a0одна кошка",
     "rc.order": "Заказ #0007 · 03:12",
     "rc.i1": "Режим фокусировки",
@@ -1354,9 +1350,9 @@ window.I18N = (() => {
     "rc.sub": "Подытог",
     "rc.tax": "Подписка",
     "rc.total": "ИТОГ",
-    "rc.paidby": "Оплатил: никто",
+    "rc.paidby": "Упаковала: Мари",
     "rc.thanks": "Спасибо, что пишешь!",
-    "rc.stamp": "ОПЛАЧЕНО",
+    "rc.stamp": "УПАКОВАНО",
     "fz.chapters": "Главы",
     "fz.ch1": "01 · Дождь",
     "fz.ch2": "02 · Контора",
@@ -1404,7 +1400,8 @@ window.I18N = (() => {
     "dm.app.s1": "Один раз сделай файл исполняемым:",
     "dm.app.s2": "Дважды щёлкни по\u00a0нему и\u00a0пиши.",
     "dm.deb.s1": "Установи пакет из\u00a0папки «Загрузки»:",
-    "dm.lin.s2": "Найди Мари среди приложений и\u00a0пиши."
+    "dm.lin.s2": "Найди Мари среди приложений и\u00a0пиши.",
+    "rc.i11": "1 × кошка"
   };
   const DE = {
     "band.1": "Kostenlos",
@@ -1527,7 +1524,7 @@ window.I18N = (() => {
     "nav.footer": "Fußzeile",
     "nav.home": "Mari, zurück nach oben",
     "nav.main": "Hauptnavigation",
-    "rc.h2": "Der Rest <em>geht aufs Haus.</em>",
+    "rc.h2": "Was <em>im Karton ist.</em>",
     "rc.i1": "Fokusmodus",
     "rc.i10": "5 Sprachen",
     "rc.i2": "Buchschriften × 5",
@@ -1539,10 +1536,10 @@ window.I18N = (() => {
     "rc.i8": "Öffnet .docx, .md, .txt",
     "rc.i9": "Leseansicht für Markdown",
     "rc.order": "Bestellung #0007 · 03:12 Uhr",
-    "rc.paidby": "Bezahlt von: niemandem",
+    "rc.paidby": "Gepackt von: Mari",
     "rc.price": "0,00",
     "rc.shop": "Schreibwaren und eine Katze",
-    "rc.stamp": "BEZAHLT",
+    "rc.stamp": "GEPACKT",
     "rc.sub": "Zwischensumme",
     "rc.tax": "Abo",
     "rc.thanks": "Danke fürs Schreiben!",
@@ -1570,7 +1567,8 @@ window.I18N = (() => {
     "shot.alt": "Mari mit geöffnetem Kapitel, die Passagen farbig markiert, links die Kapitelliste, rechts eine Karte des Kapitels",
     "shot.s1": "Dein Buch. Aber in schön.",
     "shot.s2": "100\u00a0% gratis",
-    "trailer.h2": "Mari <em>in Aktion.</em>"
+    "trailer.h2": "Mari <em>in Aktion.</em>",
+    "rc.i11": "1 × Katze"
   };
   const ES = {
     "band.1": "Gratis",
@@ -1693,7 +1691,7 @@ window.I18N = (() => {
     "nav.footer": "Pie de página",
     "nav.home": "Mari, volver al inicio",
     "nav.main": "Principal",
-    "rc.h2": "Todo lo demás, <em>invita la casa.</em>",
+    "rc.h2": "Qué hay <em>en la caja.</em>",
     "rc.i1": "Modo concentración",
     "rc.i10": "Interfaz en 5 idiomas",
     "rc.i2": "Fuentes de libro × 5",
@@ -1705,10 +1703,10 @@ window.I18N = (() => {
     "rc.i8": "Abre .docx, .md, .txt",
     "rc.i9": "Modo lectura para Markdown",
     "rc.order": "Pedido #0007 · 03:12 a.\u00a0m.",
-    "rc.paidby": "Pagado por: nadie",
+    "rc.paidby": "Empacado por: Mari",
     "rc.price": "0,00",
     "rc.shop": "Todo para escribir y una gata",
-    "rc.stamp": "PAGADO",
+    "rc.stamp": "EMPACADO",
     "rc.sub": "Subtotal",
     "rc.tax": "Suscripción",
     "rc.thanks": "¡Gracias por escribir!",
@@ -1736,7 +1734,8 @@ window.I18N = (() => {
     "shot.alt": "Mari con un capítulo abierto: sus pasajes marcados en color, la lista de capítulos a la izquierda y un mapa del capítulo a la derecha",
     "shot.s1": "Tu libro. Pero de gala.",
     "shot.s2": "100 % gratis",
-    "trailer.h2": "Mírala <em>en acción.</em>"
+    "trailer.h2": "Mírala <em>en acción.</em>",
+    "rc.i11": "1 × gata"
   };
   const ZH = {
     "band.1": "免费",
@@ -1859,7 +1858,7 @@ window.I18N = (() => {
     "nav.footer": "页脚导航",
     "nav.home": "Mari，回到顶部",
     "nav.main": "主导航",
-    "rc.h2": "其余一切，<em>本店请客。</em>",
+    "rc.h2": "箱子里有<em>什么。</em>",
     "rc.i1": "专注模式",
     "rc.i10": "5 种界面语言",
     "rc.i2": "书籍字体 × 5",
@@ -1871,10 +1870,10 @@ window.I18N = (() => {
     "rc.i8": "通吃 .docx、.md、.txt",
     "rc.i9": "Markdown 阅读模式",
     "rc.order": "订单 #0007 · 凌晨 03:12",
-    "rc.paidby": "付款人：查无此人",
+    "rc.paidby": "打包员：Mari",
     "rc.price": "0.00",
     "rc.shop": "写作用品，外加一只猫",
-    "rc.stamp": "已付款",
+    "rc.stamp": "已打包",
     "rc.sub": "小计",
     "rc.tax": "订阅费",
     "rc.thanks": "谢谢惠顾，接着写！",
@@ -1902,7 +1901,8 @@ window.I18N = (() => {
     "shot.alt": "Mari 里打开着一章，段落用颜色做了标记，左边是章节列表，右边是这一章的地图",
     "shot.s1": "你的书，但开了美颜。",
     "shot.s2": "100% 免费",
-    "trailer.h2": "看她<em>跑起来。</em>"
+    "trailer.h2": "看她<em>跑起来。</em>",
+    "rc.i11": "猫 × 1"
   };
 
   // English lines that only the script shows (the cat's lines, button states)
@@ -2387,8 +2387,6 @@ window.I18N = (() => {
       const at = Math.max(0, (el.offsetTop - 30) / rc.offsetHeight);
       tl.fromTo(el, { autoAlpha: 0, x: -14 }, { autoAlpha: 1, x: 0, duration: 0.05, ease: "power2.out" }, at);
     });
-    tl.fromTo(".tot-v .swipe", { scaleX: 0 }, { scaleX: 1, duration: 0.06, ease: "power2.inOut" }, 0.8);
-    tl.fromTo(".tot-v .pen path", { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.1, ease: "power1.inOut" }, 0.84);
     tl.fromTo(".paid", { autoAlpha: 0, scale: 2.6, rotate: 10 }, { autoAlpha: 0.95, scale: 1, rotate: -14, duration: 0.1, ease: "power4.in" }, 0.92);
     tl.fromTo(".paw", { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 0.6, scale: 1, duration: 0.06, ease: "back.out(3)" }, 1.0);
     tl.to({}, { duration: 0.25 });
