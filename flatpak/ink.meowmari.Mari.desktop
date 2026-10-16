@@ -2,7 +2,7 @@
 Type=Application
 Name=Mari
 GenericName=Writing App
-Comment=Make a messy draft good
+Comment=Minimalist yet powerful writing app
 Exec=mari
 Icon=ink.meowmari.Mari
 Terminal=false

@@ -3,7 +3,7 @@
   <id>ink.meowmari.Mari</id>
 
   <name>Mari</name>
-  <summary>Make a messy draft good</summary>
+  <summary>Minimalist yet powerful writing app</summary>
 
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>AGPL-3.0-or-later</project_license>
@@ -13,33 +13,26 @@
   </developer>
 
   <description>
+    <p>Mari is an app for writing.</p>
     <p>
-      Nothing is finished when it is written. Mari is for what comes after:
-      reading it back, marking what is weak, and making it good.
+      It is minimalist yet powerful, and all of it is aimed at one thing:
+      making the best text possible.
     </p>
     <p>
       Mark a paragraph the way you would on a printed page — good, weak, cut,
-      come back to this. The marks stay with the writing and show in the
-      margin, so the second read is a matter of looking rather than
-      remembering.
-    </p>
-    <p>
-      When something needs rewriting, open it beside the original and work on
-      both at once. What you cut goes to the drawer rather than nowhere, and
-      you can take it back later if it turns out to be wanted after all.
-    </p>
-    <p>
-      It all lives in one file: the writing, the marks, the notes, the old
-      versions, the plan and the drawer. Send that file to somebody and they
-      open exactly what you see.
+      come back to this. Open a rewrite beside the original and work on both
+      at once. What you cut goes to the drawer instead of nowhere, and comes
+      back whenever you want it. Notes, old versions, the plan and a map of
+      the whole piece are all there, and all of it lives in one file you can
+      send to somebody, who opens exactly what you see.
     </p>
     <p>And the rest of it:</p>
     <ul>
       <li>Focus mode — the words, and nothing else on screen</li>
-      <li>A map of the whole piece down the side, marks and all</li>
       <li>Opens and saves Word files, Markdown and plain text</li>
       <li>Your files stay yours: no account, nothing uploaded</li>
       <li>English, Russian, German, Spanish and Chinese</li>
+      <li>Windows, Mac and Linux</li>
       <li>Free, and the source is open</li>
     </ul>
   </description>
