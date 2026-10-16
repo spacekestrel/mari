@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>ink.meowmari.Mari</id>
+
+  <name>Mari</name>
+  <summary>Write, mark up and rewrite</summary>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>AGPL-3.0-or-later</project_license>
+
+  <developer id="ink.meowmari">
+    <name>Kestrel</name>
+  </developer>
+
+  <description>
+    <p>
+      Mari is for long writing — novels, scripts, anything that runs to chapters.
+      Your book is ordinary files in an ordinary folder on your own computer. No
+      account, no subscription, nothing uploaded, and nothing that stops working
+      if a company does.
+    </p>
+    <p>
+      Mark a paragraph the way you would on a printed draft: good, weak, cut,
+      come back to this. The marks stay with the chapter and show in the margin,
+      so the second read is a matter of looking rather than remembering.
+    </p>
+    <p>
+      When a passage needs rewriting, open it beside the original and work on
+      both at once. What you cut goes to the drawer rather than nowhere, and you
+      can take it back later if the book turns out to want it.
+    </p>
+    <p>And the rest of it:</p>
+    <ul>
+      <li>Focus mode — the prose, and nothing else on screen</li>
+      <li>A map of the whole chapter down the side, marks and all</li>
+      <li>Notes on any passage, kept with the chapter rather than beside it</li>
+      <li>Opens and saves Word files, Markdown and plain text</li>
+      <li>English, Russian, German, Spanish and Chinese</li>
+      <li>Free, and the source is open</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">ink.meowmari.Mari.desktop</launchable>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://meowmari.ink/hero-shot.png</image>
+      <caption>A chapter open in Mari, marked up and ready for a second read</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://meowmari.ink/why-mari.png</image>
+      <caption>Highlights in the margin, so the work left to do is visible</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://meowmari.ink/focus-mode.png</image>
+      <caption>Focus mode: the prose and nothing else</caption>
+    </screenshot>
+  </screenshots>
+
+  <url type="homepage">https://meowmari.ink</url>
+  <url type="bugtracker">https://github.com/spacekestrel/mari/issues</url>
+  <url type="vcs-browser">https://github.com/spacekestrel/mari</url>
+
+  <!-- The accent Mari draws its own cursor and highlights in, so the shop
+       banner is the same colour as the app it is selling. -->
+  <branding>
+    <color type="primary" scheme_preference="light">#bd5b2c</color>
+    <color type="primary" scheme_preference="dark">#e08a52</color>
+  </branding>
+
+  <categories>
+    <category>Office</category>
+    <category>WordProcessor</category>
+  </categories>
+
+  <keywords>
+    <keyword>writing</keyword>
+    <keyword>writer</keyword>
+    <keyword>novel</keyword>
+    <keyword>manuscript</keyword>
+    <keyword>chapter</keyword>
+    <keyword>draft</keyword>
+    <keyword>revision</keyword>
+    <keyword>prose</keyword>
+    <keyword>markdown</keyword>
+  </keywords>
+
+  <content_rating type="oars-1.1" />
+
+  <supports>
+    <control>keyboard</control>
+    <control>pointing</control>
+  </supports>
+
+  <requires>
+    <display_length compare="ge">768</display_length>
+  </requires>
+
+  <releases>
+    <release version="0.3.0" date="2026-10-11">
+      <description>
+        <ul>
+          <li>Rename chapters and folders without leaving the sidebar</li>
+          <li>No more stray asterisks appearing around italic words</li>
+          <li>One cursor on screen instead of three</li>
+          <li>A folder that has been moved says so, instead of loading forever</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+</component>

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Mari
+GenericName=Writing App
+Comment=Write, mark up and rewrite
+Exec=mari
+Icon=ink.meowmari.Mari
+Terminal=false
+Categories=Office;WordProcessor;
+Keywords=write;writing;writer;novel;manuscript;chapter;draft;revision;prose;markdown;
+StartupWMClass=Mari
+StartupNotify=true
