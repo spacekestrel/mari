@@ -1,0 +1,53 @@
+{
+  "_readme": "The news card at the foot of Mari's sidebar. Edit this file, push to main, and every copy of Mari picks it up the next time someone opens it. See docs/messages.md for what each field does.",
+  "messages": [
+    {
+      "id": "0-3-0",
+      "title": {
+        "en": "Mari 0.3.0 is out",
+        "ru": "Вышла Mari 0.3.0",
+        "de": "Mari 0.3.0 ist da",
+        "es": "Ya está Mari 0.3.0",
+        "zh": "Mari 0.3.0 已发布"
+      },
+      "body": {
+        "en": "Rename chapters in the sidebar, no more stray asterisks around italics, and one cursor instead of three.",
+        "ru": "Переименование глав в панели, никаких звёздочек вокруг курсива и один курсор вместо трёх.",
+        "de": "Kapitel in der Seitenleiste umbenennen, keine Sternchen mehr um Kursives und ein Cursor statt drei.",
+        "es": "Renombra capítulos en el panel, sin asteriscos alrededor de la cursiva y un solo cursor en vez de tres.",
+        "zh": "在侧栏重命名章节，斜体旁不再冒出星号，光标只剩一个。"
+      },
+      "link": {
+        "url": "https://meowmari.ink",
+        "label": {
+          "en": "Get it",
+          "ru": "Скачать",
+          "de": "Holen",
+          "es": "Descargar",
+          "zh": "下载"
+        }
+      },
+      "forVersionsBelow": "0.3.0"
+    },
+    {
+      "id": "0-2-7-welcome",
+      "title": {
+        "en": "Mari is new",
+        "ru": "Mari только начинается",
+        "de": "Mari ist neu",
+        "es": "Mari acaba de empezar",
+        "zh": "Mari 刚刚起步"
+      },
+      "body": {
+        "en": "Found something broken, or want something it doesn't do? Say so.",
+        "ru": "Что-то сломалось или чего-то не хватает? Напишите.",
+        "de": "Etwas kaputt, oder fehlt etwas? Sag es.",
+        "es": "¿Algo roto, o algo que falta? Dilo.",
+        "zh": "发现问题，或想要某个功能？告诉我。"
+      },
+      "link": {
+        "url": "https://github.com/spacekestrel/mari/issues/new/choose"
+      }
+    }
+  ]
+}

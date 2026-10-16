@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mari · Other writing apps are jealous</title>
+<meta name="description" content="Mari is the free writing app that turns messy drafts into books you're proud of. Windows, macOS and Linux.">
+<meta name="theme-color" content="#2440ff">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Mari · Other writing apps are jealous">
+<meta property="og:description" content="The free writing app that turns messy drafts into books you're proud of.">
+<meta property="og:url" content="https://spacekestrel.github.io/mari/">
+<meta property="og:image" content="https://spacekestrel.github.io/mari/og.png">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="alternate" hreflang="en" href="https://spacekestrel.github.io/mari/?lang=en">
+<link rel="alternate" hreflang="ru" href="https://spacekestrel.github.io/mari/ru/">
+<link rel="alternate" hreflang="x-default" href="https://spacekestrel.github.io/mari/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Fraunces and Bricolage have no Cyrillic, so Russian is set in Literata (the font Mari itself writes in) and Onest -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Caveat:wght@600&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,0..100,0..1;1,9..144,300..900,0..100,0..1&family=JetBrains+Mono:wght@500&family=Literata:ital,opsz,wght@0,7..72,700..900;1,7..72,700..900&family=Onest:wght@400..800&display=swap">
+<!--
+  YOUR OWN MEDIA
+  Drop a video at docs/media/trailer.mp4 (and, if you like, a still at
+  docs/media/trailer-poster.jpg). A "Watch it" section appears above the
+  downloads on its own. Every other picture is a file in docs/, the same
+  ones the README uses: replace one and the page follows.
+
+  LANGUAGES
+  English is written into the page below. Russian lives in the RU block in
+  the script at the bottom. A visitor gets, in this order: the language in
+  the link (?lang=ru), the one they picked before, the one for the country
+  their IP address is in, then their browser's language.
+-->
+<script>
+  // Before anything paints: hold the hero's words back until the language is
+  // settled and the intro is ready to play, so nothing flashes in the wrong
+  // language or jumps. A CSS fallback shows them after 2s whatever happens.
+  (function () {
+    var d = document.documentElement, q = /[?&]lang=(en|ru)\b/.exec(location.search), saved = null;
+    try { saved = localStorage.getItem("mari-lang"); } catch (e) {}
+    var lang = q ? q[1] : (saved === "en" || saved === "ru" ? saved : null);
+    if (lang) d.lang = lang;
+    d.classList.add("i18n-wait");
+  })();
+</script>
+<style>
+/* Layout: a stack of full-bleed colour worlds, each with its own pair, held together by ink outlines and hard shadows */
+:root {
+  --ink: #14120f;
+  --paper: #fff4e4;
+  --cobalt: #2440ff;
+  --gold: #ffc93c;
+  --pink: #ff3d8b;
+  --lime: #d6f53b;
+  --tang: #ff6a2b;
+  --violet: #7d5cff;
+
+  --display: "Fraunces", Georgia, serif;
+  --sans: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --hand: "Caveat", "Comic Sans MS", cursive;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+
+  --wrap: min(1240px, 100% - 32px);
+  --line: 3px solid var(--ink);
+  color-scheme: light;
+}
+/* Russian: the same soft, heavy feel in faces that carry Cyrillic */
+html:lang(ru) {
+  --display: "Literata", "Fraunces", Georgia, serif;
+  --sans: "Onest", "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+html:lang(ru) h1, html:lang(ru) h2, html:lang(ru) h3 { letter-spacing: -.03em; line-height: .92; }
+/* Russian words run long («Переписывай», «программы»): headings step down a size so every word fits its column */
+html:lang(ru) .beat h3 { font-size: clamp(2.3rem, 4.4vw, 4.2rem); }
+html:lang(ru) .reasons-head { font-size: clamp(2.6rem, 7vw, 6.4rem); }
+
+/* while the language is being worked out, the hero's words wait (never longer than 2s) */
+.i18n-wait .hero-copy, .i18n-wait .nav .btn, .i18n-wait .shot .sticker { visibility: hidden; animation: i18n-show 0s 2s forwards; }
+@keyframes i18n-show { to { visibility: visible; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 18px/1.5 var(--sans);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+body::after {
+  content: ""; position: fixed; inset: 0; z-index: 100; pointer-events: none;
+  opacity: .35; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .3 0 0 0 0 .25 0 0 0 0 .2 0 0 0 .2 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+main, footer { overflow-x: clip; }
+img, video { max-width: 100%; height: auto; display: block; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; border-radius: 8px; }
+.wrap { width: var(--wrap); margin-inline: auto; }
+
+h1, h2, h3 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 900;
+  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 144;
+  letter-spacing: -.035em;
+  line-height: .88;
+  text-wrap: balance;
+}
+h1 em, h2 em, h3 em { font-style: italic; font-weight: 800; }
+.wd { display: inline-block; overflow: hidden; vertical-align: top; padding: .02em .14em .12em .04em; margin: -.02em -.14em -.12em -.04em; }
+.wd > span { display: inline-block; }
+
+/* ---------- buttons & stickers ---------- */
+.btn {
+  --bg: var(--pink); --fg: #fff;
+  display: inline-flex; align-items: center; justify-content: center; gap: .6em;
+  min-height: 60px; padding: .9em 1.8em;
+  border-radius: 999px; border: var(--line);
+  background: var(--bg); color: var(--fg);
+  font: 800 1.1rem/1 var(--sans);
+  text-decoration: none;
+  box-shadow: 0 6px 0 var(--ink);
+  transition: transform .15s, box-shadow .15s;
+  cursor: pointer;
+}
+@media (hover: hover) { .btn:hover { transform: translateY(-3px) rotate(-1.5deg); box-shadow: 0 9px 0 var(--ink); } }
+.btn:active { transform: translateY(5px); box-shadow: 0 1px 0 var(--ink); }
+
+.sticker {
+  display: inline-flex; align-items: center; gap: .4em;
+  padding: .45em 1em;
+  border: var(--line); border-radius: 999px;
+  background: var(--bg, var(--lime)); color: var(--ink);
+  font: 800 .95rem/1 var(--sans);
+  box-shadow: 4px 4px 0 var(--ink);
+  rotate: var(--r, -4deg);
+  white-space: nowrap;
+}
+
+/* ---------- nav ---------- */
+.nav {
+  position: fixed; z-index: 50;
+  top: calc(14px + env(safe-area-inset-top, 0px)); left: 50%;
+  width: min(1240px, 100% - 24px);
+  transform: translateX(-50%);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 8px 8px 18px;
+  border: var(--line); border-radius: 999px;
+  background: var(--paper);
+  box-shadow: 0 5px 0 var(--ink);
+  transition: transform .35s;
+}
+.nav.hide { transform: translate(-50%, -160%); }
+.brand { display: flex; align-items: center; gap: .5rem; flex: none; text-decoration: none; font: 900 1.45rem/1 "Fraunces", Georgia, serif; font-variation-settings: "SOFT" 100, "WONK" 1; }
+.brand svg { width: 30px; height: 30px; fill: var(--ink); }
+.nav-end { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.nav .btn { min-height: 46px; padding: .6em 1.3em; font-size: 1rem; box-shadow: 0 4px 0 var(--ink); white-space: nowrap; }
+
+/* language picker: a real <select> laid invisibly over a chunky pill, so phones get their own native picker */
+.lang {
+  position: relative;
+  display: inline-flex; align-items: center; gap: .35rem;
+  height: 46px; padding: 0 .85rem 0 .7rem;
+  border: var(--line); border-radius: 999px;
+  background: var(--gold); color: var(--ink);
+  font: 800 .95rem/1 var(--sans);
+  box-shadow: 0 4px 0 var(--ink);
+  cursor: pointer;
+}
+.lang svg { width: 18px; height: 18px; flex: none; }
+.lang .caret { font-size: .7em; }
+.lang select {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: 0; cursor: pointer;
+  font-size: 16px; /* 16px keeps iOS from zooming in when it opens */
+  border: 0; appearance: none; -webkit-appearance: none;
+}
+.lang:focus-within { outline: 3px solid var(--pink); outline-offset: 3px; }
+@media (hover: hover) { .lang:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--ink); } }
+.lang { transition: transform .15s, box-shadow .15s; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- hero ---------- */
+.hero {
+  position: relative;
+  background: var(--cobalt);
+  color: var(--paper);
+  padding: calc(126px + env(safe-area-inset-top, 0px)) 0 clamp(3rem, 6vw, 5.5rem);
+  border-radius: 0 0 clamp(36px, 6vw, 80px) clamp(36px, 6vw, 80px);
+  isolation: isolate;
+}
+.hero::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(circle at 15% 20%, rgba(255,255,255,.12) 0 2px, transparent 3px) 0 0 / 34px 34px;
+}
+.hero-grid { display: grid; grid-template-columns: 1.4fr .6fr; gap: 2rem; align-items: end; }
+.hero h1 { font-size: clamp(3rem, 6.4vw, 6.6rem); color: var(--paper); }
+html:lang(ru) .hero h1 { font-size: clamp(2.5rem, 5vw, 5.1rem); }
+.hero h1 .gold { color: var(--gold); }
+.hero .sticker { --bg: var(--lime); margin-bottom: 1.6rem; font-size: 1rem; }
+.hero .sub { margin: 1.4rem 0 1.8rem; max-width: 30em; font-size: clamp(1.15rem, 1.7vw, 1.4rem); font-weight: 500; color: #dfe3ff; }
+.cta { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.4rem; }
+.cta small { font-weight: 600; color: #c8cdff; font-size: .98rem; }
+
+.hero-art { position: relative; width: 100%; max-width: 470px; justify-self: center; aspect-ratio: 1 / 1.05; }
+.cat-btn { position: absolute; inset: 0; padding: 0; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.cat-btn .mari { width: 100%; height: 100%; }
+.cat-btn.hop .mari { animation: hop .5s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes hop { 30% { transform: translateY(-7%) scale(.97, 1.05); } 60% { transform: translateY(0) scale(1.04, .96); } }
+.mari { overflow: visible; }
+.mari .body, .mari .wh, .mari .caret { fill: var(--ink); }
+.mari .eye { fill: var(--paper); transform-box: fill-box; transform-origin: center; animation: blink 5s infinite; }
+.mari .eyes { transition: transform .25s ease-out; }
+.mari .caret { animation: caret 1.1s steps(1) infinite; }
+.mari .shadow { fill: rgba(0,0,0,.22); }
+.mari .wh { transform-box: fill-box; }
+.mari .wh-l { transform-origin: right center; }
+.mari .wh-r { transform-origin: left center; }
+.mari:hover .wh-l { animation: twL .5s ease-in-out 2; }
+.mari:hover .wh-r { animation: twR .5s ease-in-out 2 .1s; }
+@keyframes blink { 0%, 93%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.08); } }
+@keyframes caret { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0; } }
+@keyframes twL { 50% { transform: rotate(-9deg); } }
+@keyframes twR { 50% { transform: rotate(9deg); } }
+
+.badge {
+  position: absolute; z-index: 3; left: -8%; top: 40%;
+  width: clamp(110px, 12vw, 150px); aspect-ratio: 1;
+}
+.badge svg { width: 100%; height: 100%; overflow: visible; }
+.badge .ring { animation: spin 14s linear infinite; transform-origin: 50% 50%; transform-box: fill-box; }
+.badge text { font: 800 13.5px var(--sans); letter-spacing: .14em; fill: var(--ink); }
+@keyframes spin { to { transform: rotate(360deg); } }
+.bubble {
+  position: absolute; z-index: 4; right: -2%; top: -4%;
+  max-width: 13em; padding: .6rem 1rem;
+  border: var(--line); border-radius: 20px 20px 4px 20px;
+  background: var(--paper); color: var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+  font: 600 1.6rem/1.05 var(--hand);
+  opacity: 0; transform: translateY(10px) scale(.9); transform-origin: bottom right;
+  transition: opacity .2s, transform .3s cubic-bezier(.3, 1.6, .5, 1);
+  pointer-events: none;
+}
+.bubble.show { opacity: 1; transform: none; }
+.hearts { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.heart { position: absolute; font-size: 1.8rem; color: var(--pink); animation: heart 1.2s ease-out forwards; }
+@keyframes heart { from { opacity: 1; transform: scale(.6); } to { opacity: 0; transform: translate(var(--x), -150px) scale(1.3) rotate(var(--rot)); } }
+
+/* the app itself, as a big tilted card */
+.shot { position: relative; padding: clamp(3.5rem, 7vw, 6rem) 0 0; z-index: 2; }
+.shot-card {
+  position: relative;
+  max-width: 1080px; margin: 0 auto;
+  border: var(--line); border-radius: 22px;
+  background: #1f1e1a;
+  box-shadow: 12px 12px 0 var(--ink);
+  rotate: -2deg;
+}
+.shot-card img { border-radius: 19px; }
+.shot .sticker { position: absolute; z-index: 3; font-size: clamp(.9rem, 1.4vw, 1.15rem); }
+.shot .s1 { --bg: var(--gold); --r: 6deg; right: 4%; top: clamp(2rem, 5vw, 4.2rem); }
+.shot .s2 { --bg: var(--pink); --r: -7deg; left: 3%; bottom: 12%; color: #fff; }
+
+/* ---------- marquee ---------- */
+.band {
+  position: relative; z-index: 1;
+  margin: 0 -2vw;
+  padding: clamp(.5rem, 1.2vw, 1rem) 0;
+  background: var(--lime);
+  border-block: var(--line);
+  overflow: hidden;
+}
+.band-track { display: flex; width: max-content; animation: marquee 48s linear infinite; }
+.band-track span {
+  display: inline-flex; align-items: center; gap: .3em; padding-right: .3em;
+  font: 900 clamp(2.6rem, 8vw, 7.4rem)/1 var(--display);
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+  white-space: nowrap;
+}
+.band-track span::after { content: "✶"; color: var(--pink); font-size: .6em; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* ---------- reasons ---------- */
+.reasons { padding: clamp(5rem, 11vw, 9rem) 0 clamp(3rem, 6vw, 5rem); }
+.reasons-head { font-size: clamp(3rem, 8.5vw, 7.6rem); max-width: 10em; }
+.reasons-head em { color: var(--pink); }
+.beats { display: grid; gap: 36px; margin-top: clamp(3rem, 6vw, 5rem); }
+.beat {
+  --bg: var(--lime); --acc: var(--pink); --fg: var(--ink);
+  position: sticky; top: calc(100px + env(safe-area-inset-top, 0px));
+  display: grid; grid-template-columns: .9fr 1.1fr; align-items: center; gap: clamp(1.5rem, 4vw, 4rem);
+  min-height: min(620px, calc(100vh - 140px));
+  padding: clamp(1.8rem, 4.5vw, 4rem);
+  border: var(--line); border-radius: clamp(28px, 4vw, 48px);
+  background: var(--bg); color: var(--fg);
+  box-shadow: 10px 10px 0 var(--ink);
+  transform-origin: 50% 0;
+}
+.beat > * { min-width: 0; }
+.beat .num {
+  display: inline-grid; place-items: center;
+  width: 64px; height: 64px; margin-bottom: 1.4rem;
+  border: var(--line); border-radius: 50%;
+  background: var(--acc); color: var(--ink);
+  font: 900 1.9rem/1 var(--display);
+  box-shadow: 3px 3px 0 var(--ink);
+  rotate: -8deg;
+}
+.beat h3 { font-size: clamp(2.7rem, 6vw, 5.4rem); }
+.beat h3 em { color: var(--acc); }
+.beat p { margin: 1.3rem 0 0; max-width: 22em; font-size: clamp(1.1rem, 1.6vw, 1.35rem); font-weight: 500; }
+.beat .media { position: relative; }
+.beat .media::before {
+  content: ""; position: absolute; inset: 8% -6% -8% 8%; z-index: 0;
+  border-radius: 50% 44% 52% 40%;
+  background: var(--acc);
+}
+.beat .frame {
+  position: relative; z-index: 1;
+  border: var(--line); border-radius: 18px;
+  background: #1f1e1a;
+  box-shadow: 8px 8px 0 var(--ink);
+  overflow: hidden;
+  rotate: 2.5deg;
+}
+.beat:nth-child(even) .frame { rotate: -2.5deg; }
+.b1 { --bg: var(--lime); --acc: var(--pink); }
+.b2 { --bg: var(--tang); --acc: var(--gold); }
+.b3 { --bg: var(--pink); --acc: var(--lime); }
+.b4 { --bg: var(--ink); --acc: var(--gold); --fg: var(--paper); }
+.b4 .frame { border-color: var(--paper); }
+.peek { position: absolute; z-index: 0; left: 12%; top: -86px; width: 150px; }
+.peek .mari { width: 100%; display: block; }
+.b3 .media { margin-top: 70px; }
+
+/* ---------- trailer ---------- */
+.trailer { padding: clamp(3rem, 6vw, 5rem) 0; }
+.trailer h2 { font-size: clamp(2.6rem, 6vw, 5rem); text-align: center; margin-bottom: 2.4rem; }
+.trailer .vid { max-width: 1000px; margin: 0 auto; border: var(--line); border-radius: 22px; overflow: hidden; box-shadow: 12px 12px 0 var(--ink); background: #000; }
+
+/* ---------- download ---------- */
+.download { padding: clamp(7rem, 12vw, 10rem) 0 0; }
+.dl {
+  position: relative;
+  padding: clamp(2rem, 6vw, 4.5rem);
+  border-radius: clamp(28px, 5vw, 48px);
+  background:
+    radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--gold) 70%, transparent), transparent 45%),
+    radial-gradient(circle at 95% 20%, color-mix(in srgb, var(--violet) 70%, transparent), transparent 45%),
+    radial-gradient(circle at 60% 120%, color-mix(in srgb, var(--tang) 60%, transparent), transparent 50%),
+    var(--pink);
+  border: var(--line);
+  box-shadow: 10px 10px 0 var(--ink);
+}
+.dl .pixel { position: absolute; top: -118px; left: clamp(1.5rem, 6vw, 4.5rem); width: 106px; image-rendering: pixelated; }
+.dl .kick { display: inline-flex; align-items: center; gap: .55em; margin: 0 0 1.2rem; font: 600 .82rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; }
+.dl .kick::before { content: ""; width: 26px; height: 10px; border-radius: 3px; background: var(--ink); transform: skewX(-12deg); }
+.dl h2 { font-size: clamp(2.6rem, 6vw, 4.8rem); max-width: 12em; }
+.dl .lede { margin: 1rem 0 0; font-size: clamp(1.1rem, 1.6vw, 1.3rem); }
+.oses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 2.4rem; }
+.os { position: relative; display: flex; flex-direction: column; gap: .8rem; padding: 1.4rem; border-radius: 20px; background: #fffdf8; border: 2px solid var(--ink); }
+.os.rec { box-shadow: 0 0 0 4px var(--gold), 0 0 0 6px var(--ink); }
+.os.rec::before { content: attr(data-rec); position: absolute; top: -13px; right: 16px; padding: .15rem .7rem; border-radius: 999px; background: var(--gold); border: 2px solid var(--ink); font: 700 .75rem var(--sans); }
+.os h3 { display: flex; align-items: center; gap: .6rem; font-size: 1.7rem; letter-spacing: -.02em; }
+.os h3 svg { width: 28px; height: 28px; }
+.os .btn { min-height: 50px; font-size: .98rem; padding: .7em 1.1em; box-shadow: 0 4px 0 var(--ink); }
+.os .alt { font-size: .9rem; color: #6c665a; }
+.os .alt a { font-weight: 700; color: var(--ink); }
+.warn { margin-top: 1.4rem; border-radius: 18px; background: rgba(255,253,248,.88); border: 2px solid var(--ink); }
+.warn summary { cursor: pointer; padding: 1rem 1.3rem; font-weight: 700; list-style: none; display: flex; align-items: center; gap: .7rem; }
+.warn summary::-webkit-details-marker { display: none; }
+.warn summary::before { content: "+"; display: grid; place-items: center; flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 1.1rem; transition: transform .2s; }
+.warn[open] summary::before { transform: rotate(45deg); }
+.warn .in-warn { padding: 0 1.3rem 1.3rem; display: grid; gap: .8rem; max-width: 52em; }
+.warn p { margin: 0; }
+.cmd { display: flex; align-items: center; gap: .6rem; padding: .5rem .5rem .5rem 1rem; border-radius: 12px; background: var(--ink); color: var(--paper); font: 500 .9rem var(--mono); overflow-x: auto; }
+.cmd code { white-space: nowrap; flex: 1; }
+.cmd button { flex: none; border: 0; border-radius: 8px; padding: .45rem .8rem; background: var(--gold); color: var(--ink); font: 700 .8rem var(--sans); cursor: pointer; }
+.dl-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1.5rem; margin-top: 2rem; font-weight: 600; }
+.dl-meta .beta { padding: .25rem .7rem; border-radius: 999px; background: var(--ink); color: var(--paper); font: 600 .78rem var(--mono); }
+.mobile-note { display: none; margin-top: 1.4rem; padding: 1rem 1.2rem; border-radius: 16px; background: var(--ink); color: var(--paper); font-weight: 600; }
+.is-mobile .mobile-note { display: block; }
+
+/* ---------- footer ---------- */
+footer { padding: clamp(5rem, 10vw, 8rem) 0 3rem; text-align: center; }
+.sleep { position: relative; width: 150px; margin: 0 auto 1.6rem; }
+.sleep .closed { fill: none; stroke: var(--paper); stroke-width: 7; stroke-linecap: round; }
+.sleep .mari .caret { animation-duration: 2.2s; }
+.sleep .mari .shadow { fill: rgba(20,18,15,.12); }
+.zzz { position: absolute; left: 62%; top: 0; font: 600 1.6rem var(--hand); color: #8a8274; }
+.zzz span { position: absolute; opacity: 0; animation: z 3s ease-in infinite; }
+.zzz span:nth-child(2) { animation-delay: 1s; }
+.zzz span:nth-child(3) { animation-delay: 2s; }
+@keyframes z { 0% { opacity: 0; transform: scale(.6); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(30px, -60px) scale(1.2); } }
+footer .tagline { margin: 0; font: 700 clamp(1.6rem, 3.5vw, 2.6rem)/1.1 var(--display); font-variation-settings: "SOFT" 100, "WONK" 1; }
+footer .tagline em { font-weight: 400; }
+footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem 1.6rem; margin-top: 1.6rem; color: #6c665a; }
+footer nav a { text-decoration: none; font-weight: 600; }
+footer nav a:hover { color: var(--pink); }
+
+/* ---------- small screens ---------- */
+@media (max-width: 960px) {
+  .hero-grid { grid-template-columns: 1fr; }
+  .hero-art { max-width: 360px; margin-top: 1rem; }
+  .beat { position: relative; top: 0; grid-template-columns: 1fr; min-height: 0; }
+  .oses { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  body { font-size: 17px; }
+  .hero { padding-top: calc(110px + env(safe-area-inset-top, 0px)); }
+  .cta .btn { width: 100%; }
+  .hero-art { max-width: 300px; }
+  .bubble { font-size: 1.3rem; }
+  .badge { left: -6%; }
+  .shot .sticker { display: none; }
+  .beat { box-shadow: 6px 6px 0 var(--ink); }
+  .peek { width: 110px; top: -62px; }
+  .b3 .media { margin-top: 56px; }
+  .nav { padding-left: 14px; }
+  .nav .btn { padding: .6em 1.05em; font-size: .95rem; }
+  .lang { padding: 0 .7rem 0 .6rem; }
+}
+@media (max-width: 380px) {
+  .brand-name { display: none; }
+}
+/* the paper grain is a fixed full-screen blend layer: lovely on a desktop, needless work for a phone */
+@media (pointer: coarse) {
+  body::after { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <a class="brand" href="#top" aria-label="Mari, back to top" data-i18n-aria="nav.home">
+    <svg viewBox="150 140 720 740" aria-hidden="true"><path d="M294.5 851.9C217.7 846.1 172.0 812.6 181.1 768.8C184.0 754.8 194.4 741.6 207.6 735.0C211.4 733.1 214.6 731.5 214.8 731.5C214.9 731.4 213.9 726.9 212.6 721.4C203.0 681.8 206.9 638.0 223.5 598.5C243.8 550.2 280.0 510.3 329.0 482.5C333.7 479.8 337.7 477.5 337.9 477.4C338.1 477.2 336.4 472.7 334.2 467.3C319.9 432.7 321.2 401.7 338.8 361.4C341.0 356.4 342.4 350.4 344.0 340.0C353.3 276.7 367.5 228.1 379.3 218.6C384.5 214.5 392.7 213.8 399.1 217.0C411.9 223.5 431.2 247.5 454.1 285.5L463.8 301.5L470.7 301.3C485.5 300.7 510.3 303.5 531.2 308.1L536.8 309.4L552.7 293.9C598.0 250.0 620.0 236.7 633.4 244.9C642.0 250.3 644.6 263.3 643.7 298.4C643.0 325.0 641.5 341.3 636.8 369.0L633.7 387.5L635.0 404.3C639.1 459.6 623.7 496.4 586.5 520.1C579.0 524.8 578.0 525.8 578.3 528.0C578.5 529.4 579.7 535.1 580.9 540.6C587.5 572.0 586.5 592.5 575.4 653.1C566.9 700.0 564.5 738.3 568.9 756.6C570.1 761.4 570.4 761.8 576.0 764.3C599.5 775.1 601.8 813.2 579.6 824.5L573.6 827.5L547.3 827.8C532.8 828.0 521.0 827.9 521.0 827.6C521.0 827.4 521.9 825.6 522.9 823.8C530.6 810.8 529.1 792.8 519.2 779.8C508.0 765.0 488.3 757.8 463.8 759.6C458.9 760.0 455.0 759.9 455.0 759.5C455.0 759.1 455.6 756.2 456.4 753.1C466.8 712.6 449.4 665.6 417.2 646.7C404.7 639.4 389.4 635.0 381.5 636.4C376.8 637.3 377.4 637.8 388.6 642.8C418.6 655.9 438.4 679.8 444.6 710.0C446.4 719.1 446.2 744.0 444.1 751.0C443.6 752.9 442.6 756.4 442.0 758.8C441.4 761.1 440.4 763.0 439.7 763.0C439.0 763.0 427.9 765.9 415.0 769.4C385.7 777.3 372.8 780.4 357.5 783.0C324.4 788.7 288.7 787.3 262.5 779.4C251.0 775.9 246.6 775.7 246.2 778.7C245.8 781.7 249.1 784.4 257.4 787.9C276.3 795.8 295.5 798.4 328.0 797.7C358.3 796.9 372.1 794.6 405.5 784.6C446.9 772.3 469.4 769.2 487.3 773.4C513.7 779.6 524.4 803.6 510.0 824.5C503.9 833.4 496.8 835.8 473.5 837.0C459.6 837.7 452.3 838.7 434.0 842.3C406.0 848.0 394.3 849.7 372.0 851.5C353.3 853.1 312.7 853.3 294.5 851.9Z"/><rect x="771" y="164" width="48" height="668" rx="24"/></svg>
+    <span class="brand-name">Mari</span>
+  </a>
+  <div class="nav-end">
+    <label class="lang">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19M12 2.5c2.6 2.6 3.9 5.8 3.9 9.5s-1.3 6.9-3.9 9.5c-2.6-2.6-3.9-5.8-3.9-9.5s1.3-6.9 3.9-9.5z"/></svg>
+      <span class="lang-code" aria-hidden="true">EN</span><span class="caret" aria-hidden="true">▼</span>
+      <select id="lang" aria-label="Language" data-i18n-aria="lang.label">
+        <option value="en" lang="en">English</option>
+        <option value="ru" lang="ru">Русский</option>
+      </select>
+    </label>
+    <a class="btn" href="#download" data-i18n="nav.cta">Mari beta</a>
+  </div>
+</nav>
+
+<main id="top">
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="sticker" data-i18n="hero.sticker">✍️ Made for novelists</span>
+      <h1 class="split" data-i18n="hero.h1">Marí is a cat. <em class="gold">Mari is also a writing app.</em></h1>
+      <p class="sub" data-i18n="hero.sub">Meet the coolest kid on the block.</p>
+      <div class="cta">
+        <a class="btn" href="#download" data-i18n="hero.cta">Mari beta</a>
+        <small data-i18n="hero.platforms">Windows · Mac · Linux</small>
+      </div>
+    </div>
+
+    <div class="hero-art">
+      <div class="badge" aria-hidden="true">
+        <svg viewBox="0 0 160 160">
+          <circle cx="80" cy="80" r="76" fill="#ffc93c" stroke="#14120f" stroke-width="3"/>
+          <g class="ring">
+            <path id="ringPath" d="M80 80 m-56 0 a56 56 0 1 1 112 0 a56 56 0 1 1 -112 0" fill="none"/>
+            <text textLength="348" lengthAdjust="spacing"><textPath href="#ringPath" data-i18n="hero.badge">FREE FOREVER ✶ NO ACCOUNT ✶</textPath></text>
+          </g>
+          <path d="M80 56 l7 16 17 1 -13 11 4 17 -15 -9 -15 9 4 -17 -13 -11 17 -1z" fill="#ff3d8b" stroke="#14120f" stroke-width="3" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="bubble" id="catSays" role="status" aria-live="polite"></div>
+      <button class="cat-btn" id="cat" type="button" aria-label="Pet Mari" data-i18n-aria="hero.petLabel">
+        <svg class="mari" viewBox="150 130 720 760" aria-hidden="true">
+          <ellipse class="shadow" cx="420" cy="852" rx="250" ry="14"/>
+          <ellipse class="shadow" cx="795" cy="842" rx="50" ry="7"/>
+          <path class="body" d="M294.5 851.9C217.7 846.1 172.0 812.6 181.1 768.8C184.0 754.8 194.4 741.6 207.6 735.0C211.4 733.1 214.6 731.5 214.8 731.5C214.9 731.4 213.9 726.9 212.6 721.4C203.0 681.8 206.9 638.0 223.5 598.5C243.8 550.2 280.0 510.3 329.0 482.5C333.7 479.8 337.7 477.5 337.9 477.4C338.1 477.2 336.4 472.7 334.2 467.3C319.9 432.7 321.2 401.7 338.8 361.4C341.0 356.4 342.4 350.4 344.0 340.0C353.3 276.7 367.5 228.1 379.3 218.6C384.5 214.5 392.7 213.8 399.1 217.0C411.9 223.5 431.2 247.5 454.1 285.5L463.8 301.5L470.7 301.3C485.5 300.7 510.3 303.5 531.2 308.1L536.8 309.4L552.7 293.9C598.0 250.0 620.0 236.7 633.4 244.9C642.0 250.3 644.6 263.3 643.7 298.4C643.0 325.0 641.5 341.3 636.8 369.0L633.7 387.5L635.0 404.3C639.1 459.6 623.7 496.4 586.5 520.1C579.0 524.8 578.0 525.8 578.3 528.0C578.5 529.4 579.7 535.1 580.9 540.6C587.5 572.0 586.5 592.5 575.4 653.1C566.9 700.0 564.5 738.3 568.9 756.6C570.1 761.4 570.4 761.8 576.0 764.3C599.5 775.1 601.8 813.2 579.6 824.5L573.6 827.5L547.3 827.8C532.8 828.0 521.0 827.9 521.0 827.6C521.0 827.4 521.9 825.6 522.9 823.8C530.6 810.8 529.1 792.8 519.2 779.8C508.0 765.0 488.3 757.8 463.8 759.6C458.9 760.0 455.0 759.9 455.0 759.5C455.0 759.1 455.6 756.2 456.4 753.1C466.8 712.6 449.4 665.6 417.2 646.7C404.7 639.4 389.4 635.0 381.5 636.4C376.8 637.3 377.4 637.8 388.6 642.8C418.6 655.9 438.4 679.8 444.6 710.0C446.4 719.1 446.2 744.0 444.1 751.0C443.6 752.9 442.6 756.4 442.0 758.8C441.4 761.1 440.4 763.0 439.7 763.0C439.0 763.0 427.9 765.9 415.0 769.4C385.7 777.3 372.8 780.4 357.5 783.0C324.4 788.7 288.7 787.3 262.5 779.4C251.0 775.9 246.6 775.7 246.2 778.7C245.8 781.7 249.1 784.4 257.4 787.9C276.3 795.8 295.5 798.4 328.0 797.7C358.3 796.9 372.1 794.6 405.5 784.6C446.9 772.3 469.4 769.2 487.3 773.4C513.7 779.6 524.4 803.6 510.0 824.5C503.9 833.4 496.8 835.8 473.5 837.0C459.6 837.7 452.3 838.7 434.0 842.3C406.0 848.0 394.3 849.7 372.0 851.5C353.3 853.1 312.7 853.3 294.5 851.9Z"/>
+          <path class="wh wh-l" d="M262.6 459.4C260.5 457.3 260.6 453.7 262.8 451.8C265.6 449.3 297.0 443.0 306.7 443.0C310.9 443.0 313.7 446.7 312.0 449.9C310.5 452.7 308.5 453.6 301.5 454.5C298.2 454.8 289.0 456.5 281.0 458.1C264.2 461.5 264.6 461.5 262.6 459.4ZM297.5 427.0C295.3 426.5 289.2 425.9 284.0 425.5C268.1 424.5 264.1 423.9 262.5 422.4C260.2 420.0 260.7 416.3 263.6 414.4C265.9 412.9 267.5 412.8 280.1 413.9C292.9 414.9 304.9 416.9 309.3 418.5C311.4 419.4 312.6 423.8 311.3 425.9C310.1 427.7 303.6 428.3 297.5 427.0Z"/>
+          <path class="wh wh-r" d="M662.5 501.8C659.2 500.0 652.0 496.8 646.6 494.5C635.6 489.9 634.1 488.5 635.6 484.3C637.5 478.8 645.3 480.6 666.3 491.2C676.5 496.5 678.3 498.6 676.0 502.9C674.4 505.9 669.7 505.5 662.5 501.8ZM672.5 469.4C668.6 468.6 661.1 467.6 655.8 467.1C645.2 466.2 643.0 465.2 643.0 461.0C643.0 456.2 644.8 455.6 657.8 456.3C681.4 457.4 691.7 462.3 685.0 469.0C682.7 471.3 682.1 471.3 672.5 469.4Z"/>
+          <g class="eyes"><ellipse class="eye" cx="446.8" cy="425" rx="14.5" ry="22.5"/><ellipse class="eye" cx="581.7" cy="440.5" rx="14" ry="23"/></g>
+          <rect class="caret" x="771" y="164" width="48" height="668" rx="24"/>
+        </svg>
+      </button>
+      <div class="hearts" id="hearts" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <div class="wrap shot">
+    <span class="sticker s1" data-i18n="shot.s1">Your book. But gorgeous.</span>
+    <span class="sticker s2" data-i18n="shot.s2">100% free</span>
+    <div class="shot-card">
+      <img src="why-mari.png" width="1849" height="1051" alt="Mari with a chapter open, its passages marked in colour, the chapter list on the left and a map of the chapter on the right" data-i18n-alt="shot.alt" fetchpriority="high">
+    </div>
+  </div>
+</header>
+
+<div class="band" aria-hidden="true">
+  <div class="band-track">
+    <span data-i18n="band.1">Free</span><span data-i18n="band.2">No account</span><span data-i18n="band.3">No subscription</span><span data-i18n="band.4">Your files stay yours</span><span data-i18n="band.5">Windows, Mac &amp; Linux</span><span data-i18n="band.6">Comes with a cat</span>
+    <span data-i18n="band.1">Free</span><span data-i18n="band.2">No account</span><span data-i18n="band.3">No subscription</span><span data-i18n="band.4">Your files stay yours</span><span data-i18n="band.5">Windows, Mac &amp; Linux</span><span data-i18n="band.6">Comes with a cat</span>
+  </div>
+</div>
+
+<section class="reasons" id="why">
+  <div class="wrap">
+    <h2 class="reasons-head split" data-i18n="reasons.h2">Four reasons you'll <em>never</em> go back.</h2>
+
+    <div class="beats">
+      <article class="beat b1">
+        <div>
+          <span class="num">1</span>
+          <h3 class="split" data-i18n="b1.h3">Read it like an <em>editor.</em></h3>
+          <p data-i18n="b1.p">Mark what sings, what drags and what's in the wrong place. Right on the page.</p>
+        </div>
+        <div class="media">
+          <div class="frame"><img src="highlights.gif" width="900" height="512" alt="Passages in a chapter being marked in different colours" data-i18n-alt="b1.alt" loading="lazy"></div>
+        </div>
+      </article>
+
+      <article class="beat b2">
+        <div>
+          <span class="num">2</span>
+          <h3 class="split" data-i18n="b2.h3">Rewrite without <em>fear.</em></h3>
+          <p data-i18n="b2.p">Try a new version right beside the old one. Every version you replace is kept.</p>
+        </div>
+        <div class="media">
+          <div class="frame"><img src="draft-and-compare.gif" width="900" height="553" alt="Two versions of a passage side by side, with the changed words picked out" data-i18n-alt="b2.alt" loading="lazy"></div>
+        </div>
+      </article>
+
+      <article class="beat b3">
+        <div>
+          <span class="num">3</span>
+          <h3 class="split" data-i18n="b3.h3">Kill your darlings. Keep the <em>bodies.</em></h3>
+          <p data-i18n="b3.p">Cut scenes go in the drawer, not the bin. Bring them back whenever you like.</p>
+        </div>
+        <div class="media">
+          <div class="peek" aria-hidden="true"><svg class="mari" viewBox="300 205 400 200"><path class="body" d="M294.5 851.9C217.7 846.1 172.0 812.6 181.1 768.8C184.0 754.8 194.4 741.6 207.6 735.0C211.4 733.1 214.6 731.5 214.8 731.5C214.9 731.4 213.9 726.9 212.6 721.4C203.0 681.8 206.9 638.0 223.5 598.5C243.8 550.2 280.0 510.3 329.0 482.5C333.7 479.8 337.7 477.5 337.9 477.4C338.1 477.2 336.4 472.7 334.2 467.3C319.9 432.7 321.2 401.7 338.8 361.4C341.0 356.4 342.4 350.4 344.0 340.0C353.3 276.7 367.5 228.1 379.3 218.6C384.5 214.5 392.7 213.8 399.1 217.0C411.9 223.5 431.2 247.5 454.1 285.5L463.8 301.5L470.7 301.3C485.5 300.7 510.3 303.5 531.2 308.1L536.8 309.4L552.7 293.9C598.0 250.0 620.0 236.7 633.4 244.9C642.0 250.3 644.6 263.3 643.7 298.4C643.0 325.0 641.5 341.3 636.8 369.0L633.7 387.5L635.0 404.3C639.1 459.6 623.7 496.4 586.5 520.1C579.0 524.8 578.0 525.8 578.3 528.0C578.5 529.4 579.7 535.1 580.9 540.6C587.5 572.0 586.5 592.5 575.4 653.1C566.9 700.0 564.5 738.3 568.9 756.6C570.1 761.4 570.4 761.8 576.0 764.3C599.5 775.1 601.8 813.2 579.6 824.5L573.6 827.5L547.3 827.8C532.8 828.0 521.0 827.9 521.0 827.6C521.0 827.4 521.9 825.6 522.9 823.8C530.6 810.8 529.1 792.8 519.2 779.8C508.0 765.0 488.3 757.8 463.8 759.6C458.9 760.0 455.0 759.9 455.0 759.5C455.0 759.1 455.6 756.2 456.4 753.1C466.8 712.6 449.4 665.6 417.2 646.7C404.7 639.4 389.4 635.0 381.5 636.4C376.8 637.3 377.4 637.8 388.6 642.8C418.6 655.9 438.4 679.8 444.6 710.0C446.4 719.1 446.2 744.0 444.1 751.0C443.6 752.9 442.6 756.4 442.0 758.8C441.4 761.1 440.4 763.0 439.7 763.0C439.0 763.0 427.9 765.9 415.0 769.4C385.7 777.3 372.8 780.4 357.5 783.0C324.4 788.7 288.7 787.3 262.5 779.4C251.0 775.9 246.6 775.7 246.2 778.7C245.8 781.7 249.1 784.4 257.4 787.9C276.3 795.8 295.5 798.4 328.0 797.7C358.3 796.9 372.1 794.6 405.5 784.6C446.9 772.3 469.4 769.2 487.3 773.4C513.7 779.6 524.4 803.6 510.0 824.5C503.9 833.4 496.8 835.8 473.5 837.0C459.6 837.7 452.3 838.7 434.0 842.3C406.0 848.0 394.3 849.7 372.0 851.5C353.3 853.1 312.7 853.3 294.5 851.9Z"/><path class="wh wh-l" d="M262.6 459.4C260.5 457.3 260.6 453.7 262.8 451.8C265.6 449.3 297.0 443.0 306.7 443.0C310.9 443.0 313.7 446.7 312.0 449.9C310.5 452.7 308.5 453.6 301.5 454.5C298.2 454.8 289.0 456.5 281.0 458.1C264.2 461.5 264.6 461.5 262.6 459.4ZM297.5 427.0C295.3 426.5 289.2 425.9 284.0 425.5C268.1 424.5 264.1 423.9 262.5 422.4C260.2 420.0 260.7 416.3 263.6 414.4C265.9 412.9 267.5 412.8 280.1 413.9C292.9 414.9 304.9 416.9 309.3 418.5C311.4 419.4 312.6 423.8 311.3 425.9C310.1 427.7 303.6 428.3 297.5 427.0Z"/><path class="wh wh-r" d="M662.5 501.8C659.2 500.0 652.0 496.8 646.6 494.5C635.6 489.9 634.1 488.5 635.6 484.3C637.5 478.8 645.3 480.6 666.3 491.2C676.5 496.5 678.3 498.6 676.0 502.9C674.4 505.9 669.7 505.5 662.5 501.8ZM672.5 469.4C668.6 468.6 661.1 467.6 655.8 467.1C645.2 466.2 643.0 465.2 643.0 461.0C643.0 456.2 644.8 455.6 657.8 456.3C681.4 457.4 691.7 462.3 685.0 469.0C682.7 471.3 682.1 471.3 672.5 469.4Z"/><g class="eyes"><ellipse class="eye" cx="446.8" cy="425" rx="14.5" ry="22.5"/><ellipse class="eye" cx="581.7" cy="440.5" rx="14" ry="23"/></g></svg></div>
+          <div class="frame"><img src="drawer.gif" width="900" height="506" alt="A cut passage going into the drawer and being read back" data-i18n-alt="b3.alt" loading="lazy"></div>
+        </div>
+      </article>
+
+      <article class="beat b4">
+        <div>
+          <span class="num">4</span>
+          <h3 class="split" data-i18n="b4.h3">Then just <em>write.</em></h3>
+          <p data-i18n="b4.p">One key, and everything disappears except your words.</p>
+        </div>
+        <div class="media">
+          <div class="frame"><img src="focus-mode.png" width="1920" height="1080" alt="Focus mode, with nothing on screen but the writing" data-i18n-alt="b4.alt" loading="lazy"></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="trailer" id="trailer" hidden>
+  <div class="wrap">
+    <h2 class="split" data-i18n="trailer.h2">Watch it <em>go.</em></h2>
+    <div class="vid"><video controls playsinline preload="metadata" data-slot="trailer"></video></div>
+  </div>
+</section>
+
+<section class="download" id="download">
+  <div class="wrap">
+    <div class="dl">
+      <img class="pixel" src="mari-pixel.png" width="160" height="185" alt="Mari the cat, blinking and licking her paw" data-i18n-alt="dl.pixelAlt" loading="lazy">
+      <p class="kick" data-i18n="dl.kick">Download</p>
+      <h2 data-i18n="dl.h2">Your second draft is waiting.</h2>
+      <p class="lede" data-i18n="dl.lede">Mari runs on Windows, macOS and Linux. Pick yours and start writing.</p>
+
+      <div class="oses">
+        <div class="os" data-os="win">
+          <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5 10.5 4.4v7.1H3zm0 13L10.5 19.6v-7H3zm8.4 1.2L21 21V12.6h-9.6zM11.4 4.3 21 3v8.4h-9.6z"/></svg>Windows</h3>
+          <a class="btn" data-asset="exe" href="https://github.com/spacekestrel/mari/releases/latest" data-i18n="dl.win.btn">Download installer</a>
+          <div class="alt" data-i18n="dl.win.alt">Or the <a data-asset="msi" href="https://github.com/spacekestrel/mari/releases/latest">.msi</a> if your workplace prefers it</div>
+        </div>
+        <div class="os" data-os="mac">
+          <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8s1.9.8 3.2.7c1.3 0 2.1-1.2 2.9-2.4.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.4-.9-2.4-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4z"/></svg>macOS</h3>
+          <a class="btn" data-asset="dmg-arm" href="https://github.com/spacekestrel/mari/releases/latest" data-i18n="dl.mac.btn">Apple silicon (M1 and later)</a>
+          <div class="alt" data-i18n="dl.mac.alt">Older Mac? Get the <a data-asset="dmg-intel" href="https://github.com/spacekestrel/mari/releases/latest">Intel version</a></div>
+        </div>
+        <div class="os" data-os="linux">
+          <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c-2.2 0-3.6 1.9-3.6 4.6 0 1.4.3 2.3-.6 3.6C6.5 12 5 14.1 5 16.6c0 .5.1 1 .2 1.4-.8.4-1.7 1-1.7 1.8 0 1.2 2 1.4 3.2 2 .9.5 1.6.7 2.3.2.4-.3.6-.7.8-1.1h4.4c.2.4.4.8.8 1.1.7.5 1.4.3 2.3-.2 1.2-.6 3.2-.8 3.2-2 0-.8-.9-1.4-1.7-1.8.1-.4.2-.9.2-1.4 0-2.5-1.5-4.6-2.8-6.4-.9-1.3-.6-2.2-.6-3.6C15.6 3.9 14.2 2 12 2zm-1.6 4.2c.4 0 .7.5.7 1.1 0 .6-.3 1.1-.7 1.1s-.7-.5-.7-1.1c0-.6.3-1.1.7-1.1zm3.2 0c.4 0 .7.5.7 1.1 0 .6-.3 1.1-.7 1.1s-.7-.5-.7-1.1c0-.6.3-1.1.7-1.1zM12 9.2c.9 0 2 .6 2 1s-1.1 1-2 1-2-.6-2-1 1.1-1 2-1z"/></svg>Linux</h3>
+          <a class="btn" data-asset="appimage" href="https://github.com/spacekestrel/mari/releases/latest" data-i18n="dl.linux.btn">.AppImage, runs anywhere</a>
+          <div class="alt" data-i18n="dl.linux.alt">Or <a data-asset="deb" href="https://github.com/spacekestrel/mari/releases/latest">.deb</a> for Debian and Ubuntu, <a data-asset="rpm" href="https://github.com/spacekestrel/mari/releases/latest">.rpm</a> for Fedora</div>
+        </div>
+      </div>
+
+      <p class="mobile-note" data-i18n="dl.mobile">Mari is a desktop app. Open this page on your computer to download it.</p>
+
+      <details class="warn">
+        <summary data-i18n="dl.warn.summary">Windows or macOS grumbling the first time? Read this.</summary>
+        <div class="in-warn">
+          <p data-i18n="dl.warn.p1">Apple and Microsoft charge for the certificate that stops their warnings. Mari is free and hasn't paid, so both complain once. The file is fine.</p>
+          <p data-i18n="dl.warn.p2"><strong>Windows</strong> says "unrecognised app". Click <em>More info</em>, then <em>Run anyway</em>.</p>
+          <p data-i18n="dl.warn.p3"><strong>macOS</strong> says Mari is damaged. It isn't. Drag Mari to Applications, open <em>Terminal</em>, paste this line once, then open Mari normally:</p>
+          <div class="cmd"><code id="xattr">xattr -dr com.apple.quarantine /Applications/Mari.app</code><button type="button" id="copyCmd" data-i18n="dl.copy">Copy</button></div>
+        </div>
+      </details>
+
+      <div class="dl-meta">
+        <span class="beta">BETA</span>
+        <span data-i18n="dl.beta">Version <span data-version>0.2.7</span>. Usable every day, with the odd rough edge.</span>
+        <a href="https://github.com/spacekestrel/mari/issues" data-i18n="dl.bug">Found one? Tell us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="sleep" aria-hidden="true">
+      <div class="zzz"><span>z</span><span>z</span><span>z</span></div>
+      <svg class="mari" viewBox="150 130 720 760"><ellipse class="shadow" cx="420" cy="852" rx="250" ry="14"/><path class="body" d="M294.5 851.9C217.7 846.1 172.0 812.6 181.1 768.8C184.0 754.8 194.4 741.6 207.6 735.0C211.4 733.1 214.6 731.5 214.8 731.5C214.9 731.4 213.9 726.9 212.6 721.4C203.0 681.8 206.9 638.0 223.5 598.5C243.8 550.2 280.0 510.3 329.0 482.5C333.7 479.8 337.7 477.5 337.9 477.4C338.1 477.2 336.4 472.7 334.2 467.3C319.9 432.7 321.2 401.7 338.8 361.4C341.0 356.4 342.4 350.4 344.0 340.0C353.3 276.7 367.5 228.1 379.3 218.6C384.5 214.5 392.7 213.8 399.1 217.0C411.9 223.5 431.2 247.5 454.1 285.5L463.8 301.5L470.7 301.3C485.5 300.7 510.3 303.5 531.2 308.1L536.8 309.4L552.7 293.9C598.0 250.0 620.0 236.7 633.4 244.9C642.0 250.3 644.6 263.3 643.7 298.4C643.0 325.0 641.5 341.3 636.8 369.0L633.7 387.5L635.0 404.3C639.1 459.6 623.7 496.4 586.5 520.1C579.0 524.8 578.0 525.8 578.3 528.0C578.5 529.4 579.7 535.1 580.9 540.6C587.5 572.0 586.5 592.5 575.4 653.1C566.9 700.0 564.5 738.3 568.9 756.6C570.1 761.4 570.4 761.8 576.0 764.3C599.5 775.1 601.8 813.2 579.6 824.5L573.6 827.5L547.3 827.8C532.8 828.0 521.0 827.9 521.0 827.6C521.0 827.4 521.9 825.6 522.9 823.8C530.6 810.8 529.1 792.8 519.2 779.8C508.0 765.0 488.3 757.8 463.8 759.6C458.9 760.0 455.0 759.9 455.0 759.5C455.0 759.1 455.6 756.2 456.4 753.1C466.8 712.6 449.4 665.6 417.2 646.7C404.7 639.4 389.4 635.0 381.5 636.4C376.8 637.3 377.4 637.8 388.6 642.8C418.6 655.9 438.4 679.8 444.6 710.0C446.4 719.1 446.2 744.0 444.1 751.0C443.6 752.9 442.6 756.4 442.0 758.8C441.4 761.1 440.4 763.0 439.7 763.0C439.0 763.0 427.9 765.9 415.0 769.4C385.7 777.3 372.8 780.4 357.5 783.0C324.4 788.7 288.7 787.3 262.5 779.4C251.0 775.9 246.6 775.7 246.2 778.7C245.8 781.7 249.1 784.4 257.4 787.9C276.3 795.8 295.5 798.4 328.0 797.7C358.3 796.9 372.1 794.6 405.5 784.6C446.9 772.3 469.4 769.2 487.3 773.4C513.7 779.6 524.4 803.6 510.0 824.5C503.9 833.4 496.8 835.8 473.5 837.0C459.6 837.7 452.3 838.7 434.0 842.3C406.0 848.0 394.3 849.7 372.0 851.5C353.3 853.1 312.7 853.3 294.5 851.9Z"/><path class="wh wh-l" d="M262.6 459.4C260.5 457.3 260.6 453.7 262.8 451.8C265.6 449.3 297.0 443.0 306.7 443.0C310.9 443.0 313.7 446.7 312.0 449.9C310.5 452.7 308.5 453.6 301.5 454.5C298.2 454.8 289.0 456.5 281.0 458.1C264.2 461.5 264.6 461.5 262.6 459.4ZM297.5 427.0C295.3 426.5 289.2 425.9 284.0 425.5C268.1 424.5 264.1 423.9 262.5 422.4C260.2 420.0 260.7 416.3 263.6 414.4C265.9 412.9 267.5 412.8 280.1 413.9C292.9 414.9 304.9 416.9 309.3 418.5C311.4 419.4 312.6 423.8 311.3 425.9C310.1 427.7 303.6 428.3 297.5 427.0Z"/><path class="wh wh-r" d="M662.5 501.8C659.2 500.0 652.0 496.8 646.6 494.5C635.6 489.9 634.1 488.5 635.6 484.3C637.5 478.8 645.3 480.6 666.3 491.2C676.5 496.5 678.3 498.6 676.0 502.9C674.4 505.9 669.7 505.5 662.5 501.8ZM672.5 469.4C668.6 468.6 661.1 467.6 655.8 467.1C645.2 466.2 643.0 465.2 643.0 461.0C643.0 456.2 644.8 455.6 657.8 456.3C681.4 457.4 691.7 462.3 685.0 469.0C682.7 471.3 682.1 471.3 672.5 469.4Z"/><path class="closed" d="M432 428 q15 12 30 0 M567 444 q15 12 30 0"/><rect class="caret" x="771" y="164" width="48" height="668" rx="24"/></svg>
+    </div>
+    <p class="tagline" data-i18n="footer.tagline">Marí is a cat. <em>Mari is also a writing app.</em></p>
+    <nav aria-label="Footer">
+      <a href="https://github.com/spacekestrel/mari" data-i18n="footer.github">GitHub</a>
+      <a href="https://github.com/spacekestrel/mari/releases/latest" data-i18n="footer.downloads">All downloads</a>
+      <a href="https://github.com/spacekestrel/mari/issues" data-i18n="footer.bug">Report a bug</a>
+      <a href="https://github.com/spacekestrel/mari/blob/main/LICENSE" data-i18n="footer.license">AGPL-3.0</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+/* ---------- languages ----------
+   English is the text written into the page above. Russian is RU below,
+   keyed the same way as the data-i18n attributes. To change a Russian line,
+   change it here. */
+window.I18N = (() => {
+  const RU = {
+    "meta.title": "Mari · Другие программы нервно курят",
+    "meta.description": "Мари превращает сырой черновик в книгу, которой хочется хвастаться. Бесплатная программа для писателей на Windows, macOS и Linux.",
+    "nav.home": "Мари, в\u00a0начало страницы",
+    "nav.cta": "Мари бета",
+    "lang.label": "Язык",
+    "hero.sticker": "✍️ Для романистов",
+    "hero.h1": "Мари вообще-то кошка. <em class=\"gold\">А\u00a0ещё так зовут программу для писателей.</em>",
+    "hero.sub": "Знакомься: самая крутая на\u00a0районе.",
+    "hero.cta": "Мари бета",
+    "hero.platforms": "Windows · Mac · Linux",
+    "hero.badge": "БЕСПЛАТНО ✶ БЕЗ АККАУНТА ✶",
+    "hero.petLabel": "Погладить Мари",
+    "cat.hello": "Привет, я\u00a0Мари. Погладь меня.",
+    "cat.line1": "Мрр?",
+    "cat.line2": "У\u00a0тебя дыра в\u00a0сюжете. Прикройся.",
+    "cat.line3": "Это наречие? Под нож.",
+    "cat.line4": "Третья глава сыровата. Уж\u00a0я-то знаю.",
+    "cat.line5": "Я\u00a0посидела на\u00a0клавиатуре. Не\u00a0благодари.",
+    "cat.line6": "Убей своих любимцев. Кроме меня.",
+    "cat.line7": "Делу время, котику час.",
+    "shot.alt": "Окно Мари с\u00a0открытой главой: фрагменты размечены цветом, слева список глав, справа карта главы",
+    "shot.s1": "Твоя книга. При параде.",
+    "shot.s2": "100% бесплатно",
+    "band.1": "Бесплатно",
+    "band.2": "Без регистрации",
+    "band.3": "Без подписки",
+    "band.4": "Файлы остаются у\u00a0тебя",
+    "band.5": "Windows, Mac и\u00a0Linux",
+    "band.6": "Кошка в\u00a0комплекте",
+    "reasons.h2": "Четыре причины сжечь <em>мосты.</em>",
+    "b1.h3": "Читай глазами <em>редактора.</em>",
+    "b1.p": "Отмечай, где текст поёт, где провисает и\u00a0что стоит не\u00a0на\u00a0своём месте. Прямо на\u00a0странице.",
+    "b1.alt": "Фрагменты главы размечаются разными цветами",
+    "b2.h3": "Переписывай <em>без страха.</em>",
+    "b2.p": "Пробуй новый вариант прямо рядом со\u00a0старым. Ни\u00a0одна заменённая версия не\u00a0пропадёт.",
+    "b2.alt": "Два варианта фрагмента рядом, изменённые слова выделены",
+    "b3.h3": "Убей своих любимцев. Пусть сыграют <em>в\u00a0ящик.</em>",
+    "b3.p": "Вырезанные сцены летят в\u00a0«Ящик», а\u00a0не\u00a0в\u00a0корзину. Достанешь, когда захочешь.",
+    "b3.alt": "Вырезанный фрагмент уходит в\u00a0«Ящик», а\u00a0потом его достают и\u00a0перечитывают",
+    "b4.h3": "А\u00a0теперь просто <em>пиши.</em>",
+    "b4.p": "Одна клавиша, и\u00a0исчезает всё, кроме твоих слов.",
+    "b4.alt": "Режим фокусировки: на\u00a0экране ничего, кроме текста",
+    "trailer.h2": "Мари <em>в\u00a0деле.</em>",
+    "dl.pixelAlt": "Кошка Мари моргает и\u00a0вылизывает лапку",
+    "dl.kick": "Скачать",
+    "dl.h2": "Второй черновик тебя заждался.",
+    "dl.lede": "Мари работает на\u00a0Windows, macOS и\u00a0Linux. Выбирай свою систему и\u00a0садись писать.",
+    "dl.rec": "Твой компьютер",
+    "dl.win.btn": "Скачать установщик",
+    "dl.win.alt": "Или <a data-asset=\"msi\" href=\"https://github.com/spacekestrel/mari/releases/latest\">.msi</a>, если на\u00a0работе нужен именно он",
+    "dl.mac.btn": "Apple silicon (M1 и\u00a0новее)",
+    "dl.mac.alt": "Mac постарше? Бери <a data-asset=\"dmg-intel\" href=\"https://github.com/spacekestrel/mari/releases/latest\">версию для Intel</a>",
+    "dl.mac.intelBtn": "Mac на\u00a0Intel",
+    "dl.mac.armPrefix": "Mac поновее? Бери ",
+    "dl.mac.armLink": "версию для Apple silicon",
+    "dl.linux.btn": ".AppImage, работает везде",
+    "dl.linux.alt": "Или <a data-asset=\"deb\" href=\"https://github.com/spacekestrel/mari/releases/latest\">.deb</a> для Debian и\u00a0Ubuntu, <a data-asset=\"rpm\" href=\"https://github.com/spacekestrel/mari/releases/latest\">.rpm</a> для Fedora",
+    "dl.mobile": "Мари живёт на\u00a0компьютере, а\u00a0не\u00a0в\u00a0телефоне. Открой эту страницу на\u00a0ноутбуке или ПК\u00a0и\u00a0скачай её.",
+    "dl.warn.summary": "Windows или macOS ворчит при первом запуске? Тебе сюда.",
+    "dl.warn.p1": "Apple и\u00a0Microsoft берут деньги за\u00a0сертификат, который отключает их\u00a0предупреждения. Мари бесплатная и\u00a0платить не\u00a0стала, вот обе системы разок и\u00a0ворчат. С\u00a0файлом всё в\u00a0порядке.",
+    "dl.warn.p2": "<strong>Windows</strong> пугает: «Система Windows защитила ваш компьютер». Нажми <em>Подробнее</em>, а\u00a0потом <em>Выполнить в\u00a0любом случае</em>.",
+    "dl.warn.p3": "<strong>macOS</strong> уверяет, что Мари повреждена. Не\u00a0верь. Перетащи её\u00a0в\u00a0папку «Программы», открой <em>Терминал</em>, один раз вставь эту строку, а\u00a0потом открывай Мари как обычно:",
+    "dl.copy": "Копировать",
+    "dl.copied": "Скопировано",
+    "dl.beta": "Версия <span data-version>0.2.7</span>. Можно работать каждый день, но\u00a0кое-где ещё попадаются шероховатости.",
+    "dl.bug": "Попалась? Напиши нам",
+    "footer.tagline": "Мари вообще-то кошка. <em>А\u00a0ещё так зовут программу для писателей.</em>",
+    "footer.github": "GitHub",
+    "footer.downloads": "Все загрузки",
+    "footer.bug": "Сообщить об\u00a0ошибке",
+    "footer.license": "AGPL-3.0"
+  };
+
+  // English lines that only the script shows (the cat's lines, button states)
+  const EN_EXTRA = {
+    "cat.hello": "Hi. I'm Mari. Pet me.",
+    "cat.line1": "Mrrp?",
+    "cat.line2": "Your plot hole is showing.",
+    "cat.line3": "That adverb? Cut it.",
+    "cat.line4": "Chapter three needs work. Trust me.",
+    "cat.line5": "I sat on your keyboard. You're welcome.",
+    "cat.line6": "Kill your darlings. Not me.",
+    "cat.line7": "Write first. Pet later.",
+    "dl.rec": "Your computer",
+    "dl.copied": "Copied",
+    "dl.mac.intelBtn": "Intel Mac",
+    "dl.mac.armPrefix": "Newer Mac? Get the ",
+    "dl.mac.armLink": "Apple silicon version",
+  };
+
+  const LANGS = ["en", "ru"];
+  // Countries where a visitor gets Russian unless they pick otherwise
+  const RU_COUNTRIES = ["RU", "BY", "KZ", "KG"];
+
+  const root = document.documentElement;
+  const $$ = (s) => [...document.querySelectorAll(s)];
+  const metaDesc = document.querySelector('meta[name="description"]');
+
+  // English as written in the page, read once before anything changes it
+  const EN = { ...EN_EXTRA, "meta.title": document.title, "meta.description": metaDesc.content };
+  $$("[data-i18n]").forEach((el) => (EN[el.dataset.i18n] = el.innerHTML));
+  $$("[data-i18n-alt]").forEach((el) => (EN[el.dataset.i18nAlt] = el.alt));
+  $$("[data-i18n-aria]").forEach((el) => (EN[el.dataset.i18nAria] = el.getAttribute("aria-label")));
+  const DICT = { en: EN, ru: RU };
+
+  let current = "en";
+  const listeners = [];
+  const t = (key) => DICT[current][key] ?? EN[key] ?? "";
+
+  function apply(lang) {
+    current = lang;
+    root.lang = lang;
+    document.title = t("meta.title");
+    metaDesc.content = t("meta.description");
+    $$("[data-i18n]").forEach((el) => { const v = t(el.dataset.i18n); if (el.innerHTML !== v) el.innerHTML = v; });
+    $$("[data-i18n-alt]").forEach((el) => (el.alt = t(el.dataset.i18nAlt)));
+    $$("[data-i18n-aria]").forEach((el) => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
+    $$(".os").forEach((el) => (el.dataset.rec = t("dl.rec")));
+    const sel = document.getElementById("lang");
+    if (sel) sel.value = lang;
+    const code = document.querySelector(".lang-code");
+    if (code) code.textContent = lang.toUpperCase();
+    listeners.forEach((fn) => fn(lang));
+  }
+
+  // Which country the visitor's IP address is in. Two free services race;
+  // the first answer wins, and after 1.2s we stop waiting. Remembered a week.
+  function countryFromIP() {
+    try {
+      const c = JSON.parse(localStorage.getItem("mari-country") || "null");
+      if (c && Date.now() - c.t < 7 * 864e5) return Promise.resolve(c.c);
+    } catch (e) {}
+    const ask = (url, pick) => fetch(url, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((j) => pick(j) || Promise.reject());
+    return new Promise((resolve) => {
+      let left = 2;
+      const miss = () => { if (--left === 0) resolve(null); };
+      ask("https://api.country.is/", (j) => j.country).then(resolve, miss);
+      ask("https://get.geojs.io/v1/ip/country.json", (j) => j.country).then(resolve, miss);
+      setTimeout(() => resolve(null), 1200);
+    }).then((c) => {
+      c = c ? String(c).toUpperCase() : null;
+      if (c) try { localStorage.setItem("mari-country", JSON.stringify({ c, t: Date.now() })); } catch (e) {}
+      return c;
+    });
+  }
+
+  // Order: the language in the link, the one picked before, the visitor's
+  // country, their browser's language.
+  const q = /[?&]lang=(en|ru)\b/.exec(location.search);
+  let saved = null;
+  try { saved = localStorage.getItem("mari-lang"); } catch (e) {}
+  const browser = /^ru\b/i.test(navigator.language || "") ? "ru" : "en";
+  const ready = (q ? Promise.resolve(q[1])
+    : LANGS.includes(saved) ? Promise.resolve(saved)
+    : countryFromIP().then((c) => (c ? (RU_COUNTRIES.includes(c) ? "ru" : "en") : browser))
+  ).then((lang) => { apply(lang); return lang; });
+
+  document.getElementById("lang").addEventListener("change", (e) => {
+    const lang = e.target.value;
+    try { localStorage.setItem("mari-lang", lang); } catch (err) {}
+    try {
+      const u = new URL(location.href);
+      u.searchParams.set("lang", lang);
+      history.replaceState(null, "", u);
+    } catch (err) {}
+    apply(lang);
+  });
+
+  return { ready, t, onChange: (fn) => listeners.push(fn), get lang() { return current; } };
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const { t } = I18N;
+  const motion = !!(window.gsap && window.ScrollTrigger && !reduced);
+
+  /* ---------- split headings into words for the reveal ---------- */
+  const split = (el) => {
+    for (const n of [...el.childNodes]) {
+      if (n.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        // ordinary spaces only: a no-break space keeps «в ящик» together as one word
+        n.textContent.split(/([ \t\n\r\f]+)/).forEach((part) => {
+          if (!part) return;
+          if (/^[ \t\n\r\f]+$/.test(part)) { frag.append(part); return; }
+          const outer = document.createElement("span"); outer.className = "wd";
+          const inner = document.createElement("span"); inner.textContent = part;
+          outer.append(inner); frag.append(outer);
+        });
+        n.replaceWith(frag);
+      } else if (n.nodeType === 1) split(n);
+    }
+  };
+  // after a language change the headings hold fresh text: split it again and show it as it is
+  const resplit = () => $$(".split").forEach((h) => {
+    if (h.querySelector(".wd")) return;
+    split(h);
+    if (motion) gsap.set(h.querySelectorAll(".wd > span"), { clearProps: "all" });
+  });
+
+  /* ---------- smooth scroll + motion ---------- */
+  let lenis = null;
+  function startMotion() {
+    if (!motion) return;
+    gsap.registerPlugin(ScrollTrigger);
+    if (window.Lenis) {
+      lenis = new Lenis({ lerp: 0.11 });
+      lenis.on("scroll", ScrollTrigger.update);
+      gsap.ticker.add((time) => lenis.raf(time * 1000));
+      gsap.ticker.lagSmoothing(0);
+    }
+
+    gsap.timeline()
+      .from(".hero h1 .wd > span", { yPercent: 115, rotate: 7, duration: 1, stagger: 0.08, ease: "power4.out" })
+      .from(".hero .sticker", { scale: 0, rotate: -30, duration: 0.6, ease: "back.out(2.5)" }, 0.1)
+      .from(".hero .sub, .hero .cta", { y: 30, opacity: 0, duration: 0.7, stagger: 0.1, ease: "power3.out" }, 0.45)
+      .from(".cat-btn", { y: -260, duration: 1.1, ease: "bounce.out" }, 0.25)
+      .from(".badge", { scale: 0, rotate: -120, duration: 0.8, ease: "back.out(2)" }, 0.9);
+
+    gsap.fromTo(".shot-card", { rotate: -9, y: 140, scale: 0.88 }, {
+      rotate: -2, y: 0, scale: 1, ease: "none",
+      scrollTrigger: { trigger: ".shot", start: "top bottom", end: "top 25%", scrub: true },
+    });
+    gsap.from(".shot .sticker", { scale: 0, rotate: 40, duration: 0.6, stagger: 0.15, ease: "back.out(2.5)", scrollTrigger: { trigger: ".shot-card", start: "top 70%" } });
+
+    $$(".split").forEach((h) => {
+      if (h.closest(".hero")) return;
+      gsap.from(h.querySelectorAll(".wd > span"), { yPercent: 115, rotate: 6, duration: 0.9, stagger: 0.06, ease: "power4.out", scrollTrigger: { trigger: h, start: "top 88%" } });
+    });
+    $$(".beat").forEach((b) => {
+      gsap.from(b.querySelector(".frame"), { y: 90, rotate: 10, scale: 0.85, duration: 1, ease: "back.out(1.5)", scrollTrigger: { trigger: b, start: "top 75%" } });
+      gsap.from(b.querySelector(".num"), { scale: 0, rotate: -90, duration: 0.6, ease: "back.out(2.5)", scrollTrigger: { trigger: b, start: "top 75%" } });
+    });
+
+    // the cards pile up: each one shrinks and tips as the next slides over it
+    ScrollTrigger.matchMedia({
+      "(min-width: 961px)": () => {
+        const beats = $$(".beat");
+        beats.forEach((b, i) => {
+          const next = beats[i + 1];
+          if (!next) return;
+          gsap.to(b, { scale: 0.9, rotate: i % 2 ? 1.5 : -1.5, ease: "none", scrollTrigger: { trigger: next, start: "top bottom", end: "top 20%", scrub: true } });
+        });
+      },
+    });
+
+    gsap.from(".dl", { y: 120, rotate: 3, duration: 1, ease: "back.out(1.4)", scrollTrigger: { trigger: ".download", start: "top 80%" } });
+    gsap.from(".pixel", { y: 60, opacity: 0, duration: 0.6, ease: "back.out(2)", scrollTrigger: { trigger: ".download", start: "top 60%" } });
+  }
+
+  // in-page links glide when smooth scroll is on
+  $$('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
+    const target = a.getAttribute("href");
+    const el = target === "#top" ? document.body : $(target);
+    if (!el) return;
+    e.preventDefault();
+    if (lenis) lenis.scrollTo(el, { offset: target === "#top" ? 0 : -110 });
+    else el.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
+  }));
+
+  /* ---------- nav tucks away on the way down ---------- */
+  const nav = $(".nav");
+  let lastY = scrollY;
+  addEventListener("scroll", () => {
+    const y = scrollY;
+    if (y > 500 && y > lastY + 4) nav.classList.add("hide");
+    else if (y < lastY - 4 || y < 500) nav.classList.remove("hide");
+    lastY = y;
+  }, { passive: true });
+
+  /* ---------- Mari watches the pointer ---------- */
+  const eyeGroups = $$(".mari .eyes");
+  let px = innerWidth / 2, py = innerHeight / 2, queued = false;
+  const look = () => {
+    queued = false;
+    for (const g of eyeGroups) {
+      const svg = g.ownerSVGElement, r = svg.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > innerHeight) continue;
+      const vb = svg.viewBox.baseVal;
+      const cx = r.left + (514 - vb.x) * (r.width / vb.width), cy = r.top + (433 - vb.y) * (r.height / vb.height);
+      const dx = px - cx, dy = py - cy, d = Math.hypot(dx, dy) || 1, k = Math.min(1, d / 300);
+      g.style.transform = `translate(${(dx / d) * k * 16}px, ${(dy / d) * k * 12}px)`;
+    }
+  };
+  addEventListener("pointermove", (e) => {
+    px = e.clientX; py = e.clientY;
+    if (!queued) { queued = true; requestAnimationFrame(look); }
+  }, { passive: true });
+
+  /* ---------- pet the cat ---------- */
+  const cat = $("#cat"), says = $("#catSays"), hearts = $("#hearts");
+  let li = 0, sayTimer;
+  const say = (text, ms = 2600) => {
+    says.textContent = text;
+    says.classList.add("show");
+    clearTimeout(sayTimer);
+    sayTimer = setTimeout(() => says.classList.remove("show"), ms);
+  };
+  cat.addEventListener("click", () => {
+    say(t(`cat.line${(li++ % 7) + 1}`));
+    cat.classList.remove("hop"); void cat.offsetWidth; cat.classList.add("hop");
+    for (let i = 0; i < 5; i++) {
+      const h = document.createElement("span");
+      h.className = "heart"; h.textContent = "♥";
+      h.style.left = 30 + Math.random() * 35 + "%";
+      h.style.top = 30 + Math.random() * 20 + "%";
+      h.style.setProperty("--x", (Math.random() * 140 - 70).toFixed(0) + "px");
+      h.style.setProperty("--rot", (Math.random() * 60 - 30).toFixed(0) + "deg");
+      h.style.animationDelay = i * 0.07 + "s";
+      hearts.append(h);
+      setTimeout(() => h.remove(), 1500);
+    }
+  });
+
+  /* ---------- downloads ---------- */
+  const ua = navigator.userAgent;
+  const plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "";
+  const mobile = /Android|iPhone|iPad|iPod/i.test(ua) || (/Mac/.test(plat) && navigator.maxTouchPoints > 1);
+  let os = null;
+  if (!mobile) {
+    if (/Win/i.test(plat)) os = "win";
+    else if (/Mac/i.test(plat)) os = "mac";
+    else if (/Linux|X11|CrOS/i.test(plat)) os = "linux";
+  }
+  if (mobile) document.documentElement.classList.add("is-mobile");
+  if (os) {
+    const card = $(`.os[data-os="${os}"]`);
+    card.classList.add("rec");
+    card.parentElement.prepend(card);
+  }
+  let intelMac = false;
+  if (os === "mac") {
+    try {
+      const gl = document.createElement("canvas").getContext("webgl");
+      const info = gl && gl.getExtension("WEBGL_debug_renderer_info");
+      intelMac = /Intel|AMD|Radeon/i.test(info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : "");
+    } catch (e) {}
+  }
+  // Intel Macs get the Intel build up front (and again after a language change)
+  const macOrder = () => {
+    if (!intelMac) return;
+    const main = $('.os[data-os="mac"] .btn'), line = $('.os[data-os="mac"] .alt');
+    main.dataset.asset = "dmg-intel";
+    main.textContent = t("dl.mac.intelBtn");
+    line.innerHTML = `${t("dl.mac.armPrefix")}<a data-asset="dmg-arm" href="https://github.com/spacekestrel/mari/releases/latest">${t("dl.mac.armLink")}</a>`;
+  };
+  const match = {
+    exe: /-setup\.exe$/i, msi: /\.msi$/i,
+    "dmg-arm": /aarch64\.dmg$/i, "dmg-intel": /x64\.dmg$/i,
+    appimage: /\.AppImage$/i, deb: /\.deb$/i, rpm: /\.rpm$/i,
+  };
+  let release = null;
+  const fillRelease = () => {
+    if (!release) return;
+    $$("[data-version]").forEach((el) => (el.textContent = release.tag_name.replace(/^v/, "")));
+    $$("[data-asset]").forEach((a) => {
+      const asset = release.assets.find((x) => match[a.dataset.asset].test(x.name));
+      if (asset) a.href = asset.browser_download_url;
+    });
+  };
+  fetch("https://api.github.com/repos/spacekestrel/mari/releases/latest", { headers: { Accept: "application/vnd.github+json" } })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((rel) => { release = rel; fillRelease(); })
+    .catch(() => {});
+
+  $("#copyCmd").addEventListener("click", (e) => {
+    const btn = e.currentTarget;
+    const done = () => { btn.textContent = t("dl.copied"); setTimeout(() => (btn.textContent = t("dl.copy")), 1800); };
+    const pick = () => { const r = document.createRange(); r.selectNodeContents($("#xattr")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
+    try { navigator.clipboard.writeText($("#xattr").textContent).then(done, pick); } catch (err) { pick(); }
+  });
+
+  /* ---------- once the language is settled, bring the page to life ---------- */
+  I18N.ready.then(() => {
+    $$(".split").forEach(split);
+    macOrder();
+    fillRelease();
+    startMotion();
+    document.documentElement.classList.remove("i18n-wait");
+    setTimeout(() => say(t("cat.hello")), 1900);
+    I18N.onChange(() => {
+      resplit();
+      macOrder();
+      fillRelease();
+      if (motion) ScrollTrigger.refresh();
+    });
+  });
+
+  /* ---------- your own trailer, when it's there ---------- */
+  fetch("media/trailer.mp4", { method: "HEAD" }).then((r) => {
+    if (!r.ok) return;
+    const v = $('[data-slot="trailer"]');
+    v.src = "media/trailer.mp4";
+    fetch("media/trailer-poster.jpg", { method: "HEAD" }).then((p) => p.ok && (v.poster = "media/trailer-poster.jpg")).catch(() => {});
+    $("#trailer").hidden = false;
+    if (motion) ScrollTrigger.refresh();
+  }).catch(() => {});
+})();
+</script>
+</body>
+</html>

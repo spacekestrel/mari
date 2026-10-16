@@ -1,0 +1,54 @@
+name: Something is wrong
+description: Mari did something it shouldn't, or didn't do something it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. The three questions below are the ones that
+        decide whether a bug can be found or not — a report without them
+        usually ends in a conversation asking for them anyway.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, and what Mari did instead of what you expected.
+      placeholder: |
+        I highlighted a paragraph as Cut and moved it to the drawer.
+        The text went, but the minimap still showed it in red.
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Which version of Mari
+      description: The number on the installer you downloaded, e.g. 0.2.5.
+      placeholder: "0.2.5"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Which system
+      options:
+        - Windows
+        - macOS (Apple silicon)
+        - macOS (Intel)
+        - Linux
+    validations:
+      required: true
+
+  - type: textarea
+    id: file
+    attributes:
+      label: Anything about the file
+      description: |
+        Whether it was a `.mari` chapter, a Word document or plain text, roughly
+        how long it was, and anything unusual about it. Don't paste your
+        manuscript — a description is enough, and if the bug needs the actual
+        file we can sort that out here.
+    validations:
+      required: false

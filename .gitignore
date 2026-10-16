@@ -1,0 +1,24 @@
+.DS_Store
+node_modules
+/build
+/.svelte-kit
+/package
+.env
+.env.*
+!.env.example
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Installers, whether built here or downloaded to test one
+/*.deb
+/*.rpm
+/*.dmg
+/*.exe
+/*.msi
+/*.AppImage
+
+# Local editor tooling, not part of the app
+/.claude
+
+# Installers the Website workflow copies next to the page when it publishes
+/docs/download/
