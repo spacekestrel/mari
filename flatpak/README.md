@@ -21,12 +21,6 @@ desktop-file-validate flatpak/ink.meowmari.Mari.desktop
 
 - The build recipe (`ink.meowmari.Mari.yml`). Flatpak builds with no network,
   so every Rust crate and npm package has to be listed in generated files first.
-- Change the app's identifier in `src-tauri/tauri.conf.json` from
-  `com.mari.editor` to `ink.meowmari.Mari`. Flathub requires an id on a domain
-  you control. It moves where Mari keeps its settings, so everyone running it
-  loses their preferences once.
-- The terminal is already gone, so there is nothing left that the sandbox
-  breaks.
 - A release entry per version. Shops show these as "What's New".
 
 ## Notes

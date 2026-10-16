@@ -2,6 +2,34 @@
   "_readme": "The news card at the foot of Mari's sidebar. Edit this file, push to main, and every copy of Mari picks it up the next time someone opens it. See docs/messages.md for what each field does.",
   "messages": [
     {
+      "id": "0-4-0",
+      "title": {
+        "en": "Mari 0.4.0 is out",
+        "ru": "Вышла Mari 0.4.0",
+        "de": "Mari 0.4.0 ist da",
+        "es": "Ya está Mari 0.4.0",
+        "zh": "Mari 0.4.0 已发布"
+      },
+      "body": {
+        "en": "Deleting a word out of an italic phrase no longer breaks the italic. The built-in terminal is gone.",
+        "ru": "Удаление слова из курсива больше не ломает курсив. Встроенный терминал убран.",
+        "de": "Ein Wort aus einem kursiven Satz zu löschen zerstört die Kursivschrift nicht mehr. Das eingebaute Terminal ist weg.",
+        "es": "Borrar una palabra de una frase en cursiva ya no rompe la cursiva. La terminal integrada ha desaparecido.",
+        "zh": "从斜体短语中删词不再破坏斜体。内置终端已移除。"
+      },
+      "link": {
+        "url": "https://meowmari.ink",
+        "label": {
+          "en": "Get it",
+          "ru": "Скачать",
+          "de": "Holen",
+          "es": "Descargar",
+          "zh": "下载"
+        }
+      },
+      "forVersionsBelow": "0.4.0"
+    },
+    {
       "id": "0-3-0",
       "title": {
         "en": "Mari 0.3.0 is out",

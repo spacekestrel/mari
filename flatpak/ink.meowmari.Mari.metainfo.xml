@@ -96,6 +96,14 @@
   </requires>
 
   <releases>
+    <release version="0.4.0" date="2026-10-16">
+      <description>
+        <ul>
+          <li>Deleting a word out of an italic phrase no longer breaks the italic</li>
+          <li>The built-in terminal has been removed</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.3.0" date="2026-10-11">
       <description>
         <ul>
