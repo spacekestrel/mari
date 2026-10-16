@@ -7,6 +7,6 @@ Exec=mari
 Icon=ink.meowmari.Mari
 Terminal=false
 Categories=Office;WordProcessor;
-Keywords=write;writing;writer;novel;manuscript;chapter;draft;revision;prose;markdown;
+Keywords=write;writing;writer;editor;draft;revision;notes;text;document;markdown;
 StartupWMClass=Mari
 StartupNotify=true

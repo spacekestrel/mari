@@ -14,26 +14,26 @@
 
   <description>
     <p>
-      Mari is for long writing — novels, scripts, anything that runs to chapters.
-      Your book is ordinary files in an ordinary folder on your own computer. No
-      account, no subscription, nothing uploaded, and nothing that stops working
-      if a company does.
+      Mari is a place to write. Your work is ordinary files in an ordinary
+      folder on your own computer. No account, no subscription, nothing
+      uploaded, and nothing that stops working if a company does.
     </p>
     <p>
-      Mark a paragraph the way you would on a printed draft: good, weak, cut,
-      come back to this. The marks stay with the chapter and show in the margin,
-      so the second read is a matter of looking rather than remembering.
+      Mark a paragraph the way you would on a printed page: good, weak, cut,
+      come back to this. The marks stay with the writing and show in the
+      margin, so the second read is a matter of looking rather than
+      remembering.
     </p>
     <p>
-      When a passage needs rewriting, open it beside the original and work on
-      both at once. What you cut goes to the drawer rather than nowhere, and you
-      can take it back later if the book turns out to want it.
+      When something needs rewriting, open it beside the original and work on
+      both at once. What you cut goes to the drawer rather than nowhere, and
+      you can take it back later if the writing turns out to want it.
     </p>
     <p>And the rest of it:</p>
     <ul>
-      <li>Focus mode — the prose, and nothing else on screen</li>
-      <li>A map of the whole chapter down the side, marks and all</li>
-      <li>Notes on any passage, kept with the chapter rather than beside it</li>
+      <li>Focus mode — the words, and nothing else on screen</li>
+      <li>A map of the whole piece down the side, marks and all</li>
+      <li>Notes on any passage, kept with the writing rather than beside it</li>
       <li>Opens and saves Word files, Markdown and plain text</li>
       <li>English, Russian, German, Spanish and Chinese</li>
       <li>Free, and the source is open</li>
@@ -45,7 +45,7 @@
   <screenshots>
     <screenshot type="default">
       <image>https://meowmari.ink/hero-shot.png</image>
-      <caption>A chapter open in Mari, marked up and ready for a second read</caption>
+      <caption>Writing open in Mari, marked up and ready for a second read</caption>
     </screenshot>
     <screenshot>
       <image>https://meowmari.ink/why-mari.png</image>
@@ -76,12 +76,12 @@
   <keywords>
     <keyword>writing</keyword>
     <keyword>writer</keyword>
-    <keyword>novel</keyword>
-    <keyword>manuscript</keyword>
-    <keyword>chapter</keyword>
+    <keyword>editor</keyword>
     <keyword>draft</keyword>
     <keyword>revision</keyword>
-    <keyword>prose</keyword>
+    <keyword>notes</keyword>
+    <keyword>text</keyword>
+    <keyword>document</keyword>
     <keyword>markdown</keyword>
   </keywords>
 
@@ -100,7 +100,7 @@
     <release version="0.3.0" date="2026-10-11">
       <description>
         <ul>
-          <li>Rename chapters and folders without leaving the sidebar</li>
+          <li>Rename files and folders without leaving the sidebar</li>
           <li>No more stray asterisks appearing around italic words</li>
           <li>One cursor on screen instead of three</li>
           <li>A folder that has been moved says so, instead of loading forever</li>

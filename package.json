@@ -1,7 +1,7 @@
 {
   "name": "mari",
   "version": "0.3.0",
-  "description": "A free writing app for novelists.",
+  "description": "A free writing app.",
   "type": "module",
   "scripts": {
     "dev": "vite dev",
