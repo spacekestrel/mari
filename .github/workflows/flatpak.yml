@@ -1,0 +1,40 @@
+# Builds the Flatpak the way Flathub will, so a broken recipe is found here
+# rather than in a review queue. Not a release job: nothing is published.
+name: Flatpak
+
+on:
+  push:
+    paths: ["flatpak/**", ".github/workflows/flatpak.yml"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-49
+      options: --privileged
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # The two generators turn Cargo.lock and package-lock.json into lists of
+      # every file the build will need. They are the Flatpak project's own
+      # tools; the build has no network, so this has to happen beforehand.
+      - name: Fetch the source generators
+        run: |
+          python3 -m pip install --break-system-packages aiohttp toml
+          curl -fsSLO https://raw.githubusercontent.com/flatpak/flatpak-builder-tools/master/cargo/flatpak-cargo-generator.py
+          python3 -m pip install --break-system-packages \
+            "git+https://github.com/flatpak/flatpak-builder-tools#subdirectory=node"
+
+      - name: List every crate and package
+        run: |
+          python3 flatpak-cargo-generator.py src-tauri/Cargo.lock -o flatpak/cargo-sources.json
+          flatpak-node-generator npm package-lock.json -o flatpak/node-sources.json
+          wc -l flatpak/cargo-sources.json flatpak/node-sources.json
+
+      - uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+        with:
+          bundle: mari.flatpak
+          manifest-path: flatpak/ink.meowmari.Mari.yml
+          cache-key: flatpak-builder-${{ github.sha }}
