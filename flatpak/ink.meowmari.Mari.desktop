@@ -2,11 +2,11 @@
 Type=Application
 Name=Mari
 GenericName=Writing App
-Comment=Write, mark up and rewrite
+Comment=Make a messy draft good
 Exec=mari
 Icon=ink.meowmari.Mari
 Terminal=false
 Categories=Office;WordProcessor;
-Keywords=write;writing;writer;editor;draft;revision;notes;text;document;markdown;
+Keywords=write;writing;writer;editor;draft;rewrite;revision;markup;notes;text;document;markdown;
 StartupWMClass=Mari
 StartupNotify=true

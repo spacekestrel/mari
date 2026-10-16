@@ -3,7 +3,7 @@
   <id>ink.meowmari.Mari</id>
 
   <name>Mari</name>
-  <summary>Write, mark up and rewrite</summary>
+  <summary>Make a messy draft good</summary>
 
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>AGPL-3.0-or-later</project_license>
@@ -14,12 +14,11 @@
 
   <description>
     <p>
-      Mari is a place to write. Your work is ordinary files in an ordinary
-      folder on your own computer. No account, no subscription, nothing
-      uploaded, and nothing that stops working if a company does.
+      Nothing is finished when it is written. Mari is for what comes after:
+      reading it back, marking what is weak, and making it good.
     </p>
     <p>
-      Mark a paragraph the way you would on a printed page: good, weak, cut,
+      Mark a paragraph the way you would on a printed page — good, weak, cut,
       come back to this. The marks stay with the writing and show in the
       margin, so the second read is a matter of looking rather than
       remembering.
@@ -27,14 +26,19 @@
     <p>
       When something needs rewriting, open it beside the original and work on
       both at once. What you cut goes to the drawer rather than nowhere, and
-      you can take it back later if the writing turns out to want it.
+      you can take it back later if it turns out to be wanted after all.
+    </p>
+    <p>
+      It all lives in one file: the writing, the marks, the notes, the old
+      versions, the plan and the drawer. Send that file to somebody and they
+      open exactly what you see.
     </p>
     <p>And the rest of it:</p>
     <ul>
       <li>Focus mode — the words, and nothing else on screen</li>
       <li>A map of the whole piece down the side, marks and all</li>
-      <li>Notes on any passage, kept with the writing rather than beside it</li>
       <li>Opens and saves Word files, Markdown and plain text</li>
+      <li>Your files stay yours: no account, nothing uploaded</li>
       <li>English, Russian, German, Spanish and Chinese</li>
       <li>Free, and the source is open</li>
     </ul>
@@ -45,11 +49,11 @@
   <screenshots>
     <screenshot type="default">
       <image>https://meowmari.ink/hero-shot.png</image>
-      <caption>Writing open in Mari, marked up and ready for a second read</caption>
+      <caption>A draft marked up: good, weak, cut, come back to this</caption>
     </screenshot>
     <screenshot>
       <image>https://meowmari.ink/why-mari.png</image>
-      <caption>Highlights in the margin, so the work left to do is visible</caption>
+      <caption>The rewrite beside the original, both open at once</caption>
     </screenshot>
     <screenshot>
       <image>https://meowmari.ink/focus-mode.png</image>
