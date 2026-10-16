@@ -29,7 +29,7 @@ const TRANSLATIONS = { ru, de, es, zh } as const;
  * Words a language borrows whole, so being identical to the English is right
  * rather than a sign nobody translated it.
  */
-const BORROWED = new Set(["Markdown", "Terminal", "Link", "Original", "Plan"]);
+const BORROWED = new Set(["Markdown", "Link", "Original", "Plan"]);
 
 describe.each(Object.entries(TRANSLATIONS))("locale %s", (code, dictionary) => {
   const english = leaves(en as unknown as Node);

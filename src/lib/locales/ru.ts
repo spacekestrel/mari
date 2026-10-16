@@ -24,7 +24,6 @@ export const ru: Strings = {
     openFolder: "Открыть папку",
     save: "Сохранить",
     exportAs: "Экспортировать как…",
-    terminal: "Терминал",
     lightMode: "Светлая тема",
     darkMode: "Тёмная тема",
     settings: "Настройки",
@@ -215,12 +214,6 @@ export const ru: Strings = {
     plan: "План",
     planPlaceholder: "По одному пункту в строке",
     edit: "Изменить",
-  },
-
-  terminal: {
-    title: "Терминал",
-    clear: "Очистить",
-    close: "Закрыть терминал",
   },
 
   search: {

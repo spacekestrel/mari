@@ -16,7 +16,6 @@ export const zh: Strings = {
     openFolder: "打开文件夹",
     save: "保存",
     exportAs: "导出为…",
-    terminal: "终端",
     lightMode: "浅色主题",
     darkMode: "深色主题",
     settings: "设置",
@@ -204,12 +203,6 @@ export const zh: Strings = {
     plan: "计划",
     planPlaceholder: "每行一条",
     edit: "编辑",
-  },
-
-  terminal: {
-    title: "终端",
-    clear: "清屏",
-    close: "关闭终端",
   },
 
   search: {

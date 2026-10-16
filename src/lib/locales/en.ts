@@ -19,7 +19,6 @@ export const en = {
     openFolder: "Open folder",
     save: "Save",
     exportAs: "Export as…",
-    terminal: "Terminal",
     lightMode: "Light mode",
     darkMode: "Dark mode",
     settings: "Settings",
@@ -214,12 +213,6 @@ export const en = {
     plan: "Plan",
     planPlaceholder: "One step per line",
     edit: "Edit",
-  },
-
-  terminal: {
-    title: "Terminal",
-    clear: "Clear",
-    close: "Close terminal",
   },
 
   search: {

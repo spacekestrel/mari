@@ -11,8 +11,6 @@
     onOpenFolder: () => void;
     onSave: () => void;
     onExportAs: () => void;
-    canUseTerminal: boolean;
-    onToggleTerminal: () => void;
   }
 
   let {
@@ -21,8 +19,6 @@
     onOpenFolder,
     onSave,
     onExportAs,
-    canUseTerminal,
-    onToggleTerminal,
   }: Props = $props();
 
   let open = $state(false);
@@ -112,13 +108,6 @@
           {i18n.t.menu.exportAs}
           <span class="shortcut">Ctrl+Shift+S</span>
         </button>
-        {#if canUseTerminal}
-          <div class="divider"></div>
-          <button class="row" onclick={() => run(onToggleTerminal)}>
-            <Icon name="terminal" size={16} />
-            {i18n.t.menu.terminal}
-          </button>
-        {/if}
         <div class="divider"></div>
         <!-- Theme sits beside Settings rather than inside it: it's one click,
              and burying a switch behind a submenu makes it slower than it was. -->

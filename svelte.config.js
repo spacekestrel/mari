@@ -16,9 +16,9 @@ const config = {
     /**
      * What the app is allowed to run and load.
      *
-     * Mari renders Markdown from files people send each other, and it has a
-     * terminal. DOMPurify strips anything dangerous out of that Markdown, but
-     * it is one library standing between a document and a shell. This is the
+     * Mari renders Markdown from files people send each other. DOMPurify
+     * strips anything dangerous out of it, but it is one library standing
+     * between a document and the app. This is the
      * second lock: even if something got past the sanitiser, the browser
      * refuses to execute it, and the only host it could reach is Mari's own
      * website.

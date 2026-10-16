@@ -13,10 +13,9 @@
   import Preview from "$lib/components/Preview.svelte";
   import Sidebar from "$lib/components/Sidebar.svelte";
   import { appNews } from "$lib/appNews.svelte";
-  import Terminal from "$lib/components/Terminal.svelte";
   import TitleBar from "$lib/components/TitleBar.svelte";
   import { basename, getFileSystemAdapter, type FsEntry, type OpenedFile } from "$lib/platform";
-  import { isLinuxDesktop, isTauriDesktop } from "$lib/platform/os";
+  import { isTauriDesktop } from "$lib/platform/os";
   import { getLastSession, updateLastSession } from "$lib/platform/lastSession";
   import { countChars, countWords } from "$lib/wordcount";
   import { deletePreference } from "$lib/deletePreference.svelte";
@@ -54,9 +53,6 @@
   let sidebarRefreshKey = $state(0);
   let activePath = $state<string | null>(null);
   let previewMode = $state(false);
-  let canUseTerminal = $state(false);
-  let terminalMounted = $state(false);
-  let terminalOpen = $state(false);
   let pendingDelete = $state<{ entry: FsEntry; parent: FsEntry } | null>(null);
   let treeContextMenu = $state<{ entry: FsEntry; parent: FsEntry; x: number; y: number } | null>(null);
   /** The sidebar row currently showing a box with its own name in it. */
@@ -101,7 +97,6 @@
   }
 
   onMount(async () => {
-    canUseTerminal = await isLinuxDesktop();
     // Not awaited: the session is what the writer is waiting for, and the
     // news card can arrive a moment later or not at all.
     appNews.refresh();
@@ -1029,11 +1024,6 @@
       onOpenFolder={handleOpenFolder}
       onSave={handleSave}
       onExportAs={handleSaveAs}
-      {canUseTerminal}
-      onToggleTerminal={() => {
-        terminalMounted = true;
-        terminalOpen = !terminalOpen;
-      }}
     />
   {/if}
   <div
@@ -1050,11 +1040,6 @@
           onOpenFolder={handleOpenFolder}
           onSave={handleSave}
           onExportAs={handleSaveAs}
-                  {canUseTerminal}
-          onToggleTerminal={() => {
-            terminalMounted = true;
-            terminalOpen = !terminalOpen;
-          }}
         />
       {/if}
       {#if openedFolder}
@@ -1166,11 +1151,6 @@
     </main>
   </div>
 
-  {#if terminalMounted}
-    <div class="terminal-wrap" class:hidden={!terminalOpen}>
-      <Terminal onClose={() => (terminalOpen = false)} cwd={openedFolder?.path} visible={terminalOpen} />
-    </div>
-  {/if}
 
   <footer class="status-bar">
     {#if documentOpen}
@@ -1391,10 +1371,6 @@
     transition: background-color 0.15s ease, border-color 0.15s ease;
   }
 
-  .terminal-wrap.hidden {
-    display: none;
-  }
-
   /* Focus mode is meant to read like the browser's own F11: real fullscreen,
      nothing on screen but the prose. The focus button goes too — Esc is the
      way back out, same as F11 fullscreen anywhere else. */
@@ -1410,7 +1386,6 @@
 
   .distraction-free .toolbar,
   .distraction-free .status-bar,
-  .distraction-free .terminal-wrap,
   .distraction-free .focus-fab {
     display: none;
   }

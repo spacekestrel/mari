@@ -11,11 +11,9 @@
     onOpenFolder: () => void;
     onSave: () => void;
     onExportAs: () => void;
-    canUseTerminal: boolean;
-    onToggleTerminal: () => void;
   }
 
-  let { onNew, onOpenFile, onOpenFolder, onSave, onExportAs, canUseTerminal, onToggleTerminal }: Props = $props();
+  let { onNew, onOpenFile, onOpenFolder, onSave, onExportAs }: Props = $props();
 
   let appWindow: ReturnType<typeof GetCurrentWindow> | null = null;
 
@@ -27,7 +25,7 @@
 
 <div class="titlebar" data-tauri-drag-region>
   <div class="titlebar-side">
-    <FileMenu {onNew} {onOpenFile} {onOpenFolder} {onSave} {onExportAs} {canUseTerminal} {onToggleTerminal} />
+    <FileMenu {onNew} {onOpenFile} {onOpenFolder} {onSave} {onExportAs} />
   </div>
   <div class="titlebar-title" data-tauri-drag-region>Mari</div>
   <div class="titlebar-side titlebar-controls">

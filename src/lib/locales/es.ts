@@ -11,7 +11,6 @@ export const es: Strings = {
     openFolder: "Abrir carpeta",
     save: "Guardar",
     exportAs: "Exportar como…",
-    terminal: "Terminal",
     lightMode: "Tema claro",
     darkMode: "Tema oscuro",
     settings: "Ajustes",
@@ -202,12 +201,6 @@ export const es: Strings = {
     plan: "Plan",
     planPlaceholder: "Un paso por línea",
     edit: "Editar",
-  },
-
-  terminal: {
-    title: "Terminal",
-    clear: "Limpiar",
-    close: "Cerrar el terminal",
   },
 
   search: {
