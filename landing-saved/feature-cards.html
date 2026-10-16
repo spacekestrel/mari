@@ -1,0 +1,288 @@
+<!--
+  The "Four reasons you'll never go back." cards, taken off docs/index.html
+  when the receipt and the focus-mode moment replaced them. Kept so they can
+  go back. Each piece says where it went. The whole page as it was with the
+  cards is in index-with-cards.html next to this file.
+-->
+
+<style>
+/* 1. CSS: in the main <style>, just before the "trailer" block */
+/* ---------- reasons ---------- */
+.reasons { padding: clamp(5rem, 11vw, 9rem) 0 clamp(3rem, 6vw, 5rem); }
+.reasons-head { font-size: clamp(3rem, 8.5vw, 7.6rem); max-width: 10em; }
+.reasons-head em { color: var(--pink); }
+.beats { display: grid; gap: 36px; margin-top: clamp(3rem, 6vw, 5rem); }
+.beat {
+  --bg: var(--lime); --acc: var(--pink); --fg: var(--ink);
+  position: sticky; top: calc(100px + env(safe-area-inset-top, 0px));
+  display: grid; grid-template-columns: .9fr 1.1fr; align-items: center; gap: clamp(1.5rem, 4vw, 4rem);
+  min-height: min(620px, calc(100vh - 140px));
+  padding: clamp(1.8rem, 4.5vw, 4rem);
+  border: var(--line); border-radius: clamp(28px, 4vw, 48px);
+  background: var(--bg); color: var(--fg);
+  box-shadow: 10px 10px 0 var(--ink);
+  transform-origin: 50% 0;
+}
+.beat > * { min-width: 0; }
+.beats > .beat { min-width: 0; }
+.beat .num {
+  display: inline-grid; place-items: center;
+  width: 64px; height: 64px; margin-bottom: 1.4rem;
+  border: var(--line); border-radius: 50%;
+  background: var(--acc); color: var(--ink);
+  font: 900 1.9rem/1 var(--display);
+  box-shadow: 3px 3px 0 var(--ink);
+  rotate: -8deg;
+}
+.beat h3 { font-size: clamp(2.7rem, 6vw, 5.4rem); }
+.beat h3 em { color: var(--acc); }
+.beat p { margin: 1.3rem 0 0; max-width: 22em; font-size: clamp(1.1rem, 1.6vw, 1.35rem); font-weight: 500; }
+.beat .media { position: relative; }
+.beat .media::before {
+  content: ""; position: absolute; inset: 8% -6% -8% 8%; z-index: 0;
+  border-radius: 50% 44% 52% 40%;
+  background: var(--acc);
+}
+.beat .frame {
+  position: relative; z-index: 1;
+  border: var(--line); border-radius: 18px;
+  background: #1f1e1a;
+  box-shadow: 8px 8px 0 var(--ink);
+  overflow: hidden;
+  rotate: 2.5deg;
+}
+.beat:nth-child(even) .frame { rotate: -2.5deg; }
+.b1 { --bg: var(--lime); --acc: var(--pink); }
+.b2 { --bg: var(--tang); --acc: var(--gold); }
+.b3 { --bg: var(--pink); --acc: var(--lime); }
+.b4 { --bg: var(--ink); --acc: var(--gold); --fg: var(--paper); }
+.b4 .frame { border-color: var(--paper); }
+.peek { position: absolute; z-index: 0; left: 12%; top: -86px; width: 150px; }
+.peek .mari { width: 100%; display: block; }
+.b3 .media { margin-top: 70px; }
+
+/* ---------- tap or click a picture to see it big ---------- */
+.beat .frame { cursor: zoom-in; -webkit-tap-highlight-color: transparent; }
+.beat .frame:focus-visible { outline: 3px solid var(--pink); outline-offset: 5px; }
+.zoom-hint {
+  position: absolute; right: 12px; bottom: 12px; z-index: 2;
+  display: grid; place-items: center; width: 46px; height: 46px;
+  border: var(--line); border-radius: 50%;
+  background: var(--paper); color: var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  transform: scale(.85);
+  transition: transform .3s cubic-bezier(.3, 1.6, .5, 1);
+  pointer-events: none;
+}
+.zoom-hint svg { width: 22px; height: 22px; }
+@media (hover: hover) { .beat .frame:hover .zoom-hint { transform: scale(1.1) rotate(-12deg); } }
+.zoom { position: fixed; inset: 0; z-index: 150; display: grid; place-items: center; cursor: zoom-out; overscroll-behavior: contain; }
+.zoom[hidden] { display: none; }
+.zoom-back { position: absolute; inset: 0; background: rgba(20, 18, 15, .86); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.zoom-img {
+  position: absolute; max-width: none;
+  border: 3px solid var(--paper); border-radius: 18px;
+  background: #1f1e1a;
+  box-shadow: 14px 14px 0 var(--zacc, var(--pink));
+  transform-origin: 50% 50%;
+}
+.zoom-close {
+  position: absolute; z-index: 2;
+  top: calc(16px + env(safe-area-inset-top, 0px)); right: 16px;
+  display: grid; place-items: center; width: 52px; height: 52px;
+  border: var(--line); border-radius: 50%;
+  background: var(--gold); color: var(--ink);
+  box-shadow: 0 4px 0 var(--ink);
+  cursor: pointer;
+}
+.zoom-close svg { width: 22px; height: 22px; }
+
+
+/* 2. CSS: inside @media (max-width: 960px) and @media (max-width: 560px) */
+  .beat { position: relative; top: 0; grid-template-columns: 1fr; min-height: 0; }
+  .beat { box-shadow: 6px 6px 0 var(--ink); }
+  .peek { width: 110px; top: -62px; }
+  .b3 .media { margin-top: 56px; }
+  html:lang(ru) .beat h3 { font-size: min(2.2rem, 10vw); }
+
+/* 3. CSS: next to the other html:lang(ru) rules near the top */
+html:lang(ru) .beat h3 { font-size: clamp(2.3rem, 4.4vw, 4.2rem); }
+</style>
+
+<!-- 4. HTML: in <main>, just before the trailer section -->
+<section class="reasons" id="why">
+  <div class="wrap">
+    <h2 class="reasons-head split" data-i18n="reasons.h2">Four reasons you'll <em>never</em> go back.</h2>
+
+    <div class="beats">
+      <article class="beat b1">
+        <div>
+          <span class="num">1</span>
+          <h3 class="split" data-i18n="b1.h3">Read it like an <em>editor.</em></h3>
+          <p data-i18n="b1.p">Mark what sings, what drags and what's in the wrong place. Right on the page.</p>
+        </div>
+        <div class="media">
+          <div class="frame" role="button" tabindex="0" aria-label="Enlarge the picture" data-i18n-aria="zoom.open"><img src="highlights.gif" width="900" height="512" alt="Passages in a chapter being marked in different colours" data-i18n-alt="b1.alt" loading="lazy"><span class="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg></span></div>
+        </div>
+      </article>
+
+      <article class="beat b2">
+        <div>
+          <span class="num">2</span>
+          <h3 class="split" data-i18n="b2.h3">Rewrite without <em>fear.</em></h3>
+          <p data-i18n="b2.p">Try a new version right beside the old one. Every version you replace is kept.</p>
+        </div>
+        <div class="media">
+          <div class="frame" role="button" tabindex="0" aria-label="Enlarge the picture" data-i18n-aria="zoom.open"><img src="draft-and-compare.gif" width="900" height="553" alt="Two versions of a passage side by side, with the changed words picked out" data-i18n-alt="b2.alt" loading="lazy"><span class="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg></span></div>
+        </div>
+      </article>
+
+      <article class="beat b3">
+        <div>
+          <span class="num">3</span>
+          <h3 class="split" data-i18n="b3.h3">Kill your darlings. Keep the <em>bodies.</em></h3>
+          <p data-i18n="b3.p">Cut scenes go in the drawer, not the bin. Bring them back whenever you like.</p>
+        </div>
+        <div class="media">
+          <div class="peek" aria-hidden="true"><svg class="mari" viewBox="300 205 400 200"><path class="body" d="__BODY__"/><path class="wh wh-l" d="__WL__"/><path class="wh wh-r" d="__WR__"/><g class="eyes"><ellipse class="eye" cx="446.8" cy="425" rx="14.5" ry="22.5"/><ellipse class="eye" cx="581.7" cy="440.5" rx="14" ry="23"/></g></svg></div>
+          <div class="frame" role="button" tabindex="0" aria-label="Enlarge the picture" data-i18n-aria="zoom.open"><img src="drawer.gif" width="900" height="506" alt="A cut passage going into the drawer and being read back" data-i18n-alt="b3.alt" loading="lazy"><span class="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg></span></div>
+        </div>
+      </article>
+
+      <article class="beat b4">
+        <div>
+          <span class="num">4</span>
+          <h3 class="split" data-i18n="b4.h3">Then just <em>write.</em></h3>
+          <p data-i18n="b4.p">One key, and everything disappears except your words.</p>
+        </div>
+        <div class="media">
+          <div class="frame" role="button" tabindex="0" aria-label="Enlarge the picture" data-i18n-aria="zoom.open"><img src="focus-mode.png" width="1920" height="1080" alt="Focus mode, with nothing on screen but the writing" data-i18n-alt="b4.alt" loading="lazy"><span class="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg></span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- 5. HTML: right after </main> -->
+<div class="zoom" id="zoom" hidden>
+  <div class="zoom-back"></div>
+  <img class="zoom-img" alt="">
+  <button class="zoom-close" type="button" aria-label="Close" data-i18n-aria="zoom.close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+</div>
+
+<script>
+/* 6. JS: inside startMotion(), just before rdMotion(); */
+    $$(".beat").forEach((b) => {
+      gsap.from(b.querySelector(".frame"), { y: 90, rotate: 10, scale: 0.85, duration: 1, ease: "back.out(1.5)", scrollTrigger: { trigger: b, start: "top 75%" } });
+      gsap.from(b.querySelector(".num"), { scale: 0, rotate: -90, duration: 0.6, ease: "back.out(2.5)", scrollTrigger: { trigger: b, start: "top 75%" } });
+    });
+
+    // the cards pile up: each one shrinks and tips as the next slides over it
+    ScrollTrigger.matchMedia({
+      "(min-width: 961px)": () => {
+        const beats = $$(".beat");
+        beats.forEach((b, i) => {
+          const next = beats[i + 1];
+          if (!next) return;
+          gsap.to(b, { scale: 0.9, rotate: i % 2 ? 1.5 : -1.5, ease: "none", scrollTrigger: { trigger: next, start: "top bottom", end: "top 20%", scrub: true } });
+        });
+      },
+    });
+
+
+/* 7. JS: in the main script, before "your own trailer" */
+  /* ---------- tap or click a picture to see it big ----------
+     The picture flies out of its card to the middle of the screen and fills
+     it. On a phone held upright it turns sideways to use the long side. */
+  const zoom = $("#zoom"), zoomImg = $(".zoom-img", zoom), zoomBack = $(".zoom-back", zoom), zoomClose = $(".zoom-close", zoom);
+  const zoomMs = reduced ? 0 : 560;
+  const env = { get top() { return parseFloat(getComputedStyle(zoomClose).top) - 16 || 0; } };
+  let zoomFrom = null, zoomL = null;
+
+  const zoomLayout = (img) => {
+    const nw = img.naturalWidth || img.width, nh = img.naturalHeight || img.height;
+    // fill the screen, leaving a thin edge (the close button may sit over a corner)
+    const edge = Math.max(12, Math.min(60, innerHeight * 0.06));
+    const roomW = innerWidth - 24, roomH = innerHeight - 2 * (env.top + edge);
+    const turn = innerWidth < 700 && innerHeight > innerWidth * 1.15 && nw > nh;
+    const s = turn ? Math.min(roomH / nw, roomW / nh) : Math.min(roomW / nw, roomH / nh);
+    return { w: Math.round(nw * s), h: Math.round(nh * s), rot: turn ? 90 : 0 };
+  };
+  // where the picture sits in its card, as a transform from the middle of the screen
+  const zoomStart = (frame) => {
+    const r = frame.getBoundingClientRect();
+    const rot = parseFloat(getComputedStyle(frame).rotate) || 0;
+    const rad = (rot * Math.PI) / 180, ow = frame.offsetWidth, oh = frame.offsetHeight;
+    const k = r.width / (ow * Math.abs(Math.cos(rad)) + oh * Math.abs(Math.sin(rad)));  // a card shrunk by the stack
+    const dx = r.left + r.width / 2 - innerWidth / 2, dy = r.top + r.height / 2 - innerHeight / 2;
+    return `translate(${dx}px, ${dy}px) rotate(${rot}deg) scale(${(ow * k) / zoomL.w}, ${(oh * k) / zoomL.h})`;
+  };
+  const zoomEnd = () => `rotate(${zoomL.rot}deg)`;
+  const zoomPlace = () => {
+    zoomImg.style.width = zoomL.w + "px";
+    zoomImg.style.height = zoomL.h + "px";
+    zoomImg.style.left = (innerWidth - zoomL.w) / 2 + "px";
+    zoomImg.style.top = (innerHeight - zoomL.h) / 2 + "px";
+  };
+  const stopScroll = (e) => e.preventDefault();
+
+  function openZoom(frame) {
+    if (zoomFrom) return;
+    const img = frame.querySelector("img");
+    zoomFrom = frame;
+    zoomL = zoomLayout(img);
+    zoomImg.src = img.currentSrc || img.src;
+    zoomImg.alt = img.alt;
+    zoomPlace();
+    zoom.style.setProperty("--zacc", getComputedStyle(frame.closest(".beat")).getPropertyValue("--acc"));
+    zoom.hidden = false;
+    if (lenis) lenis.stop();
+    zoomImg.getAnimations().forEach((a) => a.cancel());
+    zoomImg.style.transform = zoomEnd();
+    if (zoomMs) {
+      zoomImg.animate([{ transform: zoomStart(frame) }, { transform: zoomEnd() }], { duration: zoomMs, easing: "cubic-bezier(.2, .9, .25, 1.08)" });
+      zoomBack.animate([{ opacity: 0 }, { opacity: 1 }], { duration: zoomMs * 0.6, easing: "ease-out" });
+      zoomClose.animate([{ opacity: 0, transform: "scale(.4) rotate(-90deg)" }, { opacity: 1, transform: "none" }], { duration: zoomMs, delay: zoomMs * 0.3, easing: "cubic-bezier(.3, 1.6, .5, 1)", fill: "backwards" });
+    }
+    frame.style.visibility = "hidden";
+    zoomClose.focus({ preventScroll: true });
+  }
+
+  function closeZoom() {
+    const frame = zoomFrom;
+    if (!frame || zoom.dataset.closing) return;
+    const done = () => {
+      zoom.hidden = true;
+      delete zoom.dataset.closing;
+      zoomImg.getAnimations().forEach((a) => a.cancel());
+      zoomBack.getAnimations().forEach((a) => a.cancel());
+      frame.style.visibility = "";
+      zoomFrom = null;
+      if (lenis) lenis.start();
+      frame.focus({ preventScroll: true });
+    };
+    if (!zoomMs) return done();
+    zoom.dataset.closing = "1";
+    zoomImg.animate([{ transform: zoomEnd() }, { transform: zoomStart(frame) }], { duration: zoomMs * 0.75, easing: "cubic-bezier(.5, 0, .2, 1)", fill: "forwards" }).onfinish = done;
+    zoomBack.animate([{ opacity: 1 }, { opacity: 0 }], { duration: zoomMs * 0.75, fill: "forwards" });
+    zoomClose.animate([{ opacity: 1 }, { opacity: 0 }], { duration: zoomMs * 0.3, fill: "forwards" });
+  }
+
+  $$(".beat .frame").forEach((frame) => {
+    frame.addEventListener("click", () => openZoom(frame));
+    frame.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openZoom(frame); }
+    });
+  });
+  zoom.addEventListener("click", closeZoom);
+  zoom.addEventListener("wheel", stopScroll, { passive: false });
+  zoom.addEventListener("touchmove", stopScroll, { passive: false });
+  addEventListener("keydown", (e) => { if (e.key === "Escape") closeZoom(); });
+  addEventListener("resize", () => {
+    if (!zoomFrom || zoom.dataset.closing) return;
+    zoomL = zoomLayout(zoomFrom.querySelector("img"));
+    zoomPlace();
+    zoomImg.style.transform = zoomEnd();
+  });
+
+</script>
