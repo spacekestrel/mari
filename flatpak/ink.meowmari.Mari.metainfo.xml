@@ -13,18 +13,20 @@
   </developer>
 
   <description>
-    <p>Mari is an app for writing.</p>
     <p>
-      It is minimalist yet powerful, and all of it is aimed at one thing:
-      making the best text possible.
+      Mari is a minimalist yet powerful app aimed at one thing: making the
+      best text possible.
     </p>
     <p>
-      Mark a paragraph the way you would on a printed page — good, weak, cut,
-      come back to this. Open a rewrite beside the original and work on both
-      at once. What you cut goes to the drawer instead of nowhere, and comes
-      back whenever you want it. Notes, old versions, the plan and a map of
-      the whole piece are all there, and all of it lives in one file you can
-      send to somebody, who opens exactly what you see.
+      Write your draft. Read it back and mark it up — good, weak, cut, come
+      back to this. Then rewrite the weak parts with the original open beside
+      them, so you can see what you are changing. Anything you cut goes to the
+      drawer instead of nowhere, and comes back whenever you want it.
+    </p>
+    <p>
+      All of it is kept in one file. The text, the marks, your notes, the old
+      versions, the plan and a map of the whole piece live in a single .mari
+      file. Send that file to somebody and they open exactly what you see.
     </p>
     <p>And the rest of it:</p>
     <ul>
