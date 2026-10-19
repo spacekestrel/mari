@@ -2,13 +2,13 @@
   "_readme": "The news card at the foot of Mari's sidebar. Edit this file, push to main, and every copy of Mari picks it up the next time someone opens it. See docs/messages.md for what each field does.",
   "messages": [
     {
-      "id": "0-5-7",
+      "id": "0-5-8",
       "title": {
-        "en": "Mari 0.5.7 is out",
-        "ru": "Вышла Mari 0.5.7",
-        "de": "Mari 0.5.7 ist da",
-        "es": "Ya está Mari 0.5.7",
-        "zh": "Mari 0.5.7 已发布"
+        "en": "Mari 0.5.8 is out",
+        "ru": "Вышла Mari 0.5.8",
+        "de": "Mari 0.5.8 ist da",
+        "es": "Ya está Mari 0.5.8",
+        "zh": "Mari 0.5.8 已发布"
       },
       "body": {
         "en": "Ctrl+Z now works while you draft a rewrite. And a bracket in the margin marks the passages you have reworked, so you can find your way back to what they used to say.",
@@ -27,7 +27,7 @@
           "zh": "下载"
         }
       },
-      "forVersionsBelow": "0.5.7"
+      "forVersionsBelow": "0.5.8"
     },
     {
       "id": "0-4-0",

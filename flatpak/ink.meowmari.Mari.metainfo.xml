@@ -96,7 +96,7 @@
   </requires>
 
   <releases>
-    <release version="0.5.7" date="2026-10-19">
+    <release version="0.5.8" date="2026-10-19">
       <description>
         <ul>
           <li>Undo and redo while drafting a rewrite, with Ctrl+Z and Ctrl+Shift+Z</li>
@@ -107,6 +107,7 @@
           <li>Alt+Enter opens the highlighted passage the cursor is in</li>
           <li>Ctrl+F puts the cursor straight in the search box, ready to type</li>
           <li>Earlier versions of a passage show a coloured strip saying what it was marked as at the time</li>
+          <li>Comparing a rewrite says how many words it gained or lost</li>
         </ul>
       </description>
     </release>
