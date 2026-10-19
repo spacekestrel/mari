@@ -194,6 +194,10 @@ export const ru: Strings = {
     restoreVersion: "Восстановить эту версию",
     movedBadge: "Перемещено",
     draftBadge: "Черновик",
+    wordCount: (n: number) => `${n} ${plural(n, "слово", "слова", "слов")}`,
+    longerBy: (n: number) => `на ${n} больше`,
+    shorterBy: (n: number) => `на ${n} меньше`,
+    sameLength: "столько же",
   },
 
   drawer: {

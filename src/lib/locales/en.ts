@@ -193,6 +193,10 @@ export const en = {
     restoreVersion: "Restore this version",
     movedBadge: "Moved",
     draftBadge: "Draft",
+    wordCount: (n: number) => `${n} ${n === 1 ? "word" : "words"}`,
+    longerBy: (n: number) => `${n} more`,
+    shorterBy: (n: number) => `${n} fewer`,
+    sameLength: "same length",
   },
 
   drawer: {

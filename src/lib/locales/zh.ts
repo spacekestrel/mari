@@ -183,6 +183,10 @@ export const zh: Strings = {
     restoreVersion: "恢复到这一版",
     movedBadge: "已移动",
     draftBadge: "草稿",
+    wordCount: (n: number) => `${n} 词`,
+    longerBy: (n: number) => `多 ${n}`,
+    shorterBy: (n: number) => `少 ${n}`,
+    sameLength: "长度相同",
   },
 
   drawer: {

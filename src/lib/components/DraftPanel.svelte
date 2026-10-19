@@ -4,6 +4,7 @@
   import Icon from "./Icon.svelte";
   import type { ChunkVersion } from "$lib/chunkHistory";
   import { draftPanelWidth } from "$lib/draftPanelWidth.svelte";
+  import { countWords } from "$lib/wordcount";
   import { HIGHLIGHT_STATES, migrateStateId } from "$lib/highlightStates";
   import { i18n, highlightLabel } from "$lib/i18n.svelte";
   import {
@@ -399,6 +400,26 @@
   }
 
   const compareDiff = $derived(mode === "compare" ? buildDiff(originalText, draftText) : null);
+
+  /**
+   * How much longer or shorter the rewrite came out.
+   *
+   * Length is the thing a writer is usually trying to change when they open
+   * this panel — tightening a flabby paragraph, or filling out a thin one —
+   * and reading two columns of prose side by side will not tell you whether
+   * you managed it.
+   */
+  const originalWords = $derived(countWords(originalText));
+  const draftWords = $derived(countWords(draftText));
+  const wordDelta = $derived(draftWords - originalWords);
+
+  const draftLengthNote = $derived(
+    wordDelta === 0
+      ? i18n.t.draft.sameLength
+      : wordDelta > 0
+        ? i18n.t.draft.longerBy(wordDelta)
+        : i18n.t.draft.shorterBy(-wordDelta),
+  );
   const historyDiff = $derived(viewingVersion ? buildDiff(viewingVersion.text, originalText) : null);
 
   const historyDesc = $derived([...history].reverse());
@@ -471,7 +492,10 @@
     {:else if mode === "compare" && compareDiff}
       <div class="compare-columns">
         <div class="column">
-          <div class="column-label">{i18n.t.draft.original}</div>
+          <div class="column-label">
+            <span>{i18n.t.draft.original}</span>
+            <span class="column-count">{i18n.t.draft.wordCount(originalWords)}</span>
+          </div>
           <div class="column-text">
             {#each compareDiff.left as run, i (i)}
               <span class:removed={run.changed}>{run.text}</span>
@@ -479,7 +503,15 @@
           </div>
         </div>
         <div class="column">
-          <div class="column-label">{i18n.t.draft.draft}</div>
+          <div class="column-label">
+            <span>{i18n.t.draft.draft}</span>
+            <span class="column-count">
+              {i18n.t.draft.wordCount(draftWords)}
+              <span class="length-change" class:grew={wordDelta > 0} class:shrank={wordDelta < 0}>
+                {draftLengthNote}
+              </span>
+            </span>
+          </div>
           <div class="column-text">
             {#each compareDiff.right as run, i (i)}
               <span class:added={run.changed}>{run.text}</span>
@@ -808,10 +840,38 @@
   }
 
   .column-label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    /* Wraps rather than squashing: the panel can be dragged narrow enough that
+       the name and the count will not share a line. */
+    flex-wrap: wrap;
+    gap: 2px 8px;
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     color: var(--color-text-muted);
+  }
+
+  /* Not uppercased: these are numbers and a short phrase, and small-caps
+     digits beside a heading read as part of the heading. */
+  .column-count {
+    text-transform: none;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+
+  /* Said plainly, without colouring it a verdict: shorter is the point of a
+     tightening pass and longer is the point of an expanding one, and the
+     panel has no way of knowing which this was. */
+  .length-change::before {
+    content: "·";
+    margin: 0 3px;
+  }
+
+  .length-change.grew,
+  .length-change.shrank {
+    color: var(--color-text);
   }
 
   .column-text {

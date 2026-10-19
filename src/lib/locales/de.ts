@@ -182,6 +182,10 @@ export const de: Strings = {
     restoreVersion: "Diese Fassung wiederherstellen",
     movedBadge: "Verschoben",
     draftBadge: "Entwurf",
+    wordCount: (n: number) => `${n} ${n === 1 ? "Wort" : "Wörter"}`,
+    longerBy: (n: number) => `${n} mehr`,
+    shorterBy: (n: number) => `${n} weniger`,
+    sameLength: "gleich lang",
   },
 
   drawer: {

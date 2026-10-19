@@ -181,6 +181,10 @@ export const es: Strings = {
     restoreVersion: "Restaurar esta versión",
     movedBadge: "Movido",
     draftBadge: "Borrador",
+    wordCount: (n: number) => `${n} ${n === 1 ? "palabra" : "palabras"}`,
+    longerBy: (n: number) => `${n} más`,
+    shorterBy: (n: number) => `${n} menos`,
+    sameLength: "igual de largo",
   },
 
   drawer: {
