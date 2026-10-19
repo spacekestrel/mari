@@ -96,6 +96,20 @@
   </requires>
 
   <releases>
+    <release version="0.5.7" date="2026-10-19">
+      <description>
+        <ul>
+          <li>Undo and redo while drafting a rewrite, with Ctrl+Z and Ctrl+Shift+Z</li>
+          <li>A bracket in the margin marks passages you have reworked, and leads back to their earlier wordings</li>
+          <li>Click a bracket to light it up and open the passage it belongs to</li>
+          <li>Undoing a deletion now brings back the highlights that were in it, and the notes and earlier wordings they lead to</li>
+          <li>Bold, italic and the rest now work while drafting a rewrite</li>
+          <li>Alt+Enter opens the highlighted passage the cursor is in</li>
+          <li>Ctrl+F puts the cursor straight in the search box, ready to type</li>
+          <li>Earlier versions of a passage show a coloured strip saying what it was marked as at the time</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.4.0" date="2026-10-16">
       <description>
         <ul>

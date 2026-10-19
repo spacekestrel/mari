@@ -2,6 +2,34 @@
   "_readme": "The news card at the foot of Mari's sidebar. Edit this file, push to main, and every copy of Mari picks it up the next time someone opens it. See docs/messages.md for what each field does.",
   "messages": [
     {
+      "id": "0-5-7",
+      "title": {
+        "en": "Mari 0.5.7 is out",
+        "ru": "Вышла Mari 0.5.7",
+        "de": "Mari 0.5.7 ist da",
+        "es": "Ya está Mari 0.5.7",
+        "zh": "Mari 0.5.7 已发布"
+      },
+      "body": {
+        "en": "Ctrl+Z now works while you draft a rewrite. And a bracket in the margin marks the passages you have reworked, so you can find your way back to what they used to say.",
+        "ru": "Ctrl+Z теперь работает, пока вы пишете новый вариант. А скобка на поле отмечает переписанные места, чтобы вы могли вернуться к прежним словам.",
+        "de": "Ctrl+Z funktioniert jetzt beim Entwerfen einer Neufassung. Und eine Klammer am Rand markiert überarbeitete Stellen, damit du zurück zum alten Wortlaut findest.",
+        "es": "Ctrl+Z ya funciona mientras redactas una reescritura. Y un corchete en el margen marca los pasajes que has reelaborado, para que puedas volver a lo que decían antes.",
+        "zh": "改写时现在可以用 Ctrl+Z 撤销。页边的方括号标出你改写过的段落，让你能找回原先的文字。"
+      },
+      "link": {
+        "url": "https://meowmari.ink",
+        "label": {
+          "en": "Get it",
+          "ru": "Скачать",
+          "de": "Holen",
+          "es": "Descargar",
+          "zh": "下载"
+        }
+      },
+      "forVersionsBelow": "0.5.7"
+    },
+    {
       "id": "0-4-0",
       "title": {
         "en": "Mari 0.4.0 is out",
