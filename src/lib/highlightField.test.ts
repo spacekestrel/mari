@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { EditorState } from "@codemirror/state";
+import { EditorState, type StateCommand } from "@codemirror/state";
+import { history, isolateHistory, redo, undo } from "@codemirror/commands";
 import {
   clearHighlightById,
   clearHighlights,
   createHighlightField,
+  highlightsFollowUndo,
   readHighlights,
   setHighlight,
 } from "./highlightField";
@@ -166,5 +168,143 @@ describe("clearing marks", () => {
     ]);
     const next = state.update({ effects: clearHighlightById.of("b") }).state;
     expect(mark(next, field)).toEqual(["good:Alpha paragraph.", "unsure:Gamma paragraph."]);
+  });
+});
+
+/**
+ * Cutting marked paragraphs and pressing Ctrl+Z used to bring the words back
+ * bare: the marks were gone, and with them the only way to reach each
+ * passage's notes and earlier wordings. These run the real undo history.
+ */
+describe("marks survive undo", () => {
+  function editor(initial: StoredHighlight[]) {
+    const field = createHighlightField(initial);
+    return {
+      field,
+      state: EditorState.create({
+        doc: DOC,
+        extensions: [field, history(), highlightsFollowUndo(field)],
+      }),
+    };
+  }
+
+  /** Reads against whatever the document says now, not what it said to begin with. */
+  const show = (state: EditorState, field: ReturnType<typeof createHighlightField>) =>
+    readHighlights(state.field(field), state.doc.length).map(
+      (h) => `${h.stateId}:${state.doc.sliceString(h.from, h.to)}`,
+    );
+
+  /** Runs a command the way a keypress would, and hands back the new state. */
+  function run(state: EditorState, command: StateCommand): EditorState {
+    let next = state;
+    command({ state, dispatch: (tr) => (next = tr.state) });
+    return next;
+  }
+
+  const threeMarks: StoredHighlight[] = [
+    { from: at("Alpha"), to: at("Alpha") + 16, stateId: "good", id: "m1" },
+    { from: at("Beta"), to: at("Beta") + 15, stateId: "rewrite", id: "m2" },
+    { from: at("Gamma"), to: at("Gamma") + 16, stateId: "cut", id: "m3" },
+  ];
+
+  it("brings a deleted paragraph's mark back with the words", () => {
+    const { field, state } = editor(threeMarks);
+    const cut = state.update({ changes: { from: at("Beta"), to: at("Beta") + 15 } }).state;
+    expect(show(cut, field)).toEqual(["good:Alpha paragraph.", "cut:Gamma paragraph."]);
+
+    const back = run(cut, undo);
+    expect(back.doc.toString()).toBe(DOC);
+    expect(show(back, field)).toEqual([
+      "good:Alpha paragraph.",
+      "rewrite:Beta paragraph.",
+      "cut:Gamma paragraph.",
+    ]);
+  });
+
+  it("brings back every mark when the whole chapter goes at once", () => {
+    const { field, state } = editor(threeMarks);
+    const cut = state.update({ changes: { from: 0, to: DOC.length } }).state;
+    expect(show(cut, field)).toEqual([]);
+
+    const back = run(cut, undo);
+    expect(show(back, field)).toEqual([
+      "good:Alpha paragraph.",
+      "rewrite:Beta paragraph.",
+      "cut:Gamma paragraph.",
+    ]);
+  });
+
+  it("keeps each mark's own identity, so its notes and drafts still belong to it", () => {
+    const { field, state } = editor(threeMarks);
+    const cut = state.update({ changes: { from: 0, to: DOC.length } }).state;
+    const back = run(cut, undo);
+    expect(readHighlights(back.field(field), back.doc.length).map((h) => h.id)).toEqual([
+      "m1",
+      "m2",
+      "m3",
+    ]);
+  });
+
+  it("takes them away again on redo", () => {
+    const { field, state } = editor(threeMarks);
+    const cut = state.update({ changes: { from: at("Beta"), to: at("Beta") + 15 } }).state;
+    const forward = run(run(cut, undo), redo);
+    expect(show(forward, field)).toEqual(["good:Alpha paragraph.", "cut:Gamma paragraph."]);
+  });
+
+  it("walks back through several cuts one at a time", () => {
+    const { field, state } = editor(threeMarks);
+    let edited = state.update({ changes: { from: at("Gamma"), to: at("Gamma") + 16 } }).state;
+    // Far enough apart in the history to be two separate presses.
+    edited = edited.update({
+      changes: { from: at("Beta"), to: at("Beta") + 15 },
+      annotations: isolateHistory.of("before"),
+    }).state;
+    expect(show(edited, field)).toEqual(["good:Alpha paragraph."]);
+
+    const once = run(edited, undo);
+    expect(show(once, field)).toEqual(["good:Alpha paragraph.", "rewrite:Beta paragraph."]);
+
+    const twice = run(once, undo);
+    expect(show(twice, field)).toEqual([
+      "good:Alpha paragraph.",
+      "rewrite:Beta paragraph.",
+      "cut:Gamma paragraph.",
+    ]);
+  });
+
+  it("leaves one mark on an undone replacement, never two", () => {
+    const { field, state } = editor(threeMarks);
+    const replaced = state.update({
+      changes: { from: at("Beta"), to: at("Beta") + 15, insert: "Something else entirely." },
+    }).state;
+    const back = run(replaced, undo);
+
+    expect(readHighlights(back.field(field), back.doc.length).filter((h) => h.id === "m2")).toHaveLength(1);
+    expect(show(back, field)).toContain("rewrite:Beta paragraph.");
+  });
+
+  it("does not double up a mark that was only clipped at one end", () => {
+    const { field, state } = editor(threeMarks);
+    // Takes the back half of Beta's mark, leaving the front half standing.
+    const clipped = state.update({ changes: { from: at("Beta") + 5, to: at("Beta") + 15 } }).state;
+    const back = run(clipped, undo);
+
+    expect(readHighlights(back.field(field), back.doc.length).filter((h) => h.id === "m2")).toHaveLength(1);
+    expect(back.doc.toString()).toBe(DOC);
+  });
+
+  it("leaves marking a passage outside the undo history, as it always was", () => {
+    const { field, state } = editor([]);
+    const marked = state.update({
+      effects: setHighlight.of({ from: at("Beta"), to: at("Beta") + 15, stateId: "tweak", id: "m9" }),
+    }).state;
+    const typed = marked.update({ changes: { from: 0, insert: "New. " } }).state;
+
+    // One undo takes back the typing. The mark stays — it is not an edit, and
+    // pressing the same key again is how it is cleared.
+    const back = run(typed, undo);
+    expect(back.doc.toString()).toBe(DOC);
+    expect(readHighlights(back.field(field), back.doc.length).map((h) => h.id)).toEqual(["m9"]);
   });
 });

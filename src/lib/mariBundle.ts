@@ -1,6 +1,7 @@
 import { unzipSync, zipSync, strToU8, strFromU8 } from "fflate";
 import type { StoredHighlight } from "./highlightStore";
 import type { ChunkVersion } from "./chunkHistory";
+import type { StoredWorked } from "./workedMarks";
 
 /**
  * A `.mari` file is a zip. Nothing is encrypted or obfuscated: rename it to
@@ -15,6 +16,7 @@ import type { ChunkVersion } from "./chunkHistory";
  *   highlights.json    revision marks
  *   notes.json         per-passage notes
  *   history.json       replaced drafts and moves
+ *   worked.json        where the passages you have reworked sit
  *   synopsis.json      what this chapter is about
  *   ...                anything a later version adds
  *
@@ -33,9 +35,10 @@ const NOTES = "notes.json";
 const HISTORY = "history.json";
 const SYNOPSIS = "synopsis.json";
 const CUTS = "cuts.json";
+const WORKED = "worked.json";
 
 /** Files this build understands; everything else is preserved verbatim. */
-const KNOWN_PARTS = new Set([MANIFEST, CONTENT, HIGHLIGHTS, NOTES, HISTORY, SYNOPSIS, CUTS]);
+const KNOWN_PARTS = new Set([MANIFEST, CONTENT, HIGHLIGHTS, NOTES, HISTORY, SYNOPSIS, CUTS, WORKED]);
 
 /**
  * What this chapter is, held as two separate things.
@@ -131,6 +134,25 @@ function normalizeCuts(value: unknown): MariCut[] {
     }));
 }
 
+/**
+ * Drops entries a hand-edited file might have mangled. A bracket with no
+ * passage behind it, or one pointing nowhere, is worse than no bracket: it
+ * would stand in the margin against prose nobody ever reworked.
+ */
+function normalizeWorked(value: unknown): StoredWorked[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter(
+    (worked): worked is StoredWorked =>
+      !!worked &&
+      typeof worked === "object" &&
+      typeof worked.id === "string" &&
+      !!worked.id &&
+      Number.isFinite(worked.from) &&
+      Number.isFinite(worked.to) &&
+      worked.to > worked.from,
+  );
+}
+
 export interface MariManifest {
   format: "mari";
   version: number;
@@ -147,6 +169,8 @@ export interface MariBundle {
   history: Record<string, ChunkVersion[]>;
   synopsis: MariSynopsis;
   cuts: MariCut[];
+  /** Passages that have been reworked, and so carry a bracket in the margin. */
+  worked: StoredWorked[];
   manifest: MariManifest;
   /**
    * Parts from a newer (or simply unknown) version, kept byte-for-byte so
@@ -178,6 +202,7 @@ export function packMariBundle(bundle: {
   history: Record<string, ChunkVersion[]>;
   synopsis?: MariSynopsis;
   cuts?: MariCut[];
+  worked?: StoredWorked[];
   manifest?: Partial<MariManifest>;
   unknownParts?: Record<string, Uint8Array>;
 }): Uint8Array {
@@ -205,6 +230,7 @@ export function packMariBundle(bundle: {
     [HISTORY]: strToU8(JSON.stringify(bundle.history)),
     [SYNOPSIS]: strToU8(JSON.stringify(bundle.synopsis ?? emptySynopsis())),
     [CUTS]: strToU8(JSON.stringify(bundle.cuts ?? [])),
+    [WORKED]: strToU8(JSON.stringify(bundle.worked ?? [])),
   };
 
   return zipSync(files, { level: 6 });
@@ -231,6 +257,7 @@ export function unpackMariBundle(bytes: Uint8Array): MariBundle {
     history: parseJson<Record<string, ChunkVersion[]>>(files[HISTORY], {}),
     synopsis: normalizeSynopsis(parseJson<MariSynopsis>(files[SYNOPSIS], emptySynopsis())),
     cuts: normalizeCuts(parseJson<MariCut[]>(files[CUTS], [])),
+    worked: normalizeWorked(parseJson<StoredWorked[]>(files[WORKED], [])),
     manifest,
     unknownParts,
   };

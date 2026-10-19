@@ -26,6 +26,7 @@ function fullBundle(cuts: MariCut[] = [cut()]) {
     },
     synopsis: { text: "What happens.", plan: [{ text: "First beat" }, { text: "Second beat", done: true }] },
     cuts,
+    worked: [{ id: "mark-1", from: 0, to: 14 }],
   } as Parameters<typeof packMariBundle>[0];
 }
 
@@ -87,6 +88,55 @@ describe("cuts survive files this build didn't write", () => {
     const back = unpackMariBundle(packMariBundle(opened));
     expect(back.manifest.version).toBe(9);
     expect(back.cuts).toEqual([cut()]);
+  });
+});
+
+/**
+ * A bracket in the margin is the only sign left that a passage was reworked —
+ * the highlight that asked for the rewrite is cleared when the work is done.
+ * Lose the brackets and the earlier wordings are still in the file with nothing
+ * pointing at them.
+ */
+describe("brackets survive a save", () => {
+  it("keeps where a reworked passage sits", () => {
+    expect(roundTrip(fullBundle()).worked).toEqual([{ id: "mark-1", from: 0, to: 14 }]);
+  });
+
+  it("keeps them through repeated saves", () => {
+    let back = roundTrip(fullBundle());
+    for (let i = 0; i < 5; i++) back = roundTrip(back);
+    expect(back.worked).toEqual([{ id: "mark-1", from: 0, to: 14 }]);
+  });
+
+  it("keeps the chunk id, which is what leads back to the old wordings", () => {
+    const back = roundTrip(fullBundle());
+    expect(back.worked[0].id).toBe("mark-1");
+    expect(Object.keys(back.history)).toContain(back.worked[0].id);
+  });
+
+  it("reads a file saved before brackets existed without inventing any", () => {
+    const stripped = unzipSync(packMariBundle(fullBundle()));
+    delete stripped["worked.json"];
+    const back = unpackMariBundle(zipSync(stripped));
+    expect(back.worked).toEqual([]);
+    expect(back.cuts).toEqual([cut()]);
+  });
+
+  it("drops a mangled bracket rather than standing it against the wrong prose", () => {
+    const damaged = unzipSync(packMariBundle(fullBundle()));
+    damaged["worked.json"] = strToU8(
+      '[{"id":"ok","from":0,"to":5},{"id":"","from":0,"to":5},{"from":0,"to":5},{"id":"backwards","from":9,"to":2},{"id":"empty","from":3,"to":3}]',
+    );
+    const back = unpackMariBundle(zipSync(damaged));
+    expect(back.worked).toEqual([{ id: "ok", from: 0, to: 5 }]);
+  });
+
+  it("survives a brackets part that isn't a list", () => {
+    const damaged = unzipSync(packMariBundle(fullBundle()));
+    damaged["worked.json"] = strToU8('{"not":"a list"}');
+    const back = unpackMariBundle(zipSync(damaged));
+    expect(back.worked).toEqual([]);
+    expect(back.text).toContain("Chapter prose");
   });
 });
 

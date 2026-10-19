@@ -1,11 +1,28 @@
 <script lang="ts">
-  import { untrack } from "svelte";
+  import { tick, untrack } from "svelte";
   import { diffWordsWithSpace } from "diff";
   import Icon from "./Icon.svelte";
   import type { ChunkVersion } from "$lib/chunkHistory";
   import { draftPanelWidth } from "$lib/draftPanelWidth.svelte";
-  import { HIGHLIGHT_STATES } from "$lib/highlightStates";
+  import { HIGHLIGHT_STATES, migrateStateId } from "$lib/highlightStates";
   import { i18n, highlightLabel } from "$lib/i18n.svelte";
+  import {
+    createDraftHistory,
+    recordDraftEdit,
+    redoDraft,
+    undoDraft,
+    type DraftHistory,
+  } from "$lib/draftHistory";
+  import FormatBar from "./FormatBar.svelte";
+  import {
+    isBlockActive,
+    isInlineActive,
+    toggleBlock,
+    toggleInline,
+    type Block,
+    type Edit,
+    type Inline,
+  } from "$lib/markdownFormat";
 
   interface Props {
     originalText: string; // the chunk's current live text
@@ -29,8 +46,275 @@
   // each chunk (the caller always passes through draftPanel=null in between),
   // so props changing later shouldn't retroactively reset in-progress state.
   let mode = $state<Mode>(untrack(() => startMode));
-  let draftText = $state(untrack(() => originalText));
   let viewingVersion = $state<ChunkVersion | null>(null);
+
+  /**
+   * The draft and its undo trail, held as one thing: the trail is the draft's
+   * own, and keeping them together is what lets Ctrl+Z still work after a trip
+   * through Compare, which takes the box off screen and builds a new one.
+   *
+   * The caret starts at the end of the text, which is where a writer reading
+   * the passage back would carry on from.
+   */
+  let edits = $state<DraftHistory>(
+    untrack(() => createDraftHistory({ text: originalText, from: originalText.length, to: originalText.length })),
+  );
+  const draftText = $derived(edits.present.text);
+
+  /** The box itself, so undo can put the caret back where the words changed. */
+  let draftBox = $state<HTMLTextAreaElement | null>(null);
+
+  /**
+   * Puts the caret in the box whenever the draft comes on screen: opening the
+   * panel, and coming back from Compare with Keep tweaking. Both are the
+   * writer asking to write, so the box should be ready for them.
+   *
+   * It is also what keeps Ctrl+Z within reach. The panel only hears a key
+   * while the focus is somewhere inside it, and Keep tweaking removes the very
+   * button that was clicked — which left the focus on the page body, and the
+   * draft with no undo, in exactly the place it was most wanted.
+   *
+   * Reads `edits` untracked: the caret is restored to where it last stood, and
+   * this must not run again on every keystroke and fight for it.
+   */
+  $effect(() => {
+    if (mode !== "write") return;
+    const box = draftBox;
+    if (!box || box === document.activeElement) return;
+    const { from, to } = untrack(() => edits.present);
+    box.focus();
+    box.setSelectionRange(from, to);
+  });
+
+  function handleDraftInput(event: Event) {
+    const box = event.currentTarget as HTMLTextAreaElement;
+    edits = recordDraftEdit(
+      edits,
+      { text: box.value, from: box.selectionStart, to: box.selectionEnd },
+      Date.now(),
+    );
+    // The words under the selection changed, so what the buttons should read
+    // as applied may have changed with them.
+    refreshFormatState();
+  }
+
+  /**
+   * Bold, italic and the rest, over a selection in the draft.
+   *
+   * The same bar the chapter itself uses, and the same rules behind it: a
+   * rewrite is Markdown exactly as the prose is, so formatting it is the same
+   * job. Kept to the bar rather than given keys of its own, because that is
+   * how formatting works everywhere else in Mari.
+   *
+   * It follows the selected words the way the chapter's own does, which takes
+   * some doing over a textarea — see selectionPoint below.
+   */
+  let formatBar = $state<{ x: number; y: number } | null>(null);
+  let formatActive = $state<{ inline: Inline[]; block: Block | null }>({ inline: [], block: null });
+
+  function refreshFormatState() {
+    const box = draftBox;
+    if (!box) return;
+    const text = box.value;
+    const from = box.selectionStart;
+    const to = box.selectionEnd;
+    formatActive = {
+      inline: (["bold", "italic", "strike"] as Inline[]).filter((kind) =>
+        isInlineActive(text, from, to, kind),
+      ),
+      block:
+        (["heading1", "heading2", "quote"] as Block[]).find((kind) =>
+          isBlockActive(text, from, kind),
+        ) ?? null,
+    };
+  }
+
+  /**
+   * Everything that decides where a character lands, so the hidden copy below
+   * breaks its lines in exactly the same places as the real box.
+   */
+  const MIRRORED_STYLES = [
+    "font-family",
+    "font-size",
+    "font-weight",
+    "font-style",
+    "font-variant",
+    "letter-spacing",
+    "word-spacing",
+    "line-height",
+    "text-indent",
+    "text-transform",
+    "padding-top",
+    "padding-right",
+    "padding-bottom",
+    "padding-left",
+    "border-top-width",
+    "border-right-width",
+    "border-bottom-width",
+    "border-left-width",
+  ];
+
+  /**
+   * Where the selected words sit on screen.
+   *
+   * A textarea draws its own text and will not say where any of it ended up —
+   * there is no range to measure, the way there is over the chapter. So the
+   * draft is laid out a second time in a hidden copy of the box, styled down
+   * to the font and the wrapping, and the position is read off that.
+   *
+   * Without this the bar had nowhere to go but a fixed spot at the top of the
+   * panel, which sat on the title and the close button and told the writer
+   * nothing about which words it was going to act on.
+   */
+  function selectionPoint(box: HTMLTextAreaElement): { x: number; y: number } | null {
+    const style = getComputedStyle(box);
+    const mirror = document.createElement("div");
+    for (const property of MIRRORED_STYLES) {
+      mirror.style.setProperty(property, style.getPropertyValue(property));
+    }
+    mirror.style.position = "absolute";
+    mirror.style.top = "0";
+    mirror.style.left = "0";
+    mirror.style.visibility = "hidden";
+    mirror.style.pointerEvents = "none";
+    mirror.style.whiteSpace = "pre-wrap";
+    mirror.style.overflowWrap = "break-word";
+    mirror.style.boxSizing = "border-box";
+    // clientWidth leaves out the border and any scrollbar, which is exactly
+    // the width the real text is being wrapped into.
+    mirror.style.width = `${box.clientWidth}px`;
+
+    mirror.textContent = box.value.slice(0, box.selectionStart);
+    const marker = document.createElement("span");
+    // A selection running to the very end has nothing after it to give the
+    // span a height, so it is stood up by a single character instead.
+    marker.textContent = box.value.slice(box.selectionStart, box.selectionEnd) || ".";
+    mirror.appendChild(marker);
+
+    document.body.appendChild(mirror);
+    const markerBox = marker.getBoundingClientRect();
+    const mirrorBox = mirror.getBoundingClientRect();
+    document.body.removeChild(mirror);
+    if (markerBox.height === 0) return null;
+
+    const rect = box.getBoundingClientRect();
+    return {
+      // The first line of a selection spanning several, which is where the
+      // writer's eye is and what the chapter's own bar follows.
+      x: rect.left + (markerBox.left - mirrorBox.left) + Math.min(markerBox.width, box.clientWidth) / 2,
+      y: rect.top + (markerBox.top - mirrorBox.top) - box.scrollTop,
+    };
+  }
+
+  function showFormatBar() {
+    const box = draftBox;
+    if (!box || box.selectionStart === box.selectionEnd) {
+      formatBar = null;
+      return;
+    }
+    refreshFormatState();
+
+    const point = selectionPoint(box);
+    const rect = box.getBoundingClientRect();
+    if (!point) {
+      formatBar = null;
+      return;
+    }
+    // Selections scrolled out of the box keep the bar at the nearest edge
+    // rather than letting it wander off over the rest of the app.
+    formatBar = {
+      x: point.x,
+      y: Math.min(Math.max(point.y, rect.top), rect.bottom),
+    };
+  }
+
+  /** Deferred: the box hasn't finished moving its selection while the event runs. */
+  function showFormatBarSoon() {
+    setTimeout(showFormatBar, 0);
+  }
+
+  /**
+   * Writes a formatting change into the draft through the undo trail, so one
+   * Ctrl+Z takes the formatting off again rather than it being the one change
+   * in the box that cannot be undone.
+   */
+  function applyFormatEdit(edit: Edit) {
+    const box = draftBox;
+    if (!box) return;
+    const next = box.value.slice(0, edit.from) + edit.insert + box.value.slice(edit.to);
+    edits = recordDraftEdit(edits, { text: next, from: edit.selectFrom, to: edit.selectTo }, Date.now());
+
+    tick().then(() => {
+      draftBox?.focus();
+      draftBox?.setSelectionRange(edit.selectFrom, edit.selectTo);
+      // The same words stay selected, so the bar stays up and can be pressed
+      // again — turning italic back off without reselecting.
+      showFormatBar();
+    });
+  }
+
+  function applyInline(kind: Inline) {
+    const box = draftBox;
+    if (!box) return;
+    const edit = toggleInline(box.value, box.selectionStart, box.selectionEnd, kind);
+    if (edit) applyFormatEdit(edit);
+  }
+
+  function applyBlock(kind: Block) {
+    const box = draftBox;
+    if (!box) return;
+    applyFormatEdit(toggleBlock(box.value, box.selectionStart, kind, box.selectionEnd));
+  }
+
+  /**
+   * Which editing key was pressed, named so it works on any keyboard.
+   *
+   * A Latin letter is taken from the character the key produces: on a German
+   * keyboard the Z key sits where Y is on a US one, and going by position
+   * would turn its undo into a redo. A layout that produces no Latin letter at
+   * all — Cyrillic reports Ctrl+Z as "я" — is taken from the key's position
+   * instead, which is the only thing left to go on.
+   */
+  function editingKey(event: KeyboardEvent): string | null {
+    if (/^[a-z]$/i.test(event.key)) return event.key.toUpperCase();
+    return /^Key([A-Z])$/.exec(event.code)?.[1] ?? null;
+  }
+
+  /** Moves the draft to another step and puts the caret back with it. */
+  async function goToStep(next: DraftHistory | null) {
+    if (!next) return;
+    edits = next;
+    // The box's contents are written by Svelte, so the caret can only be set
+    // once that has happened.
+    await tick();
+    draftBox?.focus();
+    draftBox?.setSelectionRange(next.present.from, next.present.to);
+  }
+
+  /**
+   * Ctrl+Z and Ctrl+Shift+Z (or Ctrl+Y) over the draft.
+   *
+   * On the panel rather than the box so it still answers when the focus is on
+   * one of the panel's own buttons, and only while the draft is on screen —
+   * stepping through text nobody can see would be worse than doing nothing.
+   *
+   * The key is always taken, never passed on: the textarea's own undo is
+   * half-working here, and letting both run would leave the box showing one
+   * thing and the trail holding another.
+   */
+  function handlePanelKeydown(event: KeyboardEvent) {
+    if (mode !== "write") return;
+    if (!(event.ctrlKey || event.metaKey) || event.altKey) return;
+
+    const key = editingKey(event);
+    if (key === "Z") {
+      event.preventDefault();
+      goToStep(event.shiftKey ? redoDraft(edits) : undoDraft(edits));
+    } else if (key === "Y" && !event.shiftKey) {
+      event.preventDefault();
+      goToStep(redoDraft(edits));
+    }
+  }
 
   // Drag-to-resize, same as the sidebar: listeners on window rather than the
   // handle, so the drag survives the pointer outrunning a 7px strip.
@@ -118,9 +402,24 @@
   const historyDiff = $derived(viewingVersion ? buildDiff(viewingVersion.text, originalText) : null);
 
   const historyDesc = $derived([...history].reverse());
+
+  /**
+   * The mark a wording was carrying when it was retired, for the strip down
+   * the side of its row.
+   *
+   * Run through the rename map first: a version recorded before "Keep" became
+   * "Good" still names the old one, and would otherwise show no colour at all
+   * rather than the green it was given.
+   */
+  function versionState(version: ChunkVersion) {
+    if (!version.stateId) return undefined;
+    const id = migrateStateId(version.stateId);
+    return HIGHLIGHT_STATES.find((state) => state.id === id);
+  }
 </script>
 
-<div class="panel" style="width: {draftPanelWidth.current}px">
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div class="panel" style="width: {draftPanelWidth.current}px" onkeydown={handlePanelKeydown}>
   <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
   <div
     class="resize-handle"
@@ -149,7 +448,17 @@
 
   <div class="panel-body">
     {#if mode === "write"}
-      <textarea class="draft-area" bind:value={draftText} placeholder={i18n.t.draft.placeholder}></textarea>
+      <!-- Not `bind:value`: every change has to go through the undo trail, so
+           the box reads from it rather than writing straight past it. -->
+      <textarea
+        class="draft-area"
+        bind:this={draftBox}
+        value={draftText}
+        oninput={handleDraftInput}
+        onmouseup={showFormatBarSoon}
+        onkeyup={showFormatBarSoon}
+        placeholder={i18n.t.draft.placeholder}
+      ></textarea>
       <div class="actions">
         <button class="btn primary" onclick={handleSaveDraft}>{i18n.t.draft.compare}</button>
       </div>
@@ -239,8 +548,14 @@
         {/if}
         <ul class="history-list">
           {#each historyDesc as version (version.id)}
+            {@const state = versionState(version)}
             <li>
-              <button class="history-item" onclick={() => (viewingVersion = version)}>
+              <button
+                class="history-item"
+                style={state ? `border-left-color: ${state.solid}` : ""}
+                title={state ? highlightLabel(state.id, state.label) : undefined}
+                onclick={() => (viewingVersion = version)}
+              >
                 <span class="history-item-meta">
                   <span class="badge" class:moved={version.kind === "moved"}>
                     {version.kind === "moved" ? i18n.t.draft.movedBadge : i18n.t.draft.draftBadge}
@@ -256,6 +571,17 @@
     {/if}
   </div>
 </div>
+
+{#if mode === "write" && formatBar}
+  <FormatBar
+    x={formatBar.x}
+    y={formatBar.y}
+    active={formatActive}
+    onInline={applyInline}
+    onBlock={applyBlock}
+    boundary={draftBox?.getBoundingClientRect().top ?? 8}
+  />
+{/if}
 
 <style>
   .panel {
@@ -531,6 +857,10 @@
     gap: 4px;
     padding: var(--space-2) var(--space-3);
     border: 1px solid var(--color-border);
+    /* The strip saying what the passage was marked as when this wording was
+       retired. Always this wide, coloured or not, so the rows line up whether
+       or not a version carries a mark. */
+    border-left-width: 3px;
     border-radius: var(--radius);
     background: var(--color-bg);
     cursor: pointer;

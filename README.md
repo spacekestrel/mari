@@ -234,6 +234,7 @@ npm run tauri build     # installer for your OS, in src-tauri/target/release/bun
 |---|---|
 | `Alt+1` … `Alt+8` | Highlight the selection, or the paragraph |
 | `Alt+0` | Clear the highlight |
+| `Alt+Enter` | Open the highlighted passage the cursor is in |
 | `Ctrl+N` | New chapter |
 | `Ctrl+O` | Open a file |
 | `Ctrl+Shift+O` | Open a project folder |

@@ -1,5 +1,6 @@
 import { Decoration, EditorView, type DecorationSet } from "@codemirror/view";
-import { StateEffect, StateField, type Range } from "@codemirror/state";
+import { StateEffect, StateField, type Extension, type Range } from "@codemirror/state";
+import { invertedEffects } from "@codemirror/commands";
 import type { StoredHighlight } from "./highlightStore";
 
 /**
@@ -132,6 +133,43 @@ export function createHighlightField(initialHighlights: StoredHighlight[]): Stat
       return decorations;
     },
     provide: (field) => EditorView.decorations.from(field),
+  });
+}
+
+/**
+ * Marks come back when a deletion is undone.
+ *
+ * Undo only knows about the text. The marks are kept beside it and carried
+ * forward through every edit, which is one-way: delete the words under a mark
+ * and the mark has nothing left to sit on, so it goes. Undo then put the words
+ * back with nothing on them — and because a mark is the only thing pointing at
+ * a passage's notes and earlier wordings, those went out of reach with it. One
+ * Ctrl+Z after cutting a few marked paragraphs lost the lot.
+ *
+ * So each edit now carries instructions for putting its own marks back, which
+ * the editor's history stores alongside the text it is holding.
+ *
+ * Only marks that were destroyed outright — wholly inside the deleted range.
+ * One merely clipped at an end survived as a shorter mark, and grows back on
+ * its own when the text returns; told to restore itself as well, it would
+ * fight with the copy that is already there.
+ */
+export function highlightsFollowUndo(field: StateField<DecorationSet>): Extension {
+  return invertedEffects.of((tr) => {
+    if (tr.changes.empty) return [];
+
+    const restore: StateEffect<unknown>[] = [];
+    const before = tr.startState.field(field);
+
+    tr.changes.iterChangedRanges((fromA, toA) => {
+      before.between(fromA, toA, (from, to, deco) => {
+        if (from < fromA || to > toA) return;
+        const mark = readMark(deco);
+        if (mark) restore.push(setHighlight.of({ from, to, stateId: mark.stateId, id: mark.id }));
+      });
+    });
+
+    return restore;
   });
 }
 

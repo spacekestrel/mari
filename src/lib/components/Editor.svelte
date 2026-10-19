@@ -42,10 +42,26 @@
     clearHighlightById,
     clearHighlights,
     createHighlightField,
+    highlightsFollowUndo,
     makeHighlightMark,
     readHighlights,
     setHighlight,
   } from "$lib/highlightField";
+  import {
+    activeWorkedField,
+    bracketsFollowUndo,
+    clearWorked,
+    coversWholeLine,
+    createWorkedField,
+    readWorked,
+    setActiveWorked,
+    setWorked,
+    workedAt,
+    workedBrackets,
+    workedById,
+    WORKED_LINE_ATTR,
+    type StoredWorked,
+  } from "$lib/workedMarks";
   import { viewportIndicator, withAlpha, wrapLineIntoRows } from "$lib/minimapLayout";
   import { HIGHLIGHT_STATES } from "$lib/highlightStates";
   import type { ChunkVersion } from "$lib/chunkHistory";
@@ -86,6 +102,12 @@
     // Same seeding rationale as initialHighlights: read once at construction
     // so a rebuilt instance (file switch or HMR) starts with the right notes.
     initialChunkNotes?: Record<string, string>;
+    // Where the brackets in the margin go — the passages already reworked.
+    // Seeded once at construction, like the highlights above.
+    initialWorked?: StoredWorked[];
+    // Fired when a passage earns a bracket, or loses one, so the caller can
+    // write it to the file.
+    onWorkedChange?: (worked: StoredWorked[]) => void;
     // Fired when a note is written or cleared (null = cleared).
     onChunkNoteChange?: (chunkId: string, note: string | null) => void;
     // Focus mode wants nothing but the prose: no minimap, no highlight
@@ -144,6 +166,8 @@
     onChunkHistoryChange,
     initialChunkNotes = {},
     onChunkNoteChange,
+    initialWorked = [],
+    onWorkedChange,
     focusMode = false,
     plain = false,
     chapter = emptySynopsis(),
@@ -354,6 +378,11 @@
   // them without rebuilding the editor. The decorations themselves stay in
   // place — only their styling goes — so nothing is lost on the way out.
   const highlightThemeCompartment = new Compartment();
+
+  // Focus mode wants nothing but the prose, so the brackets come out of the
+  // margin with the highlight colours. Removed outright rather than hidden, so
+  // nothing is being drawn and thrown away.
+  const workedBracketsCompartment = new Compartment();
   function highlightThemeFor(hidden: boolean) {
     if (hidden) return [];
     return EditorView.theme(
@@ -427,6 +456,30 @@
       highlightsSyncTimeout = undefined;
     }
     return extractHighlights();
+  }
+
+  const workedField = createWorkedField(untrack(() => initialWorked));
+
+  function extractWorked(): StoredWorked[] {
+    if (!view) return [];
+    return readWorked(view.state.field(workedField), view.state.doc.length);
+  }
+
+  // Not debounced like the highlights: a bracket appears on a deliberate
+  // Replace, which happens once and is worth recording straight away.
+  function syncWorked() {
+    onWorkedChange?.(extractWorked());
+  }
+
+  /** The brackets as they stand, for Save and the paths that can't wait. */
+  export function flushWorked(): StoredWorked[] {
+    return extractWorked();
+  }
+
+  // Same idea as pendingHighlights, for the other file's brackets.
+  let pendingWorked: StoredWorked[] | null = null;
+  export function setPendingWorked(worked: StoredWorked[]) {
+    pendingWorked = worked;
   }
 
   // Set by the caller just before it changes `value` to a different file's
@@ -637,7 +690,21 @@
     view.state.field(highlightField).between(pos, pos, (from, to, deco) => {
       if (!found) found = chunkFromDeco(from, to, deco);
     });
-    return found;
+    if (found) return found;
+
+    /**
+     * No highlight here, but perhaps a bracket. A reworked passage has no
+     * verdict left on it — it was settled by being rewritten — so it is
+     * offered as "decided", which is exactly the row that shows the way back
+     * to its earlier versions and nothing else.
+     *
+     * Without this the bracket could only ever say *something happened here*,
+     * and the versions behind it would stay as unreachable as they were when
+     * there was no bracket at all.
+     */
+    const worked = workedAt(view.state.field(workedField), pos);
+    if (!worked) return null;
+    return { id: worked.id, from: worked.from, to: worked.to, stateId: "", action: "terminal" };
   }
 
   function findChunkById(id: string): ActiveChunk | null {
@@ -679,15 +746,37 @@
     chunkIconPos = { left: contentRect.right, top };
   }
 
+  /**
+   * Lights up the bracket belonging to whatever passage the row is open on,
+   * and puts out the one before it.
+   *
+   * Deferred, and only when it actually changes: this is reached from inside
+   * CodeMirror's own update cycle, where dispatching another transaction
+   * straight away isn't allowed, and hovering across a chapter would otherwise
+   * fire one per paragraph.
+   */
+  let litBracketId: string | null = null;
+  function litBracket(id: string | null) {
+    if (id === litBracketId) return;
+    litBracketId = id;
+    queueMicrotask(() => {
+      if (view && litBracketId === id) view.dispatch({ effects: setActiveWorked.of(id) });
+    });
+  }
+
   /** Hover wins over cursor; either can put the row on screen. */
   function refreshChunkIcon() {
     const chunk = hoverChunk ?? cursorChunk;
     if (!chunk) {
       activeChunk = null;
       chunkIconPos = null;
+      litBracket(null);
       return;
     }
     activeChunk = chunk;
+    // By id, so a passage that kept a highlight after being reworked lights
+    // its bracket too — same passage, same id, whichever one was found first.
+    litBracket(chunk.id);
     updateChunkIconPos();
   }
 
@@ -736,6 +825,40 @@
   }
 
   /**
+   * Alt+Enter opens the passage the cursor is sitting in — the same thing its
+   * button does, without reaching for the mouse. Alt because that is already
+   * the family for marking a passage, so acting on one belongs with it.
+   *
+   * Deliberately the cursor's passage rather than the one under the pointer.
+   * Hover wins for the button row, which is right for a click and wrong for a
+   * keystroke: the mouse may be resting anywhere at all, including over a
+   * paragraph the writer isn't looking at.
+   */
+  function handlePassageShortcut(event: KeyboardEvent): boolean {
+    if (plain || focusMode || draftPanel || placementMode) return false;
+    if (!view || !event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return false;
+    // Matched on `key`, unlike the marking shortcuts below, which go by
+    // position. That rule is for character keys, which layouts move about and
+    // which Alt turns into accented characters and dead keys. Enter produces
+    // no character: it reports as "Enter" on every layout, and does so for the
+    // numpad's one too, which `code` would have needed a second case for.
+    if (event.key !== "Enter") return false;
+
+    const chunk = findChunkAtPos(view.state.selection.main.head);
+    if (!chunk) return false;
+    // A decided passage with nothing recorded against it has no panel to open,
+    // the same reason its row shows no button.
+    if (chunk.action === "terminal" && !chunkHistoryMap[chunk.id]?.length) return false;
+
+    if (chunk.action === "reposition") {
+      startPlacementMode(chunk);
+      return true;
+    }
+    draftPanel = { chunk, originalText: view.state.sliceDoc(chunk.from, chunk.to) };
+    return true;
+  }
+
+  /**
    * Replacing is the writer saying the rewrite is done, so the mark that asked
    * for it goes with it — leaving it would put a to-do on work already
    * finished. `keepState` overrides that: a state id re-marks the new wording,
@@ -746,12 +869,39 @@
     if (!view || !draftPanel) return;
     const { chunk, originalText } = draftPanel;
 
+    /**
+     * Whether this passage earns a bracket in the margin. Judged on the
+     * passage as it was marked, before the replacement — that is the portion
+     * the writer picked out and will be looking for again, however long or
+     * short the new wording turns out to be.
+     */
+    const earnsBracket = coversWholeLine(view.state.doc, chunk.from, chunk.to);
+
+    /**
+     * One transaction for the whole thing, so one Ctrl+Z takes the whole thing
+     * back: the old wording returns, its mark with it, and the bracket comes
+     * off. Split across two, undo would have needed two presses and could
+     * leave the margin claiming a rework that had just been undone.
+     *
+     * The bracket carries the same chunk id as the highlight that asked for the
+     * rewrite. That is what ties it to the versions stored against this
+     * passage, and the bracket is only useful because it leads back to them.
+     */
     view.dispatch({
       changes: { from: chunk.from, to: chunk.to, insert: newText },
-      // Cleared in the same transaction as the replacement, so there's no
-      // moment where the mark sits over half-replaced text.
-      effects: keepState === "keep" ? [] : [clearHighlightById.of(chunk.id)],
+      effects: [
+        // Cleared in the same transaction as the replacement, so there's no
+        // moment where the mark sits over half-replaced text.
+        ...(keepState === "keep" ? [] : [clearHighlightById.of(chunk.id)]),
+        // Positions are the new wording's, which is what the document holds by
+        // the time effects are applied.
+        ...(earnsBracket
+          ? [setWorked.of({ id: chunk.id, from: chunk.from, to: chunk.from + newText.length })]
+          : []),
+      ],
     });
+
+    if (earnsBracket) syncWorked();
 
     if (keepState && keepState !== "keep") {
       // The old mark is gone, so this is a fresh one over exactly the new
@@ -765,6 +915,10 @@
       text: originalText,
       createdAt: new Date().toISOString(),
       kind: "draft",
+      // What the writer thought was wrong with this wording when they set
+      // about replacing it. The mark is cleared a line above, so if it isn't
+      // kept here it is gone.
+      stateId: chunk.stateId,
     });
     scheduleHighlightsSync();
     drawMinimap();
@@ -781,6 +935,8 @@
     to: number;
     text: string;
     preview: string;
+    /** Carried through the move so the version it records keeps its colour. */
+    stateId: string;
   }
   let placementMode = $state<PlacementState | null>(null);
   let placementTargetPos: number | null = null; // doc position; not reactive, only read at click time
@@ -790,10 +946,51 @@
   // is armed; see startPlacementMode for why they exist.
   let placementDismiss: (() => void) | undefined;
 
+  /**
+   * A click on a bracket out in the margin, rather than on the prose.
+   *
+   * Told apart from an ordinary click by where it landed: left of the text
+   * column there is nothing but margin, so a click there against a bracketed
+   * line can only have been aimed at the bracket.
+   *
+   * Handled rather than left to the editor because the editor would read it as
+   * a click on the nearest text and drop the cursor at the start of that line
+   * — which is not necessarily inside the passage, and so would open nothing.
+   * This puts the cursor at the start of the passage itself, and everything
+   * else follows from that as if the writer had clicked the prose.
+   */
+  function clickedBracket(event: MouseEvent, editorView: EditorView): boolean {
+    if (plain || focusMode) return false;
+    if (event.button !== 0) return false;
+    if (event.clientX >= editorView.contentDOM.getBoundingClientRect().left) return false;
+
+    const line = (event.target as HTMLElement | null)?.closest?.(`[${WORKED_LINE_ATTR}]`);
+    const id = line?.getAttribute(WORKED_LINE_ATTR);
+    if (!id) return false;
+
+    const passage = workedById(editorView.state.field(workedField), editorView.state.doc.length, id);
+    if (!passage) return false;
+
+    event.preventDefault();
+    editorView.dispatch({ selection: { anchor: passage.from } });
+    // The row and the lit bracket both hang off the cursor's chunk, and the
+    // dispatch above has already moved it — so this only has to make sure the
+    // editor has the focus the writer just aimed at.
+    editorView.focus();
+    return true;
+  }
+
   function startPlacementMode(chunk: ActiveChunk) {
     if (!view) return;
     const text = view.state.sliceDoc(chunk.from, chunk.to);
-    placementMode = { chunkId: chunk.id, from: chunk.from, to: chunk.to, text, preview: text.slice(0, 60) };
+    placementMode = {
+      chunkId: chunk.id,
+      from: chunk.from,
+      to: chunk.to,
+      text,
+      preview: text.slice(0, 60),
+      stateId: chunk.stateId,
+    };
     activeChunk = null;
     chunkIconPos = null;
 
@@ -843,7 +1040,7 @@
 
   function performMove(editorView: EditorView) {
     if (!placementMode || placementTargetPos == null) return;
-    const { chunkId, from, to, text } = placementMode;
+    const { chunkId, from, to, text, stateId } = placementMode;
     const target = placementTargetPos;
     // Clear before dispatching — the updateListener's auto-cancel-on-typing
     // check then sees placementMode already null for this transaction, so it
@@ -861,6 +1058,7 @@
       text,
       createdAt: new Date().toISOString(),
       kind: "moved",
+      stateId,
     });
     // The move retires the mark, so the note goes with it — otherwise it would
     // linger in storage attached to a chunk nothing can reach any more.
@@ -1414,6 +1612,13 @@
           // for a code-editor-style surface this is pure overhead, not a feature.
           EditorView.contentAttributes.of({ spellcheck: "false", autocorrect: "off", autocapitalize: "off" }),
           highlightField,
+          // Both of these teach the history how to put marks and brackets back
+          // when an edit that destroyed them is undone.
+          highlightsFollowUndo(highlightField),
+          workedField,
+          bracketsFollowUndo(workedField),
+          activeWorkedField,
+          workedBracketsCompartment.of(focusMode ? [] : workedBrackets(workedField)),
           EditorView.domEventHandlers({
             // On mouseup rather than on every selection change: extending a
             // selection with Shift+arrow would otherwise make the bar jump
@@ -1483,6 +1688,7 @@
               return false;
             },
             mousedown: (event, editorView) => {
+              if (!placementMode && clickedBracket(event, editorView)) return true;
               if (!placementMode) return false;
               // Resolve the target from this click's own coordinates rather
               // than trusting a previous mousemove — a click arriving without
@@ -1502,6 +1708,11 @@
             keydown: (event, editorView) => {
               if (placementMode && event.key === "Escape") {
                 abandonPlacementMode();
+                return true;
+              }
+              if (handlePassageShortcut(event)) {
+                // Alt+Enter would otherwise put a line break in the prose.
+                event.preventDefault();
                 return true;
               }
               if (handleHighlightShortcut(event)) {
@@ -1655,6 +1866,8 @@
       isLargeDoc = value.length > LARGE_DOC_THRESHOLD;
       const restored = pendingHighlights ?? [];
       pendingHighlights = null;
+      const restoredWorked = pendingWorked ?? [];
+      pendingWorked = null;
       chunkHistoryMap = pendingChunkHistory ?? {};
       pendingChunkHistory = null;
       chunkNotes = pendingChunkNotes ?? {};
@@ -1686,8 +1899,13 @@
           // (if the caller set pendingHighlights) happens in this same transaction
           // so the document and its highlights are never out of sync for a tick.
           clearHighlights.of(null),
+          // Brackets are plain offsets too, with the same problem: left in
+          // place they would stand in the margin of the next chapter, against
+          // whatever prose happened to land on those offsets.
+          clearWorked.of(null),
           languageCompartment.reconfigure(languageExtensions(value.length)),
           ...restored.map((h) => setHighlight.of({ from: h.from, to: h.to, stateId: h.stateId, id: h.id })),
+          ...restoredWorked.map((w) => setWorked.of(w)),
         ],
       });
       // Clearing the pending sync above isn't enough: the dispatch just made
@@ -1730,7 +1948,12 @@
   $effect(() => {
     const hidden = focusMode;
     if (!view) return;
-    view.dispatch({ effects: highlightThemeCompartment.reconfigure(highlightThemeFor(hidden)) });
+    view.dispatch({
+      effects: [
+        highlightThemeCompartment.reconfigure(highlightThemeFor(hidden)),
+        workedBracketsCompartment.reconfigure(hidden ? [] : workedBrackets(workedField)),
+      ],
+    });
   });
 
   // Same for the paragraph layout, so the toolbar toggle takes effect without

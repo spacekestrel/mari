@@ -149,7 +149,22 @@ function createPanel(view: EditorView): Panel {
   return {
     dom,
     top: true,
-    mount: refresh,
+    /**
+     * Ctrl+F puts the cursor in the box, ready to be typed or pasted into.
+     *
+     * Done here rather than left to CodeMirror, which only focuses the box
+     * when the panel is already open: the press that *opens* it builds the
+     * panel and stops, so the first Ctrl+F used to leave the cursor in the
+     * prose and the writer had to go and click the box.
+     *
+     * The old search is selected rather than cleared, so typing replaces it
+     * and Enter repeats it — whichever the writer meant.
+     */
+    mount: () => {
+      refresh();
+      input.focus();
+      input.select();
+    },
     update: (update) => {
       if (update.docChanged || update.selectionSet) refresh();
     },

@@ -26,6 +26,7 @@
   import { expandedFolders } from "$lib/expandedFolders.svelte";
   import { enterFullscreen, exitFullscreen } from "$lib/platform/fullscreen";
   import type { ChunkVersion } from "$lib/chunkHistory";
+  import { inferWorked, type StoredWorked } from "$lib/workedMarks";
   import {
     packMariBundle,
     unpackMariBundle,
@@ -79,6 +80,9 @@
   let documentOpen = $state(false);
   // Passages cut out of the prose but kept against the file.
   let currentCuts = $state<MariCut[]>([]);
+  // Passages already reworked, which carry a bracket in the margin. Seeds a
+  // freshly-built Editor, same as currentHighlights above.
+  let currentWorked = $state<StoredWorked[]>([]);
 
   const runningInTauri = isTauriDesktop();
 
@@ -181,6 +185,8 @@
     editorRef?.setPendingChunkHistory({});
     currentSynopsis = emptySynopsis();
     currentCuts = [];
+    currentWorked = [];
+    editorRef?.setPendingWorked([]);
   }
 
   /**
@@ -250,6 +256,13 @@
       ...currentChunkHistory,
       [chunkId]: [...(currentChunkHistory[chunkId] ?? []), version],
     };
+    dirty = true;
+  }
+
+  // A bracket appearing is a change to the file, same as a highlight: the
+  // writer has recorded something they'll want back next time they open it.
+  function handleWorkedChange(worked: StoredWorked[]) {
+    currentWorked = worked;
     dirty = true;
   }
 
@@ -514,6 +527,11 @@
     editorRef?.setPendingChunkNotes(sample.notes);
     currentChunkHistory = sample.history;
     editorRef?.setPendingChunkHistory(sample.history);
+    // Worked out the same way an older file's are, so the sample shows a
+    // bracket wherever a real chapter in the same state would.
+    const sampleWorked = inferWorked(sample.text, sample.highlights, sample.history);
+    currentWorked = sampleWorked;
+    editorRef?.setPendingWorked(sampleWorked);
     currentSynopsis = sample.synopsis;
     currentCuts = sample.cuts;
     documentOpen = true;
@@ -833,6 +851,9 @@
       history: currentChunkHistory,
       synopsis: currentSynopsis,
       cuts: currentCuts,
+      // Read from the editor rather than the copy held here: the brackets move
+      // with every edit above them, and only the editor knows where they are now.
+      worked: editorRef?.flushWorked() ?? currentWorked,
       manifest: activeBundle?.manifest,
       unknownParts: activeBundle?.unknownParts,
     });
@@ -851,6 +872,20 @@
     editorRef?.setPendingChunkHistory(bundle.history);
     currentSynopsis = bundle.synopsis;
     currentCuts = bundle.cuts;
+    /**
+     * A chapter saved before brackets existed carries none. Where the file
+     * still says enough to place one — a highlight left on a passage that has
+     * earlier wordings under the same id — the bracket is worked out on
+     * opening, so an old chapter isn't left blank for work that was done.
+     *
+     * Only when the file has no brackets of its own. Once it has been saved
+     * since, what it says is the truth and nothing is second-guessed.
+     */
+    const worked = bundle.worked.length > 0
+      ? bundle.worked
+      : inferWorked(bundle.text, bundle.highlights, bundle.history);
+    currentWorked = worked;
+    editorRef?.setPendingWorked(worked);
     documentOpen = true;
     dirty = false;
     activePath = typeof handle === "string" ? handle : null;
@@ -1123,6 +1158,8 @@
           onChunkHistoryChange={handleChunkHistoryChange}
           initialChunkNotes={currentChunkNotes}
           onChunkNoteChange={handleChunkNoteChange}
+          initialWorked={currentWorked}
+          onWorkedChange={handleWorkedChange}
           focusMode={distractionFree}
           plain={!isMariFile(displayName)}
           initialPosition={initialPlace}

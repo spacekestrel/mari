@@ -15,9 +15,16 @@
     active: { inline: Inline[]; block: Block | null };
     onInline: (kind: Inline) => void;
     onBlock: (kind: Block) => void;
+    /**
+     * The highest the bar may reach before it drops below the selection
+     * instead. The top of the window over the chapter, where there is nothing
+     * above to collide with; the top of the drafting box in the panel, which
+     * has its own title and close button up there to keep clear of.
+     */
+    boundary?: number;
   }
 
-  let { x, y, active, onInline, onBlock }: Props = $props();
+  let { x, y, active, onInline, onBlock, boundary = 8 }: Props = $props();
 
   let bar = $state<HTMLDivElement>();
 
@@ -40,8 +47,8 @@
   );
 
   // Above the selection normally; underneath it when there isn't room, so the
-  // bar never sits off the top of the window.
-  const flipped = $derived(height > 0 && y - height - GAP < 8);
+  // bar never sits off the top of whatever it is working over.
+  const flipped = $derived(height > 0 && y - height - GAP < boundary);
   const top = $derived(flipped ? y + GAP * 3 : y - height - GAP);
 </script>
 
@@ -119,7 +126,9 @@
      on the selection — the same approach the highlight menu uses. */
   .bar {
     position: fixed;
-    z-index: 60;
+    /* Above the drafting panel, which this also serves and which would
+       otherwise cover it. Still under the right-click menu. */
+    z-index: 170;
     display: flex;
     align-items: center;
     gap: 2px;
