@@ -2,20 +2,20 @@
   "_readme": "The news card at the foot of Mari's sidebar. Edit this file, push to main, and every copy of Mari picks it up the next time someone opens it. See docs/messages.md for what each field does.",
   "messages": [
     {
-      "id": "0-6-0",
+      "id": "0-6-2",
       "title": {
-        "en": "Mari 0.6.0 is out",
-        "ru": "Вышла Mari 0.6.0",
-        "de": "Mari 0.6.0 ist da",
-        "es": "Ya está Mari 0.6.0",
-        "zh": "Mari 0.6.0 已发布"
+        "en": "Mari 0.6.2 is out",
+        "ru": "Вышла Mari 0.6.2",
+        "de": "Mari 0.6.2 ist da",
+        "es": "Ya está Mari 0.6.2",
+        "zh": "Mari 0.6.2 已发布"
       },
       "body": {
-        "en": "Every passage you have marked now has a bracket in the margin, and clicking one shows the colour of its mark. While you rewrite a passage, the rest of the chapter steps back so it stands on its own.",
-        "ru": "У каждого отмеченного места теперь есть скобка на поле, а по щелчку она показывает цвет его метки. Пока вы переписываете место, остальная глава отступает, и оно остаётся одно.",
-        "de": "Jede markierte Stelle hat jetzt eine Klammer am Rand, und ein Klick zeigt die Farbe ihrer Markierung. Während du eine Stelle neu schreibst, tritt der Rest des Kapitels zurück.",
-        "es": "Cada pasaje que has marcado tiene ahora un corchete en el margen, y al hacer clic muestra el color de su marca. Mientras reescribes un pasaje, el resto del capítulo se aparta.",
-        "zh": "每个标记过的段落现在都有页边方括号，点击它会显示该标记的颜色。改写某段时，章节其余部分会淡下去，让它独自突出。"
+        "en": "Clearing a highlight now takes its margin bracket with it, even on a passage you had already reworked. And a new button in the sidebar shuts every folder in the project at once.",
+        "ru": "Снятие метки теперь убирает и скобку на поле, даже там, где место уже переписано. А новая кнопка в панели сворачивает все папки проекта разом.",
+        "de": "Eine Markierung zu löschen nimmt jetzt auch die Klammer am Rand mit, selbst bei einer bereits überarbeiteten Stelle. Und ein neuer Knopf in der Seitenleiste klappt alle Ordner des Projekts auf einmal ein.",
+        "es": "Quitar una marca ahora se lleva también su corchete del margen, incluso en un pasaje ya reelaborado. Y un botón nuevo en el panel contrae todas las carpetas del proyecto de una vez.",
+        "zh": "清除标记时，页边的方括号现在也会一并消失，已改写过的段落同样如此。侧栏新增一个按钮，可一次折叠项目中的所有文件夹。"
       },
       "link": {
         "url": "https://meowmari.ink",
@@ -27,7 +27,7 @@
           "zh": "下载"
         }
       },
-      "forVersionsBelow": "0.6.0"
+      "forVersionsBelow": "0.6.2"
     },
     {
       "id": "0-4-0",

@@ -93,9 +93,10 @@
   </requires>
 
   <releases>
-    <release version="0.6.1" date="2026-10-20">
+    <release version="0.6.2" date="2026-10-20">
       <description>
         <ul>
+          <li>A button in the sidebar that shuts every folder in the project at once</li>
           <li>Clearing a highlight now takes its margin bracket with it, including on a passage that had been reworked</li>
         </ul>
       </description>
