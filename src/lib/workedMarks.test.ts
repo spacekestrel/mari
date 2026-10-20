@@ -2,9 +2,12 @@ import { describe, expect, it } from "vitest";
 import { EditorState, Text, type StateCommand } from "@codemirror/state";
 import { history, redo, undo } from "@codemirror/commands";
 import type { ChunkVersion } from "./chunkHistory";
+import type { StoredHighlight } from "./highlightStore";
+import { createHighlightField } from "./highlightField";
 import {
   activeWorkedField,
   bracketLines,
+  bracketSources,
   bracketsFollowUndo,
   clearWorked,
   clearWorkedById,
@@ -467,5 +470,91 @@ describe("brackets survive undo", () => {
     const cut = state.update({ changes: { from: beta[0], to: beta[1] } }).state;
     const back = run(cut, undo);
     expect(read(back, field).filter((w) => w.id === "a")).toHaveLength(1);
+  });
+});
+
+/**
+ * Every marked passage earns a bracket now, not only the reworked ones. The
+ * two must not collide: a passage that is both should be one bracket wearing
+ * its current colour, not two stacked in the margin.
+ */
+describe("which passages the margin shows", () => {
+  const beta = spanOf("Beta paragraph here.");
+  const gamma = spanOf("Gamma paragraph.");
+
+  function chapter(marks: StoredHighlight[], worked: StoredWorked[]) {
+    const workedField = createWorkedField(worked);
+    const highlightField = createHighlightField(marks);
+    const state = EditorState.create({
+      doc: CHAPTER,
+      extensions: [workedField, highlightField],
+    });
+    return bracketSources(state, workedField, highlightField);
+  }
+
+  it("gives a marked passage a bracket in its own colour", () => {
+    const sources = chapter([{ from: beta[0], to: beta[1], stateId: "rewrite", id: "m1" }], []);
+    expect(sources).toEqual([{ id: "m1", from: beta[0], to: beta[1], color: "#F2994A" }]);
+  });
+
+  it("still gives a reworked passage one, with no colour to show", () => {
+    const sources = chapter([], [{ id: "w1", from: beta[0], to: beta[1] }]);
+    expect(sources).toEqual([{ id: "w1", from: beta[0], to: beta[1] }]);
+  });
+
+  it("gives a passage that is both one bracket, in the colour it wears now", () => {
+    const sources = chapter(
+      [{ from: beta[0], to: beta[1], stateId: "good", id: "same" }],
+      [{ id: "same", from: beta[0], to: beta[1] }],
+    );
+    expect(sources).toEqual([{ id: "same", from: beta[0], to: beta[1], color: "#5CB85C" }]);
+  });
+
+  it("holds marks to the same whole-line rule as reworked passages", () => {
+    const fragment = spanOf("paragraph here");
+    expect(chapter([{ from: fragment[0], to: fragment[1], stateId: "tweak", id: "m1" }], [])).toEqual([]);
+  });
+
+  it("colours a mark saved under its old name", () => {
+    // "keep" was renamed to "good"; the colour should follow the rename.
+    const sources = chapter([{ from: beta[0], to: beta[1], stateId: "keep", id: "m1" }], []);
+    expect(sources[0].color).toBe("#5CB85C");
+  });
+
+  it("leaves a mark with an unknown name uncoloured rather than guessing", () => {
+    const sources = chapter([{ from: beta[0], to: beta[1], stateId: "invented", id: "m1" }], []);
+    expect(sources[0].color).toBeUndefined();
+  });
+
+  it("lists every marked and reworked passage in the chapter", () => {
+    const sources = chapter(
+      [{ from: beta[0], to: beta[1], stateId: "cut", id: "m1" }],
+      [{ id: "w1", from: gamma[0], to: gamma[1] }],
+    );
+    expect(sources.map((s) => s.id).sort()).toEqual(["m1", "w1"]);
+  });
+
+  it("carries the colour down every line the bracket covers", () => {
+    const lines = bracketLines(
+      doc,
+      [{ id: "m1", from: at("Alpha"), to: beta[1], color: "#F2994A" }],
+      0,
+      CHAPTER.length,
+    );
+    expect(lines.every((line) => line.color === "#F2994A")).toBe(true);
+  });
+
+  it("gives a shared line to the lit passage's colour", () => {
+    const lines = bracketLines(
+      doc,
+      [
+        { id: "a", from: at("Alpha"), to: beta[1], color: "#F2994A" },
+        { id: "b", from: beta[0], to: CHAPTER.length, color: "#5CB85C" },
+      ],
+      0,
+      CHAPTER.length,
+      "b",
+    );
+    expect(lines.find((line) => line.from === beta[0])?.color).toBe("#5CB85C");
   });
 });

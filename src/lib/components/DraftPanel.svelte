@@ -38,9 +38,21 @@
      */
     onReplace: (newText: string, keepState: string | null | "keep") => void;
     onClose: () => void;
+    /**
+     * What the passage is marked as. The panel wears its colour down its edge,
+     * so there is no doubt which passage is open while the prose behind it is
+     * scrolled away. Empty for a passage opened by its bracket, which has no
+     * mark left to show.
+     */
+    stateId?: string;
   }
 
-  let { originalText, history, startMode, onReplace, onClose }: Props = $props();
+  let { originalText, history, startMode, onReplace, onClose, stateId = "" }: Props = $props();
+
+  /** The colour of the mark the open passage carries, if it still carries one. */
+  const edgeColor = $derived(
+    HIGHLIGHT_STATES.find((state) => state.id === migrateStateId(stateId))?.solid,
+  );
 
   type Mode = "write" | "compare" | "history";
   // Deliberate one-time snapshots — this component is fully remounted for
@@ -440,7 +452,11 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="panel" style="width: {draftPanelWidth.current}px" onkeydown={handlePanelKeydown}>
+<div
+  class="panel"
+  style="width: {draftPanelWidth.current}px; {edgeColor ? `--panel-edge: ${edgeColor}` : ''}"
+  onkeydown={handlePanelKeydown}
+>
   <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
   <div
     class="resize-handle"
@@ -626,6 +642,10 @@
     min-width: 320px;
     max-width: 95vw;
     background: var(--color-surface);
+    /* Plain, like any other edge. The open passage's colour belongs on the
+       writing box, where the eye already is; out here beside the prose it was
+       only another coloured line to read past. It does appear on this edge
+       while the panel is being dragged wider — see the handle below. */
     border-left: 1px solid var(--color-border);
     box-shadow: -8px 0 24px rgba(0, 0, 0, 0.08);
     z-index: 150;
@@ -700,6 +720,8 @@
     z-index: 5;
   }
 
+  /* The line under the pointer while the edge is being dragged, in the open
+     passage's colour — the one place the edge says which passage this is. */
   .resize-handle:hover::after,
   .resize-handle.active::after {
     content: "";
@@ -708,7 +730,7 @@
     left: 3px;
     width: 1px;
     height: 100%;
-    background: var(--color-accent);
+    background: var(--panel-edge, var(--color-accent));
   }
 
   .panel-header {
@@ -768,9 +790,12 @@
     padding: var(--space-3);
   }
 
+  /* The open passage's colour, the same one down the panel's edge — so the
+     box you are writing in says which mark you are answering. Falls back to
+     the accent for a passage with no mark left on it. */
   .draft-area:focus {
     outline: none;
-    border-color: var(--color-accent);
+    border-color: var(--panel-edge, var(--color-accent));
   }
 
   .actions {

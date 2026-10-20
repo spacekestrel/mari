@@ -5,10 +5,13 @@ import {
   StateEffect,
   StateField,
   Text,
+  type EditorState,
   type Extension,
   type Range,
 } from "@codemirror/state";
 import { invertedEffects } from "@codemirror/commands";
+import { readHighlights } from "./highlightField";
+import { HIGHLIGHT_STATES, migrateStateId } from "./highlightStates";
 import type { StoredHighlight } from "./highlightStore";
 import type { ChunkVersion } from "./chunkHistory";
 
@@ -127,6 +130,48 @@ export function inferWorked(
   return found;
 }
 
+/**
+ * A passage that earns a bracket, and what colour it shows when pointed at.
+ *
+ * Two kinds end up here. A passage you have marked, which has a colour of its
+ * own; and one you have reworked, whose mark was cleared when the work was
+ * done and so has none left to show.
+ */
+export interface BracketSource extends StoredWorked {
+  /** The mark's colour, or absent for a passage with no mark on it. */
+  color?: string;
+}
+
+/**
+ * Every passage in the chapter with a bracket beside it: the marked ones and
+ * the reworked ones together.
+ *
+ * Marked ones first, so a passage that is both — reworked, and left marked
+ * afterwards — is listed once and keeps the colour it is wearing now rather
+ * than being counted twice.
+ */
+export function bracketSources(
+  state: EditorState,
+  worked: StateField<RangeSet<WorkedMark>>,
+  highlights: StateField<DecorationSet>,
+): BracketSource[] {
+  const sources: BracketSource[] = [];
+  const seen = new Set<string>();
+
+  for (const mark of readHighlights(state.field(highlights), state.doc.length)) {
+    if (!coversWholeLine(state.doc, mark.from, mark.to)) continue;
+    const info = HIGHLIGHT_STATES.find((s) => s.id === migrateStateId(mark.stateId));
+    sources.push({ id: mark.id, from: mark.from, to: mark.to, color: info?.solid });
+    seen.add(mark.id);
+  }
+
+  for (const passage of readWorked(state.field(worked), state.doc.length)) {
+    if (!seen.has(passage.id)) sources.push(passage);
+  }
+
+  return sources;
+}
+
 /** One line of a bracket: the stroke, plus an arm where the passage begins or ends. */
 export interface BracketLine {
   /** Start of the line the stroke is drawn beside. */
@@ -141,6 +186,8 @@ export interface BracketLine {
   id: string;
   /** True for the passage currently being looked at, which draws it stronger. */
   active: boolean;
+  /** The mark's colour, shown when the bracket is pointed at. */
+  color?: string;
 }
 
 /** Which passage the brackets should draw as the one being looked at. */
@@ -174,7 +221,7 @@ export const activeWorkedField = StateField.define<string | null>({
  */
 export function bracketLines(
   doc: Text,
-  worked: StoredWorked[],
+  worked: BracketSource[],
   visibleFrom: number,
   visibleTo: number,
   activeId: string | null = null,
@@ -203,6 +250,8 @@ export function bracketLines(
         // and the click.
         id: already?.active ? already.id : active ? passage.id : (already?.id ?? passage.id),
         active: (already?.active ?? false) || active,
+        // Follows the id above: whichever passage owns the line owns its colour.
+        color: already?.active ? already.color : active ? passage.color : (already?.color ?? passage.color),
       });
     }
   }
@@ -323,31 +372,34 @@ export function bracketsFollowUndo(field: StateField<RangeSet<WorkedMark>>): Ext
 }
 
 const STROKE = "2px solid var(--color-text-muted)";
-const STROKE_ACTIVE = "2px solid var(--color-accent)";
+/** The clicked bracket's colour: its passage's mark, or the accent if it has none. */
+const ACTIVE_STROKE_COLOR = "var(--worked-color, var(--color-accent))";
 
 /**
  * Draws the brackets. A view plugin rather than the field itself, because what
  * is drawn depends on which lines are on screen as well as on the passages.
  */
-export function workedBrackets(field: StateField<RangeSet<WorkedMark>>): Extension {
+export function workedBrackets(
+  field: StateField<RangeSet<WorkedMark>>,
+  highlights: StateField<DecorationSet>,
+): Extension {
   function build(view: EditorView): DecorationSet {
-    const worked = readWorked(view.state.field(field), view.state.doc.length);
-    if (worked.length === 0) return Decoration.none;
+    const sources = bracketSources(view.state, field, highlights);
+    if (sources.length === 0) return Decoration.none;
 
     const activeId = view.state.field(activeWorkedField, false) ?? null;
     const marks: Range<Decoration>[] = [];
     for (const { from, to } of view.visibleRanges) {
-      for (const line of bracketLines(view.state.doc, worked, from, to, activeId)) {
+      for (const line of bracketLines(view.state.doc, sources, from, to, activeId)) {
         const classes = ["cm-worked"];
         if (line.first) classes.push("cm-worked-first");
         if (line.last) classes.push("cm-worked-last");
         if (line.active) classes.push("cm-worked-active");
-        marks.push(
-          Decoration.line({
-            class: classes.join(" "),
-            attributes: { [WORKED_LINE_ATTR]: line.id },
-          }).range(line.from),
-        );
+        const attributes: Record<string, string> = { [WORKED_LINE_ATTR]: line.id };
+        // Handed to the CSS rather than painted on directly, so the colour
+        // only shows where the clicked-bracket rule below asks for it.
+        if (line.color) attributes.style = `--worked-color: ${line.color}`;
+        marks.push(Decoration.line({ class: classes.join(" "), attributes }).range(line.from));
       }
     }
     return Decoration.set(marks, true);
@@ -371,6 +423,7 @@ export function workedBrackets(field: StateField<RangeSet<WorkedMark>>): Extensi
         }) {
           const movedOrChanged =
             update.state.field(field) !== update.startState.field(field) ||
+            update.state.field(highlights) !== update.startState.field(highlights) ||
             update.state.field(activeWorkedField, false) !==
               update.startState.field(activeWorkedField, false);
           if (update.docChanged || update.viewportChanged || movedOrChanged) {
@@ -402,26 +455,37 @@ export function workedBrackets(field: StateField<RangeSet<WorkedMark>>): Extensi
         opacity: "0.55",
         cursor: "pointer",
       },
-      // A little stronger under the pointer, so it reads as something to click
-      // before anyone has tried clicking it. Not on the one already being
-      // looked at: that is at full strength, and a hover rule reaching it
-      // would dim the lit bracket the moment you went to click it.
-      ".cm-worked:not(.cm-worked-active):hover::before": { opacity: "0.8" },
+      /**
+       * No hover state. The bracket is drawn one piece per line, and the piece
+       * reacts to the whole line of prose rather than to itself — so running
+       * the mouse down a passage lit its segments one at a time and made a
+       * tall bracket look broken up. Clicking is what colours a bracket, and
+       * that needs no warming up to.
+       */
       ".cm-worked-first::before": { borderTop: STROKE },
       ".cm-worked-last::before": { borderBottom: STROKE },
       /**
-       * The passage being looked at, in the accent colour and at full strength.
-       * After the more specific rules above so it takes all three edges, and
-       * drawn a touch wider as well — a colour change alone is easy to miss in
-       * a 2px line out at the edge of the page.
+       * Click a bracket and it shows what its passage is marked as, which is
+       * the one thing the margin cannot say on its own — out here it is a grey
+       * line like every other, and the colour is over in the prose.
+       *
+       * A reworked passage has no mark left to show, so it falls back to the
+       * accent: still clearly the one being worked on, making no claim about
+       * what it is marked as.
+       *
+       * Drawn a touch wider as well, because a colour change alone is easy to
+       * miss in a 2px line out at the edge of the page.
+       *
+       * The two arms are matched on both classes so they beat the plain grey
+       * ones above however the rules come out in the stylesheet.
        */
       ".cm-worked-active::before": {
-        borderLeftColor: "var(--color-accent)",
+        borderLeftColor: ACTIVE_STROKE_COLOR,
         opacity: "1",
         width: "0.5em",
       },
-      ".cm-worked-active.cm-worked-first::before": { borderTop: STROKE_ACTIVE },
-      ".cm-worked-active.cm-worked-last::before": { borderBottom: STROKE_ACTIVE },
+      ".cm-worked-active.cm-worked-first::before": { borderTopColor: ACTIVE_STROKE_COLOR },
+      ".cm-worked-active.cm-worked-last::before": { borderBottomColor: ACTIVE_STROKE_COLOR },
     }),
   ];
 }

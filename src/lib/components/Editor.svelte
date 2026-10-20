@@ -62,6 +62,7 @@
     WORKED_LINE_ATTR,
     type StoredWorked,
   } from "$lib/workedMarks";
+  import { setSpotlight, spotlightPassage } from "$lib/spotlight";
   import { viewportIndicator, withAlpha, wrapLineIntoRows } from "$lib/minimapLayout";
   import { HIGHLIGHT_STATES } from "$lib/highlightStates";
   import type { ChunkVersion } from "$lib/chunkHistory";
@@ -774,9 +775,16 @@
       return;
     }
     activeChunk = chunk;
-    // By id, so a passage that kept a highlight after being reworked lights
-    // its bracket too — same passage, same id, whichever one was found first.
-    litBracket(chunk.id);
+    /**
+     * The cursor's passage, not the hovered one — unlike the row above, which
+     * follows the pointer.
+     *
+     * A lit bracket means "the passage you are working in". Letting hover set
+     * it too meant that pointing at a bracket turned it the accent colour
+     * before it could show the colour of its own mark, which is the one thing
+     * the margin cannot otherwise tell you.
+     */
+    litBracket(cursorChunk?.id ?? null);
     updateChunkIconPos();
   }
 
@@ -968,7 +976,11 @@
     const id = line?.getAttribute(WORKED_LINE_ATTR);
     if (!id) return false;
 
-    const passage = workedById(editorView.state.field(workedField), editorView.state.doc.length, id);
+    // A bracket belongs either to a reworked passage or to a marked one, so
+    // both have to be asked before the click can be placed.
+    const passage =
+      workedById(editorView.state.field(workedField), editorView.state.doc.length, id) ??
+      findChunkById(id);
     if (!passage) return false;
 
     event.preventDefault();
@@ -1612,13 +1624,16 @@
           // for a code-editor-style surface this is pure overhead, not a feature.
           EditorView.contentAttributes.of({ spellcheck: "false", autocorrect: "off", autocapitalize: "off" }),
           highlightField,
+          // Holds the chapter back around the passage the drafting panel has
+          // open; does nothing at all until one is.
+          spotlightPassage(),
           // Both of these teach the history how to put marks and brackets back
           // when an edit that destroyed them is undone.
           highlightsFollowUndo(highlightField),
           workedField,
           bracketsFollowUndo(workedField),
           activeWorkedField,
-          workedBracketsCompartment.of(focusMode ? [] : workedBrackets(workedField)),
+          workedBracketsCompartment.of(focusMode ? [] : workedBrackets(workedField, highlightField)),
           EditorView.domEventHandlers({
             // On mouseup rather than on every selection change: extending a
             // selection with Shift+arrow would otherwise make the bar jump
@@ -1943,6 +1958,22 @@
     if (!focusMode && !plain) drawMinimap();
   });
 
+  /**
+   * Holds the rest of the chapter back while the drafting panel is open, and
+   * lets it up again when the panel closes.
+   *
+   * The passage is handed over once, when the panel opens; from there the
+   * editor's own state carries it along through whatever is typed behind the
+   * panel, so it stays lit where the words actually are.
+   */
+  $effect(() => {
+    const panel = draftPanel;
+    if (!view) return;
+    view.dispatch({
+      effects: setSpotlight.of(panel ? { from: panel.chunk.from, to: panel.chunk.to } : null),
+    });
+  });
+
   // Swap the highlight colours in/out as focus mode toggles. Reads focusMode
   // so it re-runs on change; the initial state is already set at construction.
   $effect(() => {
@@ -1951,7 +1982,7 @@
     view.dispatch({
       effects: [
         highlightThemeCompartment.reconfigure(highlightThemeFor(hidden)),
-        workedBracketsCompartment.reconfigure(hidden ? [] : workedBrackets(workedField)),
+        workedBracketsCompartment.reconfigure(hidden ? [] : workedBrackets(workedField, highlightField)),
       ],
     });
   });
@@ -2146,6 +2177,7 @@
 {#if draftPanel}
   <DraftPanel
     originalText={draftPanel.originalText}
+    stateId={draftPanel.chunk.stateId}
     history={chunkHistoryMap[draftPanel.chunk.id] ?? []}
     startMode={draftPanel.chunk.action === "terminal" ? "history" : "write"}
     onReplace={handleDraftReplace}
