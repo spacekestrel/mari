@@ -51,6 +51,7 @@
     activeWorkedField,
     bracketsFollowUndo,
     clearWorked,
+    clearWorkedById,
     coversWholeLine,
     createWorkedField,
     readWorked,
@@ -574,8 +575,35 @@
       if (dFrom === from && dTo === to) id = (deco.spec as { id?: string }).id;
     });
     id ??= crypto.randomUUID();
-    view.dispatch({ effects: setHighlight.of({ from, to, stateId, id }) });
+
+    /**
+     * Clearing takes the bracket with it.
+     *
+     * A reworked passage keeps its bracket after the mark that asked for the
+     * rewrite is gone, which is the point of it. But that left no way at all
+     * to be rid of one: there was no mark left to clear, so Clear highlight
+     * did nothing and the bracket stayed for good. Clear now means clear.
+     *
+     * Every bracket overlapping the range goes, not just one sitting exactly
+     * on it, so clearing across a few paragraphs sweeps all of them.
+     */
+    const clearBrackets: StateEffect<unknown>[] = [];
+    if (stateId === null) {
+      view.state.field(workedField).between(from, to, (bFrom, bTo, mark) => {
+        if (bTo > from && bFrom < to) clearBrackets.push(clearWorkedById.of(mark.id));
+      });
+    }
+
+    view.dispatch({
+      effects: [setHighlight.of({ from, to, stateId, id }), ...clearBrackets],
+      // Marking and clearing have never been on the undo trail — pressing the
+      // same key again is how a mark is taken off. Clearing a bracket rides
+      // along with that, and left on the trail it made Ctrl+Z put the bracket
+      // back while the mark stayed cleared: half the action reversed.
+      annotations: notUndoable,
+    });
     scheduleHighlightsSync();
+    if (clearBrackets.length > 0) syncWorked();
     drawMinimap();
     updateActiveChunk();
   }
