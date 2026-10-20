@@ -55,6 +55,27 @@ class ExpandedFolders {
 
   /** Forgets a folder and everything under it, once it no longer exists. */
   forget(path: string) {
+    this.dropUnder(path);
+  }
+
+  /**
+   * Closes every folder in one project.
+   *
+   * Scoped to the project rather than wiping the lot, because this remembers
+   * folders across every project you have opened: shutting one tree must not
+   * collapse the next one you switch to.
+   */
+  collapseAll(root: string) {
+    this.dropUnder(root);
+  }
+
+  /** Whether anything inside this project is open, so the button can say so. */
+  hasExpanded(root: string): boolean {
+    const prefix = root.endsWith("/") ? root : `${root}/`;
+    return this.paths.some((p) => p.startsWith(prefix));
+  }
+
+  private dropUnder(path: string) {
     const prefix = path.endsWith("/") ? path : `${path}/`;
     this.paths = this.paths.filter((p) => p !== path && !p.startsWith(prefix));
     this.persist();

@@ -103,6 +103,7 @@ export const en = {
   sidebar: {
     newFile: "New file",
     newFolder: "New folder",
+    collapseAll: "Collapse all folders",
     rename: "Rename",
     renameProblemForbidden: "A name can't contain \\ / : * ? \" < > |",
     renameProblemTaken: "Something in this folder is already called that",

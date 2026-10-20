@@ -92,6 +92,7 @@ export const es: Strings = {
   sidebar: {
     newFile: "Archivo nuevo",
     newFolder: "Carpeta nueva",
+    collapseAll: "Contraer todas las carpetas",
     rename: "Cambiar el nombre",
     renameProblemForbidden: "Un nombre no puede llevar \\ / : * ? \" < > |",
     renameProblemTaken: "Ya hay algo con ese nombre en esta carpeta",

@@ -93,6 +93,7 @@ export const de: Strings = {
   sidebar: {
     newFile: "Neue Datei",
     newFolder: "Neuer Ordner",
+    collapseAll: "Alle Ordner einklappen",
     rename: "Umbenennen",
     renameProblemForbidden: "Ein Name darf \\ / : * ? \" < > | nicht enthalten",
     renameProblemTaken: "In diesem Ordner heißt schon etwas so",

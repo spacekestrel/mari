@@ -8,6 +8,7 @@
   import type { FsEntry } from "$lib/platform";
   import { sidebarWidth } from "$lib/sidebarWidth.svelte";
   import { canDrop } from "$lib/treeMove";
+  import { expandedFolders } from "$lib/expandedFolders.svelte";
   import { i18n } from "$lib/i18n.svelte";
   import { isMissing } from "$lib/failureReason";
 
@@ -155,6 +156,9 @@
     sidebarWidth.persist();
   }
 
+  /** Nothing to shut when the whole tree is already closed. */
+  const anyExpanded = $derived(expandedFolders.hasExpanded(folder.path));
+
   function handleRootContextMenu(e: MouseEvent) {
     e.preventDefault();
     // preventDefault only suppresses the native menu, not propagation, and
@@ -175,6 +179,17 @@
       </button>
       <button class="header-btn" onclick={() => (creatingRoot = "folder")} title={i18n.t.sidebar.newFolder} aria-label={i18n.t.sidebar.newFolder}>
         <Icon name="folder-plus" size={14} />
+      </button>
+      <!-- Greyed rather than hidden when the tree is already shut: a button
+           that comes and goes is harder to aim at than one that waits. -->
+      <button
+        class="header-btn"
+        onclick={() => expandedFolders.collapseAll(folder.path)}
+        disabled={!anyExpanded}
+        title={i18n.t.sidebar.collapseAll}
+        aria-label={i18n.t.sidebar.collapseAll}
+      >
+        <Icon name="collapse-all" size={14} />
       </button>
     </div>
   </div>
@@ -329,6 +344,16 @@
     border-radius: 4px;
     color: var(--color-text-muted);
     cursor: pointer;
+  }
+
+  .header-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .header-btn:disabled:hover {
+    background: transparent;
+    color: var(--color-text-muted);
   }
 
   .header-btn:hover {

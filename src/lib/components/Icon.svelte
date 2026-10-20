@@ -9,6 +9,7 @@
     | "sun"
     | "moon"
     | "chevron-right"
+    | "collapse-all"
     | "sidebar"
     | "article"
     | "pencil"
@@ -85,6 +86,11 @@
     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
   {:else if name === "chevron-right"}
     <polyline points="9 18 15 12 9 6" />
+    <!-- Two chevrons folding in towards a line: the tree closing up on itself. -->
+  {:else if name === "collapse-all"}
+    <polyline points="7 9 12 4 17 9" />
+    <polyline points="7 15 12 20 17 15" />
+    <line x1="4" y1="12" x2="20" y2="12" />
   {:else if name === "sidebar"}
     <rect x="3" y="3" width="18" height="18" rx="2" />
     <line x1="9" y1="3" x2="9" y2="21" />

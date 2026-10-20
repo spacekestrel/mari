@@ -95,6 +95,7 @@ export const zh: Strings = {
   sidebar: {
     newFile: "新建文件",
     newFolder: "新建文件夹",
+    collapseAll: "折叠所有文件夹",
     rename: "重命名",
     renameProblemForbidden: "名称中不能含有 \\ / : * ? \" < > |",
     renameProblemTaken: "这个文件夹里已经有同名的东西了",

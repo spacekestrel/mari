@@ -105,6 +105,7 @@ export const ru: Strings = {
   sidebar: {
     newFile: "Новый файл",
     newFolder: "Новая папка",
+    collapseAll: "Свернуть все папки",
     rename: "Переименовать",
     renameProblemForbidden: "В имени нельзя использовать \\ / : * ? \" < > |",
     renameProblemTaken: "В этой папке уже есть что-то с таким именем",
