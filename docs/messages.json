@@ -2,20 +2,20 @@
   "_readme": "The news card at the foot of Mari's sidebar. Edit this file, push to main, and every copy of Mari picks it up the next time someone opens it. See docs/messages.md for what each field does.",
   "messages": [
     {
-      "id": "0-5-8",
+      "id": "0-6-0",
       "title": {
-        "en": "Mari 0.5.8 is out",
-        "ru": "Вышла Mari 0.5.8",
-        "de": "Mari 0.5.8 ist da",
-        "es": "Ya está Mari 0.5.8",
-        "zh": "Mari 0.5.8 已发布"
+        "en": "Mari 0.6.0 is out",
+        "ru": "Вышла Mari 0.6.0",
+        "de": "Mari 0.6.0 ist da",
+        "es": "Ya está Mari 0.6.0",
+        "zh": "Mari 0.6.0 已发布"
       },
       "body": {
-        "en": "Ctrl+Z now works while you draft a rewrite. And a bracket in the margin marks the passages you have reworked, so you can find your way back to what they used to say.",
-        "ru": "Ctrl+Z теперь работает, пока вы пишете новый вариант. А скобка на поле отмечает переписанные места, чтобы вы могли вернуться к прежним словам.",
-        "de": "Ctrl+Z funktioniert jetzt beim Entwerfen einer Neufassung. Und eine Klammer am Rand markiert überarbeitete Stellen, damit du zurück zum alten Wortlaut findest.",
-        "es": "Ctrl+Z ya funciona mientras redactas una reescritura. Y un corchete en el margen marca los pasajes que has reelaborado, para que puedas volver a lo que decían antes.",
-        "zh": "改写时现在可以用 Ctrl+Z 撤销。页边的方括号标出你改写过的段落，让你能找回原先的文字。"
+        "en": "Every passage you have marked now has a bracket in the margin, and clicking one shows the colour of its mark. While you rewrite a passage, the rest of the chapter steps back so it stands on its own.",
+        "ru": "У каждого отмеченного места теперь есть скобка на поле, а по щелчку она показывает цвет его метки. Пока вы переписываете место, остальная глава отступает, и оно остаётся одно.",
+        "de": "Jede markierte Stelle hat jetzt eine Klammer am Rand, und ein Klick zeigt die Farbe ihrer Markierung. Während du eine Stelle neu schreibst, tritt der Rest des Kapitels zurück.",
+        "es": "Cada pasaje que has marcado tiene ahora un corchete en el margen, y al hacer clic muestra el color de su marca. Mientras reescribes un pasaje, el resto del capítulo se aparta.",
+        "zh": "每个标记过的段落现在都有页边方括号，点击它会显示该标记的颜色。改写某段时，章节其余部分会淡下去，让它独自突出。"
       },
       "link": {
         "url": "https://meowmari.ink",
@@ -27,7 +27,7 @@
           "zh": "下载"
         }
       },
-      "forVersionsBelow": "0.5.8"
+      "forVersionsBelow": "0.6.0"
     },
     {
       "id": "0-4-0",

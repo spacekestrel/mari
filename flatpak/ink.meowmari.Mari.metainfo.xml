@@ -96,6 +96,16 @@
   </requires>
 
   <releases>
+    <release version="0.6.0" date="2026-10-19">
+      <description>
+        <ul>
+          <li>Every marked passage now has a bracket in the margin, not only the reworked ones</li>
+          <li>Click a bracket and it shows the colour of the mark its passage carries</li>
+          <li>The rewrite panel wears the colour of the passage it has open down its edge</li>
+          <li>While a rewrite is open, the rest of the chapter is held back so the passage being worked on stands out</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.5.8" date="2026-10-19">
       <description>
         <ul>
