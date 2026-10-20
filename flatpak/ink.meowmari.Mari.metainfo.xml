@@ -93,6 +93,13 @@
   </requires>
 
   <releases>
+    <release version="0.6.1" date="2026-10-20">
+      <description>
+        <ul>
+          <li>Clearing a highlight now takes its margin bracket with it, including on a passage that had been reworked</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.6.0" date="2026-10-19">
       <description>
         <ul>
