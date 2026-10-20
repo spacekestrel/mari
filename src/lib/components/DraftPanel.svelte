@@ -30,7 +30,7 @@
     history: ChunkVersion[];
     // "write" opens straight into drafting (Tweak/Rewrite/Expand/Unsure);
     // "history" opens straight into the version list with no drafting offered
-    // (Good/Cut — the mark means "decided," but past history still browsable).
+    // (Good/Cut: the mark means "decided," but past history still browsable).
     startMode: "write" | "history";
     /**
      * `keepState` says what the passage should be left marked as: null clears
@@ -55,7 +55,7 @@
   );
 
   type Mode = "write" | "compare" | "history";
-  // Deliberate one-time snapshots — this component is fully remounted for
+  // Deliberate one-time snapshots. This component is fully remounted for
   // each chunk (the caller always passes through draftPanel=null in between),
   // so props changing later shouldn't retroactively reset in-progress state.
   let mode = $state<Mode>(untrack(() => startMode));
@@ -84,7 +84,7 @@
    *
    * It is also what keeps Ctrl+Z within reach. The panel only hears a key
    * while the focus is somewhere inside it, and Keep tweaking removes the very
-   * button that was clicked — which left the focus on the page body, and the
+   * button that was clicked, which left the focus on the page body, and the
    * draft with no undo, in exactly the place it was most wanted.
    *
    * Reads `edits` untracked: the caret is restored to where it last stood, and
@@ -120,7 +120,7 @@
    * how formatting works everywhere else in Mari.
    *
    * It follows the selected words the way the chapter's own does, which takes
-   * some doing over a textarea — see selectionPoint below.
+   * some doing over a textarea (see selectionPoint below).
    */
   let formatBar = $state<{ x: number; y: number } | null>(null);
   let formatActive = $state<{ inline: Inline[]; block: Block | null }>({ inline: [], block: null });
@@ -170,7 +170,7 @@
   /**
    * Where the selected words sit on screen.
    *
-   * A textarea draws its own text and will not say where any of it ended up —
+   * A textarea draws its own text and will not say where any of it ended up:
    * there is no range to measure, the way there is over the chapter. So the
    * draft is laid out a second time in a hidden copy of the box, styled down
    * to the font and the wrapping, and the position is read off that.
@@ -261,7 +261,7 @@
       draftBox?.focus();
       draftBox?.setSelectionRange(edit.selectFrom, edit.selectTo);
       // The same words stay selected, so the bar stays up and can be pressed
-      // again — turning italic back off without reselecting.
+      // again, turning italic back off without reselecting.
       showFormatBar();
     });
   }
@@ -285,7 +285,7 @@
    * A Latin letter is taken from the character the key produces: on a German
    * keyboard the Z key sits where Y is on a US one, and going by position
    * would turn its undo into a redo. A layout that produces no Latin letter at
-   * all — Cyrillic reports Ctrl+Z as "я" — is taken from the key's position
+   * all (Cyrillic reports Ctrl+Z as "я") is taken from the key's position
    * instead, which is the only thing left to go on.
    */
   function editingKey(event: KeyboardEvent): string | null {
@@ -308,7 +308,7 @@
    * Ctrl+Z and Ctrl+Shift+Z (or Ctrl+Y) over the draft.
    *
    * On the panel rather than the box so it still answers when the focus is on
-   * one of the panel's own buttons, and only while the draft is on screen —
+   * one of the panel's own buttons, and only while the draft is on screen:
    * stepping through text nobody can see would be worse than doing nothing.
    *
    * The key is always taken, never passed on: the textarea's own undo is
@@ -361,7 +361,7 @@
 
   /**
    * Replacing means the writer is satisfied, so the mark that asked for the
-   * rewrite has done its job and goes. Unless they say otherwise here — a
+   * rewrite has done its job and goes. Unless they say otherwise here: a
    * rewrite that still needs another look shouldn't lose its place.
    */
   let keepState = $state<string | null>(null);
@@ -371,7 +371,7 @@
   }
 
   function handleRestoreVersion(version: ChunkVersion) {
-    // Restoring an older wording isn't finishing a rewrite — whatever mark the
+    // Restoring an older wording isn't finishing a rewrite. Whatever mark the
     // passage carries is about where it stands, so it stays as it is.
     onReplace(version.text, "keep");
   }
@@ -417,9 +417,9 @@
    * How much longer or shorter the rewrite came out.
    *
    * Length is the thing a writer is usually trying to change when they open
-   * this panel — tightening a flabby paragraph, or filling out a thin one —
-   * and reading two columns of prose side by side will not tell you whether
-   * you managed it.
+   * this panel, whether tightening a flabby paragraph or filling out a thin
+   * one, and reading two columns of prose side by side will not tell you
+   * whether you managed it.
    */
   const originalWords = $derived(countWords(originalText));
   const draftWords = $derived(countWords(draftText));
@@ -645,7 +645,7 @@
     /* Plain, like any other edge. The open passage's colour belongs on the
        writing box, where the eye already is; out here beside the prose it was
        only another coloured line to read past. It does appear on this edge
-       while the panel is being dragged wider — see the handle below. */
+       while the panel is being dragged wider (see the handle below). */
     border-left: 1px solid var(--color-border);
     box-shadow: -8px 0 24px rgba(0, 0, 0, 0.08);
     z-index: 150;
@@ -721,7 +721,7 @@
   }
 
   /* The line under the pointer while the edge is being dragged, in the open
-     passage's colour — the one place the edge says which passage this is. */
+     passage's colour, the one place the edge says which passage this is. */
   .resize-handle:hover::after,
   .resize-handle.active::after {
     content: "";
@@ -790,7 +790,7 @@
     padding: var(--space-3);
   }
 
-  /* The open passage's colour, the same one down the panel's edge — so the
+  /* The open passage's colour, the same one down the panel's edge, so the
      box you are writing in says which mark you are answering. Falls back to
      the accent for a passage with no mark left on it. */
   .draft-area:focus {
@@ -910,7 +910,7 @@
     font-size: 0.9rem;
     line-height: 1.6;
     white-space: pre-wrap;
-    /* A long unbroken run — a pasted URL, or typing with no spaces — was
+    /* A long unbroken run (a pasted URL, or typing with no spaces) was
        running off the side instead of wrapping. */
     overflow-wrap: anywhere;
   }

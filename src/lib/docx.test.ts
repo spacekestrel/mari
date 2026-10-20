@@ -50,7 +50,7 @@ describe("reading Word documents", () => {
   });
 
   it("treats an explicitly-off toggle as off", () => {
-    // Inherited from a style then switched back — Word shows this as plain.
+    // Inherited from a style then switched back, which Word shows as plain.
     const file = wordFile(para(run("not bold", '<w:rPr><w:b w:val="0"/></w:rPr>')));
     expect(docxToMarkdown(file)).toBe("not bold");
   });
@@ -100,8 +100,8 @@ describe("reading Word documents", () => {
   });
 
   it("drops a deletion even when it holds ordinary text elements", () => {
-    // `w:delText` alone would never be read, but not every producer uses it —
-    // the deletion has to go as a whole, whatever it contains.
+    // `w:delText` alone would never be read, but not every producer uses it,
+    // so the deletion has to go as a whole, whatever it contains.
     const file = wordFile(
       para(run("The cat sat ") + `<w:del w:id="2">${run("badly ")}</w:del>` + run("down.")),
     );

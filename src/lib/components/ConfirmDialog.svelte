@@ -10,7 +10,7 @@
     confirmTone?: "danger" | "primary";
     /** Only the delete flow offers to stop asking. */
     showDontAskAgain?: boolean;
-    /** A third answer, between Cancel and confirm — "Discard", say. */
+    /** A third answer, between Cancel and confirm: "Discard", say. */
     altLabel?: string;
     onAlt?: () => void;
     onConfirm: (dontAskAgain: boolean) => void;

@@ -183,7 +183,7 @@ describe("deleting part of an italic phrase", () => {
     return state.doc.toString();
   }
 
-  // "one *two three* four" — the closing marker is at 14.
+  // "one *two three* four": the closing marker is at 14.
   const phrase = "one *two three* four";
 
   it("stays italic when the last word goes", () => {
@@ -205,7 +205,7 @@ describe("deleting part of an italic phrase", () => {
   });
 
   it("keeps every character the writer could see", () => {
-    // "one two three four" minus "three" is "one two  four" — two spaces,
+    // "one two three four" minus "three" is "one two  four": two spaces,
     // because the writer deleted a word and not the spaces around it.
     expect(visibleText(cut(phrase, 9, 14).text)).toBe("one two  four");
     expect(visibleText(cut(phrase, 5, 8).text)).toBe("one  three four");
@@ -224,7 +224,7 @@ describe("deleting part of an italic phrase", () => {
 
   it("closes up the outer markers too, not just the inner ones", () => {
     // Bold and italic together. Closing only the inner pair would leave
-    // "a ***b** * d" — the same bug one layer out.
+    // "a ***b** * d": the same bug one layer out.
     const { text } = cut("a ***b c*** d", 7, 8);
     expect(text).toBe("a ***b***  d");
     expect(italic(text)).toBe(true);

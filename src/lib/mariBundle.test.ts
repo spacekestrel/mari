@@ -5,7 +5,7 @@ import { emptySynopsis, packMariBundle, unpackMariBundle, type MariCut } from ".
 /**
  * A cut passage exists in exactly one place: the `.mari` file. It isn't in the
  * prose any more, and the clipboard forgot it long ago. So these tests are
- * about one thing — no future change to this app may quietly drop it.
+ * about one thing: no future change to this app may quietly drop it.
  */
 
 const cut = (over: Partial<MariCut> = {}): MariCut => ({
@@ -92,7 +92,7 @@ describe("cuts survive files this build didn't write", () => {
 });
 
 /**
- * A bracket in the margin is the only sign left that a passage was reworked —
+ * A bracket in the margin is the only sign left that a passage was reworked:
  * the highlight that asked for the rewrite is cleared when the work is done.
  * Lose the brackets and the earlier wordings are still in the file with nothing
  * pointing at them.

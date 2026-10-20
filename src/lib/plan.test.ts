@@ -53,7 +53,7 @@ describe("editing the plan", () => {
   it("does not let two identical beats share one tick", () => {
     const twins: MariPlanBeat[] = [{ text: "Same wording", done: true }, { text: "Same wording" }];
     const next = mergePlanBeats("Same wording\nSame wording", twins);
-    // Exactly one tick between them, as before — not both, not neither.
+    // Exactly one tick between them, as before: not both, not neither.
     expect(next.filter((b) => b.done)).toHaveLength(1);
   });
 

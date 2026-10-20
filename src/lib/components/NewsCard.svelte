@@ -8,7 +8,7 @@
    * is one more reason to stop opening it.
    *
    * The words come from a file on the website, so they have never been read by
-   * anyone here. They are drawn as text and nothing else — no markup, and a
+   * anyone here. They are drawn as text and nothing else: no markup, and a
    * link only if it was plain https.
    */
   import Icon from "./Icon.svelte";

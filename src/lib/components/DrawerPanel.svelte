@@ -112,7 +112,7 @@
 
 <style>
   /* Hangs under the "Drawer" word in the chapter header rather than being a
-     full-height sidebar — it's a short list, and the height of the document
+     full-height sidebar: it's a short list, and the height of the document
      has nothing to do with how much is in it. Left edge lines up with the
      header's own box (its 10px negative margin inside the 1rem inset). */
   .panel {
@@ -191,8 +191,8 @@
     font-family: var(--font-ui);
   }
 
-  /* Expanded, the row is just the byline above the passage — no need for it
-     to keep the full height it has when it's the whole entry. */
+  /* Expanded, the row is just the byline above the passage, so there's no
+     need for the full height it has when it's the whole entry. */
   li.expanded .row {
     padding-bottom: var(--space-2);
   }
@@ -223,7 +223,7 @@
     color: var(--color-text-muted);
   }
 
-  /* The passage itself reads in the prose voice — it is prose, after all. */
+  /* The passage itself reads in the prose voice. It is prose, after all. */
   .full {
     max-height: 30vh;
     overflow-y: auto;

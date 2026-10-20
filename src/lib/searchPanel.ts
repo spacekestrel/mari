@@ -158,7 +158,7 @@ function createPanel(view: EditorView): Panel {
      * prose and the writer had to go and click the box.
      *
      * The old search is selected rather than cleared, so typing replaces it
-     * and Enter repeats it — whichever the writer meant.
+     * and Enter repeats it, whichever the writer meant.
      */
     mount: () => {
       refresh();

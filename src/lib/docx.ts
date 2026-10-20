@@ -7,7 +7,7 @@ import { unzipSync, zipSync, strToU8, strFromU8 } from "fflate";
  * this needs no library beyond the one already unpacking bundles.
  *
  * What crosses the boundary is prose: paragraphs, headings, bold and italic.
- * That is the honest overlap between Word and Mari — everything else Word can
+ * That is the honest overlap between Word and Mari. Everything else Word can
  * hold (comments, tracked changes, tables, images) has nowhere to go in a
  * plain-Markdown editor, and silently dropping it on save would be worse than
  * not claiming to support it. Highlights, notes and the drawer stay behind
@@ -48,7 +48,7 @@ function decodeXml(text: string): string {
 
 /**
  * Word writes a toggle as `<w:b/>`, but also as `<w:b w:val="0"/>` to mean
- * explicitly off — inherited from a style and then switched back. Treating any
+ * explicitly off, inherited from a style and then switched back. Treating any
  * appearance as "on" would bold text that Word shows as plain.
  */
 function toggledOn(runProps: string, tag: string): boolean {
@@ -178,7 +178,7 @@ export function docxToMarkdown(bytes: Uint8Array): string {
 /* Writing                                                             */
 /* ------------------------------------------------------------------ */
 
-/** Characters XML 1.0 cannot represent at all — Word rejects the whole file. */
+/** Characters XML 1.0 cannot represent at all: Word rejects the whole file. */
 // eslint-disable-next-line no-control-regex
 const ILLEGAL = /[\x00-\x08\x0B\x0C\x0E-\x1F\uFFFE\uFFFF]/g;
 
@@ -204,7 +204,7 @@ function runXml(text: string, bold: boolean, italic: boolean): string {
 
 /**
  * Splits one line of Markdown into runs. Handles `**bold**`, `*italic*` and
- * `_italic_`, which is the emphasis Mari's own reading view renders — anything
+ * `_italic_`, which is the emphasis Mari's own reading view renders. Anything
  * more elaborate is passed through as the characters the writer typed.
  */
 function inlineRuns(line: string): string {
@@ -252,7 +252,7 @@ const DOC_RELS = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 </Relationships>`;
 
 /**
- * Heading styles have to be declared or Word shows them as body text — the
+ * Heading styles have to be declared or Word shows them as body text; the
  * `pStyle` reference alone isn't enough. Body text is manuscript-standard:
  * 12pt serif, double-spaced, indented first line.
  */

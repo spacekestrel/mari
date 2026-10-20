@@ -79,7 +79,7 @@ describe.each(Object.entries(TRANSLATIONS))("locale %s", (code, dictionary) => {
 
 describe("Russian counting", () => {
   it("counts the way Russian counts", () => {
-    // 1 слово, 2 слова, 5 слов — and the teens break the pattern.
+    // 1 слово, 2 слова, 5 слов, and the teens break the pattern.
     expect(ru.document.words(1)).toBe("1 слово");
     expect(ru.document.words(3)).toBe("3 слова");
     expect(ru.document.words(5)).toBe("5 слов");

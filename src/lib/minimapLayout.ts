@@ -3,7 +3,7 @@
  * in the little preview, and where the viewport box sits on it.
  *
  * Kept apart from the drawing because this is where the early minimap bugs
- * were — rows not filling the width, an uneven right-hand edge — and because
+ * were (rows not filling the width, an uneven right-hand edge), and because
  * arithmetic can be checked without a canvas.
  */
 
@@ -29,7 +29,7 @@ export interface MinimapRow {
  * measurements per redraw on a chapter-length document.
  */
 export function wrapLineIntoRows(text: string, maxWidth: number, avgCharWidth: number): MinimapRow[] {
-  // An empty line still occupies a row — otherwise the paragraph breaks
+  // An empty line still occupies a row. Otherwise the paragraph breaks
   // collapse and the preview stops lining up with the document.
   if (text.length === 0) return [{ from: 0, to: 0 }];
 
@@ -47,7 +47,7 @@ export function wrapLineIntoRows(text: string, maxWidth: number, avgCharWidth: n
     const token = match[0];
     const tokenEnd = match.index + token.length;
     // A word that won't fit starts the next row, taking its leading space
-    // with it — that space is what kept rows short of the right edge.
+    // with it: that space is what kept rows short of the right edge.
     if (rowChars > 0 && rowChars + token.length > maxChars) {
       rows.push({ from: rowStart, to: lastEnd });
       rowStart = lastEnd;

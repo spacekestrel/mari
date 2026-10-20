@@ -18,7 +18,7 @@ import type { ChunkVersion } from "./chunkHistory";
 /**
  * Brackets down the margin, beside passages that have been reworked.
  *
- * Replacing a passage clears the mark that asked for the rewrite — the work is
+ * Replacing a passage clears the mark that asked for the rewrite: the work is
  * done, and leaving a to-do on finished prose would be wrong. But the earlier
  * wordings are still in the file, and with the mark gone there was nothing
  * left to say where they belonged: the passage looked like every other
@@ -26,12 +26,12 @@ import type { ChunkVersion } from "./chunkHistory";
  * it used to say.
  *
  * So a reworked passage keeps a quieter mark of its own. It carries no verdict
- * and no colour — it only says *this is a passage you have already been
+ * and no colour. It only says *this is a passage you have already been
  * through, and there is history behind it*. A bracket in the margin rather
  * than anything over the prose, because the prose has been settled.
  *
- * Kept out of the editor component so the two decisions worth getting right —
- * which passages earn a bracket, and which lines it is drawn beside — can be
+ * Kept out of the editor component so the two decisions worth getting right
+ * (which passages earn a bracket, and which lines it is drawn beside) can be
  * tested without a browser.
  */
 
@@ -63,7 +63,7 @@ export const setWorked = StateEffect.define<StoredWorked>();
 /** Drops one, for a passage that is no longer worth marking. */
 export const clearWorkedById = StateEffect.define<string>();
 
-/** Wipes the lot — used when another file's content is swapped in. */
+/** Wipes the lot, as swapping in another file's content does. */
 export const clearWorked = StateEffect.define<null>();
 
 function rangesFrom(worked: StoredWorked[]): Range<WorkedMark>[] {
@@ -94,13 +94,13 @@ export function coversWholeLine(doc: Text, from: number, to: number): boolean {
 /**
  * Working out the brackets for a chapter saved before brackets existed.
  *
- * Those files never recorded where a reworked passage sat — the highlight was
+ * Those files never recorded where a reworked passage sat: the highlight was
  * holding the place, and replacing the passage cleared it. So for most of them
  * the position is simply gone, and nothing here invents one.
  *
  * But not all of them. Replacing offers to leave the passage marked, and when
  * it was, the highlight stayed behind carrying the same chunk id. Those two
- * facts together — a highlight here, earlier wordings under that same id — are
+ * facts together (a highlight here, earlier wordings under that same id) are
  * enough to say exactly where the work was done, so those passages get their
  * brackets back rather than being written off with the rest.
  *
@@ -146,8 +146,8 @@ export interface BracketSource extends StoredWorked {
  * Every passage in the chapter with a bracket beside it: the marked ones and
  * the reworked ones together.
  *
- * Marked ones first, so a passage that is both — reworked, and left marked
- * afterwards — is listed once and keeps the colour it is wearing now rather
+ * Marked ones first, so a passage that is both reworked and left marked
+ * afterwards is listed once and keeps the colour it is wearing now rather
  * than being counted twice.
  */
 export function bracketSources(
@@ -181,7 +181,7 @@ export interface BracketLine {
   /**
    * The passage this line belongs to. Put on the rendered line so a click out
    * in the margin can be traced back to a passage, which is the only thing
-   * there to aim at — the bracket is beside the prose, not in it.
+   * there to aim at: the bracket is beside the prose, not in it.
    */
   id: string;
   /** True for the passage currently being looked at, which draws it stronger. */
@@ -334,8 +334,8 @@ export const WORKED_LINE_ATTR = "data-worked-id";
 
 /**
  * Brackets come back when a deletion is undone, and go away when the rework
- * that earned one is undone. Same reasoning as the marks — see
- * highlightsFollowUndo — with one more case of its own.
+ * that earned one is undone. Same reasoning as the marks (see
+ * highlightsFollowUndo), with one more case of its own.
  *
  * A Replace puts a bracket on in the same breath as it changes the prose, so
  * undoing it has to take the bracket off again. Otherwise the margin would go
@@ -457,7 +457,7 @@ export function workedBrackets(
       },
       /**
        * No hover state. The bracket is drawn one piece per line, and the piece
-       * reacts to the whole line of prose rather than to itself — so running
+       * reacts to the whole line of prose rather than to itself, so running
        * the mouse down a passage lit its segments one at a time and made a
        * tall bracket look broken up. Clicking is what colours a bracket, and
        * that needs no warming up to.
@@ -466,7 +466,7 @@ export function workedBrackets(
       ".cm-worked-last::before": { borderBottom: STROKE },
       /**
        * Click a bracket and it shows what its passage is marked as, which is
-       * the one thing the margin cannot say on its own — out here it is a grey
+       * the one thing the margin cannot say on its own: out here it is a grey
        * line like every other, and the colour is over in the prose.
        *
        * A reworked passage has no mark left to show, so it falls back to the

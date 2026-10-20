@@ -155,7 +155,7 @@ const fsAccessAdapter: FileSystemAdapter = {
 
     // Only once the copy is safely written. A failure above leaves the
     // original where it was rather than losing it, and this order can never
-    // produce nothing — at worst a duplicate, which is recoverable.
+    // produce nothing: at worst a duplicate, which is recoverable.
     await (parent.handle as FileSystemDirectoryHandle).removeEntry(entry.name);
 
     return { name: entry.name, path: `${targetDir.path}/${entry.name}`, kind: "file", handle: created };
@@ -309,7 +309,7 @@ const downloadFallbackAdapter: FileSystemAdapter = {
     throw new Error(`Cannot move "${entry.name}": folder browsing is unsupported in this browser.`);
   },
 
-  // This fallback has no save picker at all — every write is a download, so
+  // This fallback has no save picker at all: every write is a download, so
   // the suggested name is the destination and the format follows from it.
   async chooseSaveTarget(_extensions, suggestedName) {
     return { name: suggestedName, handle: suggestedName };

@@ -4,8 +4,9 @@ import { dirname, join } from "@tauri-apps/api/path";
 import { basename, sortFsEntries, type FileSystemAdapter, type FsEntry } from "./types";
 import { getLastDirectory, setLastDirectory } from "./lastDirectory";
 
-// The plain-text pickers must not offer `.mari` — those are zips and would be
-// mangled by being read as text. Bundles go through the binary pickers below.
+// The plain-text pickers must not offer `.mari`, since those are zips and
+// would be mangled by being read as text. Bundles go through the binary
+// pickers below.
 const FILTERS = [{ name: "Text", extensions: ["md", "markdown", "txt"] }];
 
 /** Every format the byte pickers handle, and what to call it in a dialog. */
@@ -18,7 +19,7 @@ const FORMAT_NAMES: Record<string, string> = {
 };
 
 /**
- * One entry per format so the dialog offers a real choice — saving picks the
+ * One entry per format so the dialog offers a real choice: saving picks the
  * format this way. A combined entry leads when there's more than one, so
  * opening still shows everything at once.
  */

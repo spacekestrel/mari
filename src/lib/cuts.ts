@@ -17,8 +17,8 @@ export function newCutId(): string {
 /**
  * Describes a passage about to leave the chapter, including the prose either
  * side of it so it can be put back where it came from. Returns null when the
- * selection holds nothing worth keeping — cutting a blank line shouldn't fill
- * the drawer with empties.
+ * selection holds nothing worth keeping, since cutting a blank line shouldn't
+ * fill the drawer with empties.
  */
 export function describeCut(
   doc: string,
@@ -50,7 +50,7 @@ function onlyOccurrence(doc: string, needle: string | undefined): number {
 
 /**
  * Where a cut passage goes back. The remembered context is only trusted when
- * it appears exactly once — otherwise there's no telling which copy is the
+ * it appears exactly once. Otherwise there's no telling which copy is the
  * right one, and dropping it at the cursor is honest about that rather than
  * quietly putting it in the wrong chapter position.
  */

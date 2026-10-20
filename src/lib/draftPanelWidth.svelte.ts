@@ -28,7 +28,7 @@ function initial(): number {
 class DraftPanelWidthStore {
   current = $state<number>(initial());
 
-  /** Live while dragging — deliberately not written to storage per pixel. */
+  /** Live while dragging; deliberately not written to storage per pixel. */
   set(value: number) {
     this.current = clamp(value);
   }

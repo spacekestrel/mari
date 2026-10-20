@@ -120,7 +120,7 @@
   function handleContextMenu(e: MouseEvent) {
     e.preventDefault();
     // Without this, the event keeps bubbling to window after preventDefault()
-    // (that only suppresses the native menu, not propagation) — and since the
+    // (that only suppresses the native menu, not propagation), and since the
     // menu we're about to open listens on window for contextmenu-to-dismiss,
     // it would catch this same event and close itself instantly.
     e.stopPropagation();
@@ -233,7 +233,7 @@
   {/if}
   <!-- What's already here wins over the spinner. Showing "Loading…" instead
        of the current rows destroys them, and each row is what remembers
-       whether its own folder is open — so a refresh collapsed everything
+       whether its own folder is open, so a refresh collapsed everything
        below this one. -->
   {#if children}
     {#each children as child (child.path)}

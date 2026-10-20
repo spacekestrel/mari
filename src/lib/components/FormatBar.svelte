@@ -123,7 +123,7 @@
 
 <style>
   /* Fixed, because the coordinates come straight from getBoundingClientRect
-     on the selection — the same approach the highlight menu uses. */
+     on the selection, the same approach the highlight menu uses. */
   .bar {
     position: fixed;
     /* Above the drafting panel, which this also serves and which would

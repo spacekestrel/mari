@@ -157,7 +157,7 @@
 
   function handleRootContextMenu(e: MouseEvent) {
     e.preventDefault();
-    // preventDefault only suppresses the native menu, not propagation — and
+    // preventDefault only suppresses the native menu, not propagation, and
     // ContextMenu listens on window for contextmenu-to-dismiss, so without
     // this it would catch this same event and close itself instantly.
     e.stopPropagation();

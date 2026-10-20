@@ -2,7 +2,7 @@
   // Self-hosted so the editor looks the same regardless of what's installed on
   // the OS (Georgia, for instance, isn't present on most Linux systems). All
   // five options users can pick from Settings are loaded upfront so switching
-  // is instant — see src/lib/fonts.ts for the catalog.
+  // is instant (see src/lib/fonts.ts for the catalog).
   import "@fontsource/literata/300.css";
   import "@fontsource/literata/300-italic.css";
   import "@fontsource/literata/600.css";

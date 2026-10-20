@@ -6,7 +6,7 @@ import type { StoredWorked } from "./workedMarks";
 /**
  * A `.mari` file is a zip. Nothing is encrypted or obfuscated: rename it to
  * `.zip`, open it, and `content.md` is your prose in plain Markdown. That's
- * deliberate — the extras are worth having, but they must never be able to
+ * deliberate: the extras are worth having, but they must never be able to
  * hold a manuscript hostage.
  *
  * Layout:
@@ -44,12 +44,12 @@ const KNOWN_PARTS = new Set([MANIFEST, CONTENT, HIGHLIGHTS, NOTES, HISTORY, SYNO
  * What this chapter is, held as two separate things.
  *
  * `plan` is intent, written before drafting: what the chapter has to get done,
- * in order. `text` is the synopsis — what the chapter actually does, written
+ * in order. `text` is the synopsis, what the chapter actually does, written
  * after. Keeping them apart is the point: the drift between them is worth
  * seeing.
  *
- * An object rather than bare strings so it can gain fields later — POV,
- * location, a word target — without changing shape or needing a format bump.
+ * An object rather than bare strings so it can gain fields later (POV,
+ * location, a word target) without changing shape or needing a format bump.
  */
 /** One step of the plan: what has to happen, and whether it has yet. */
 export interface MariPlanBeat {
@@ -74,7 +74,7 @@ export function emptySynopsis(): MariSynopsis {
 
 /**
  * Beats were plain strings before they could be ticked off, and files written
- * then are still out there — so a string is read as an unticked beat rather
+ * then are still out there, so a string is read as an unticked beat rather
  * than thrown away.
  */
 function normalizePlan(value: unknown): MariPlanBeat[] {
@@ -103,7 +103,7 @@ function normalizeSynopsis(value: MariSynopsis): MariSynopsis {
 }
 
 /**
- * A passage taken out of the prose but kept. Not a version of anything — it
+ * A passage taken out of the prose but kept. Not a version of anything: it
  * simply isn't in the chapter any more, and the writer wasn't ready to lose it.
  */
 export interface MariCut {
@@ -114,7 +114,7 @@ export interface MariCut {
   /** Why it went, if the writer said. */
   note?: string;
   /**
-   * The prose either side of it when it left. Used to aim "Put back" — an
+   * The prose either side of it when it left. Used to aim "Put back": an
    * offset would rot with the next edit, but the surrounding words survive.
    */
   before?: string;
@@ -156,7 +156,7 @@ function normalizeWorked(value: unknown): StoredWorked[] {
 export interface MariManifest {
   format: "mari";
   version: number;
-  /** Set by whichever build wrote the file — useful when diagnosing old files. */
+  /** Set by whichever build wrote the file; useful when diagnosing old files. */
   generator?: string;
   savedAt?: string;
   [key: string]: unknown;
@@ -185,7 +185,7 @@ function parseJson<T>(bytes: Uint8Array | undefined, fallback: T): T {
     const parsed = JSON.parse(strFromU8(bytes));
     return parsed && typeof parsed === "object" ? (parsed as T) : fallback;
   } catch {
-    // A corrupt part shouldn't cost the user their prose — drop just that part.
+    // A corrupt part shouldn't cost the user their prose, so drop just that part.
     return fallback;
   }
 }
@@ -208,7 +208,7 @@ export function packMariBundle(bundle: {
 }): Uint8Array {
   // Never stamp the version *down*. An older build opening a newer file
   // preserves the parts it doesn't understand (see unknownParts), so the file
-  // is still genuinely that newer version — relabelling it would make a future
+  // is still genuinely that newer version. Relabelling it would make a future
   // build read it as old and ignore data that's actually still in there.
   const incomingVersion = Number(bundle.manifest?.version);
   const manifest: MariManifest = {

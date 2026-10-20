@@ -7,7 +7,7 @@
     icon?: IconName;
     colorSwatch?: string;
     danger?: boolean;
-    /** Shown right-aligned — this is how the shortcuts get learned. */
+    /** Shown right-aligned, which is how the shortcuts get learned. */
     shortcut?: string;
     onClick: () => void;
   }
@@ -22,7 +22,7 @@
   let { x, y, items, onDismiss }: Props = $props();
 
   let menuEl: HTMLDivElement;
-  // Snapshot on purpose — the menu's position shouldn't track the trigger point live.
+  // Snapshot on purpose: the menu's position shouldn't track the trigger point live.
   let left = $state(untrack(() => x));
   let top = $state(untrack(() => y));
 

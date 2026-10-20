@@ -10,8 +10,8 @@ const LIMIT = 90;
 
 export function failureReason(error: unknown): string {
   const raw = error instanceof Error ? error.message : String(error ?? "");
-  // `String({})` gives "[object Object]", which tells the writer nothing —
-  // better to show no reason than a fake one.
+  // `String({})` gives "[object Object]", which tells the writer nothing.
+  // Better to show no reason than a fake one.
   const reason = raw.startsWith("[object ") ? "" : raw.trim();
   return reason.length > LIMIT ? `${reason.slice(0, LIMIT - 1)}…` : reason;
 }
@@ -27,7 +27,7 @@ export function failureReason(error: unknown): string {
  * the file system. The wording differs per platform, so each one is listed:
  * Linux and macOS say "No such file or directory (os error 2)", Windows says
  * it cannot find the path, and a browser throws NotFoundError. The boundary
- * after `os error 2` matters — `os error 20` is "not a directory", which is a
+ * after `os error 2` matters: `os error 20` is "not a directory", which is a
  * different problem and must not be swallowed as a missing folder.
  */
 const MISSING =

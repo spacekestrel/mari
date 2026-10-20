@@ -1,5 +1,5 @@
 /**
- * Revision marks. They live inside the `.mari` file (see mariBundle) — this
+ * Revision marks. They live inside the `.mari` file (see mariBundle). This
  * module only describes their shape.
  */
 export interface StoredHighlight {

@@ -10,7 +10,7 @@
    * empty, or what you already wrote if it isn't.
    */
   interface Props {
-    /** Ordered beats — what this chapter has to get done. */
+    /** Ordered beats: what this chapter has to get done. */
     plan: MariPlanBeat[];
     /** What actually happens, in a sentence or two. */
     synopsis: string;
@@ -42,8 +42,8 @@
   function toggle(field: Field) {
     // Keep whatever is in the box first. Clicking the open word to put it
     // away, or the other word to switch, both used to discard it silently.
-    // Must run before `open` moves — applyDraft reads it to know which field
-    // it's writing.
+    // Must run before `open` moves, since applyDraft reads it to know which
+    // field it's writing.
     if (editing) applyDraft();
 
     if (open === field) {
@@ -53,7 +53,7 @@
     }
     open = field;
     onOpenField();
-    // Nothing written yet means there's nothing to read — go straight to the box.
+    // Nothing written yet means there's nothing to read: go straight to the box.
     if (isEmpty(field)) startEditing();
     else editing = false;
   }
@@ -72,7 +72,7 @@
 
     if (open === "plan") {
       const next = mergePlanBeats(draft, steps);
-      // Only report a real change — otherwise opening and closing the box
+      // Only report a real change. Otherwise opening and closing the box
       // would mark the file unsaved.
       if (!samePlan(next, steps)) onPlanChange(next);
     } else {
@@ -196,8 +196,8 @@
   {@render field("synopsis", i18n.t.chapter.synopsis, i18n.t.chapter.synopsisPlaceholder)}
   {@render field("plan", i18n.t.chapter.plan, i18n.t.chapter.planPlaceholder)}
 
-  <!-- Same category as the two above — things about the chapter that aren't
-       the prose — so it sits with them rather than in the app's toolbar. This
+  <!-- Same category as the two above: things about the chapter that aren't
+       the prose, so it sits with them rather than in the app's toolbar. This
        one opens the side panel instead of unfolding here. -->
   <button
     class="label"
@@ -272,7 +272,7 @@
     color: var(--color-text);
   }
 
-  /* The same rule the plan's beats hang off, without the dots — so the two
+  /* The same rule the plan's beats hang off, without the dots, so the two
      read as one family: a line down the side of what the chapter is. */
   .written p {
     position: relative;

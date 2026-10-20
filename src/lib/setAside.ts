@@ -25,7 +25,7 @@ export interface SetAsideWork {
  * A short, stable fingerprint of a file's bytes (FNV-1a, 32-bit).
  *
  * Only ever compared against another fingerprint of the same kind, so it needs
- * to be quick and to change when the bytes change — not to be unguessable.
+ * to be quick and to change when the bytes change, not to be unguessable.
  * A `.mari` is a zip, so even a one-word edit moves most of it.
  */
 export function fingerprint(bytes: Uint8Array): string {

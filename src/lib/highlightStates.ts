@@ -6,18 +6,18 @@ export interface HighlightState {
   // Translucent color, used for the applied highlight background.
   rgba: string;
   // What the chunk action icon does for a range marked with this state:
-  // "draft" — opens the draft/compare workflow; this state means "I want to
-  // change this text." "reposition" — opens move-placement mode instead of
-  // drafting. "terminal" — the mark means a decision was already made
-  // (keep as-is, or remove), so no *new* draft can start — but if the chunk
-  // already has history from before, it stays viewable.
+  // "draft" opens the draft/compare workflow; this state means "I want to
+  // change this text." "reposition" opens move-placement mode instead of
+  // drafting. "terminal" means a decision was already made (keep as-is, or
+  // remove), so no *new* draft can start, but if the chunk already has
+  // history from before, it stays viewable.
   chunkAction: "draft" | "reposition" | "terminal";
 }
 
 /**
  * Old state ids that have since been renamed, mapped to their replacement.
  * Sidecar files written before a rename still carry the old id, and an id that
- * matches no state renders as an invisible, inert mark — so loading migrates
+ * matches no state renders as an invisible, inert mark, so loading migrates
  * them rather than silently dropping the user's work.
  */
 const RENAMED_STATE_IDS: Record<string, string> = {

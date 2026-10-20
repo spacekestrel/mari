@@ -73,7 +73,7 @@ describe("putting a cut back", () => {
   it("refuses to guess when the surrounding words appear twice", () => {
     const doc = "Repeat.\n\nRepeat.\n\nEnd.\n";
     const where = findPutBackPosition(doc, cut({ before: "Repeat.\n\n", after: "End.\n" }), 0);
-    // Not after either "Repeat." — it fell through to the unambiguous `after`.
+    // Not after either "Repeat.": it fell through to the unambiguous `after`.
     expect(where).toBe(doc.indexOf("End."));
   });
 

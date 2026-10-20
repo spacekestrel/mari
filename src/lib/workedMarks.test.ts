@@ -174,7 +174,7 @@ describe("which lines the bracket is drawn beside", () => {
 
 /**
  * Chapters saved before brackets existed. Most reworked passages in them are
- * genuinely unplaceable — the highlight that held the spot was cleared when the
+ * genuinely unplaceable: the highlight that held the spot was cleared when the
  * work was done. The ones where a mark was left behind are not, and those are
  * what this recovers. Nothing here may invent a bracket: one standing against
  * prose that was never reworked is worse than none, because it would be trusted.
@@ -385,8 +385,9 @@ describe("the bracket being looked at", () => {
 /**
  * Brackets have the same exposure the marks had: delete the passage, undo, and
  * the bracket was gone even though the words came back. And a bracket must not
- * outlive the rework that earned it — a margin claiming work that was undone
- * would send the writer looking for a wording that is already on the page.
+ * outlive the rework that earned it, since a margin claiming work that was
+ * undone would send the writer looking for a wording that is already on the
+ * page.
  */
 describe("brackets survive undo", () => {
   function editor(initial: StoredWorked[]) {

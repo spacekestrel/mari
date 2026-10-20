@@ -86,7 +86,7 @@ export interface FileSystemAdapter {
   /**
    * Prompt for a save destination without writing anything, so the caller can
    * see which format was chosen before encoding. Exporting offers several at
-   * once — `.mari`, `.docx`, plain text — and they are different bytes.
+   * once (`.mari`, `.docx`, plain text), and they are different bytes.
    * Null if cancelled.
    */
   chooseSaveTarget(

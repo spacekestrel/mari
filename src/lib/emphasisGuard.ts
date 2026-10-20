@@ -20,9 +20,9 @@ import { isHidden, markEnd } from "./hideMarkers";
  * instead. Letters typed against a marker stay where they were typed, because
  * finishing an italic word has to keep working.
  *
- * Only the writer's own typing and deleting. Mari's own edits — the formatting
+ * Only the writer's own typing and deleting. Mari's own edits (the formatting
  * buttons, replacing a passage from the draft panel, putting one back from the
- * drawer, loading another chapter — are left exactly as they were written.
+ * drawer, loading another chapter) are left exactly as they were written.
  */
 
 /** Markdown punctuation a space must not be typed against. */
@@ -43,7 +43,7 @@ export function spaceBelongsAt(tree: Tree, pos: number): number | null {
     const node = tree.resolveInner(at, 1);
     // A mark that starts here and finishes where its emphasis finishes is the
     // closing one. The opening mark of an adjacent word starts here too, and
-    // must not be jumped over — that would move the space into the next word.
+    // must not be jumped over: that would move the space into the next word.
     if (!MARKS.has(node.name) || node.from !== at) break;
     if (node.parent?.to !== node.to) break;
     at = node.to;
@@ -152,7 +152,7 @@ const MARK_CHARACTER = /[*_~]/;
  *
  * Markdown only reads `*two*` as italic while the markers are up against the
  * words. Take a word out of the middle of an italic phrase and a space is left
- * standing inside one of them — `*two * four` — and the whole thing stops
+ * standing inside one of them (`*two * four`), and the whole thing stops
  * being italic, which is how a writer deleting one word ends up looking at an
  * asterisk they never typed.
  *
@@ -163,7 +163,7 @@ const MARK_CHARACTER = /[*_~]/;
  *
  * Done to the outermost emphasis rather than the innermost. `***b c***` is an
  * italic inside a bold, and closing up only the inner pair leaves the space
- * against the outer one — the same bug one layer out.
+ * against the outer one: the same bug one layer out.
  */
 export function markersHugTheWords(
   tree: Tree,
@@ -240,7 +240,7 @@ export function markersHugTheWords(
  *
  * Matched on the exact label rather than by family. Typing arrives as
  * "input.type" but Enter arrives as plain "input", and asking whether a
- * transaction is an "input.type" says no to Enter — which is how the line
+ * transaction is an "input.type" says no to Enter, which is how the line
  * break went on breaking emphasis after the space had been fixed. Asking the
  * family question instead would say yes to pasting and dropping, which are
  * their own decisions.

@@ -8,7 +8,7 @@ export type LocaleId = "en" | "ru" | "de" | "es" | "zh";
 
 export interface LocaleOption {
   id: LocaleId;
-  /** Named in its own language — that's the one word a reader is sure to know. */
+  /** Named in its own language: that's the one word a reader is sure to know. */
   label: string;
 }
 
@@ -77,7 +77,7 @@ export const i18n = new I18nStore();
 
 /**
  * The same strings for code that runs outside a component and can't hold a
- * reactive reference — the CodeMirror extensions, mostly. Reads the current
+ * reactive reference, mostly the CodeMirror extensions. Reads the current
  * language each time it's called, so anything built fresh gets it right.
  */
 export function t(): Strings {

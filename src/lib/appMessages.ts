@@ -10,7 +10,7 @@
  * none of it is trusted. A message without an id or without words is dropped,
  * a link that isn't plain https is thrown away and the message kept, and the
  * file is only ever read for the first few entries. Nothing in this file
- * fetches or draws anything — it only decides.
+ * fetches or draws anything: it only decides.
  */
 
 import type { LocaleId } from "./i18n.svelte";
@@ -58,7 +58,7 @@ export function today(now: Date = new Date()): string {
  * Two version strings, compared the way versions mean it.
  *
  * Negative when a is older. Segments are numbers, a missing one counts as 0,
- * and anything that isn't a number counts as 0 too — so 0.3.0-beta sorts just
+ * and anything that isn't a number counts as 0 too, so 0.3.0-beta sorts just
  * below 0.3.0 rather than throwing the whole comparison out.
  */
 export function compareVersions(a: string, b: string): number {

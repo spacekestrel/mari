@@ -64,7 +64,7 @@ const quoteLine = Decoration.line({ class: "cm-quoted" });
  * A chapter title, centred the way a printed one is.
  *
  * On the line rather than the text: alignment belongs to the line box, and the
- * highlight style can only reach the words. Only in a `.mari` chapter — a `.md`
+ * highlight style can only reach the words. Only in a `.mari` chapter: a `.md`
  * file is a document of some other kind, and centring its headings would be an
  * opinion nobody asked for.
  */

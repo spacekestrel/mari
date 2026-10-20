@@ -1,7 +1,7 @@
 /**
  * Copying text to the clipboard, with the old way as a fallback.
  *
- * Some webviews — WebKitGTK on Linux among them — refuse the clipboard API
+ * Some webviews (WebKitGTK on Linux among them) refuse the clipboard API
  * outside a few narrow conditions. Falling back to a hidden textarea and
  * `execCommand` keeps copying working there rather than failing silently.
  */

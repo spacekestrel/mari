@@ -39,7 +39,7 @@
   }
 
   // The popover's own clicks never get here (see the stopPropagation below),
-  // so this only has to spare the button that opened the menu — which is
+  // so this only has to spare the button that opened the menu, which is
   // still in the document, unlike the rows inside.
   function handleWindowClick(e: MouseEvent) {
     if (open && !container?.contains(e.target as Node)) {
@@ -78,7 +78,7 @@
     <!-- Kept from reaching the window's dismiss handler. Testing whether the
          click landed inside the menu isn't enough: opening Settings replaces
          the row that was clicked, and by the time the window sees the event
-         that row is no longer in the document — so it reads as an outside
+         that row is no longer in the document, so it reads as an outside
          click and shuts the menu the moment it's asked to open. -->
     <div class="popover" onclick={(e) => e.stopPropagation()}>
       <div class="popover-arrow"></div>
@@ -247,8 +247,8 @@
   }
 
   /* Deliberately no opacity here. A menu that fades in from nothing is
-     invisible until the animation runs, and if it never advances — the
-     window not compositing, animations switched off, a throttled webview —
+     invisible until the animation runs, and if it never advances (the
+     window not compositing, animations switched off, a throttled webview)
      it stays invisible and the menu looks broken. The slide is decoration;
      being visible isn't. */
   @keyframes pop-in {

@@ -1,7 +1,7 @@
 /**
  * Undo and redo inside the drafting box.
  *
- * The box is a plain textarea, and a textarea has undo of its own — but not
+ * The box is a plain textarea, and a textarea has undo of its own, but not
  * one that can be relied on here. Going to Compare and back to Keep tweaking
  * takes the box off screen and builds a new one, and the browser's undo trail
  * goes with it: the writer presses Ctrl+Z after coming back and nothing
@@ -9,8 +9,8 @@
  * app runs on, is unreliable about redo in a textarea even without that.
  *
  * So the trail is kept here instead, beside the draft rather than inside the
- * box, and it survives the box being rebuilt. It is deliberately plain data —
- * no DOM, no editor — so the grouping rules below can be tested.
+ * box, and it survives the box being rebuilt. It is deliberately plain data,
+ * with no DOM and no editor, so the grouping rules below can be tested.
  */
 
 /** The draft box at one moment: what was in it, and where the caret stood. */
@@ -21,7 +21,7 @@ export interface DraftSnapshot {
   to: number;
 }
 
-/** Typing, deleting, or something that did both at once — a paste over a selection. */
+/** Typing, deleting, or something that did both at once: a paste over a selection. */
 export type DraftEditKind = "insert" | "delete" | "other";
 
 /** How the present snapshot came about, so the next keystroke knows whether to join it. */
@@ -40,7 +40,7 @@ export interface DraftHistory {
   present: DraftSnapshot;
   /** Steps that have been undone, nearest first, waiting to be redone. */
   future: DraftSnapshot[];
-  /** Null when the present can't be joined — after an undo, or at the start. */
+  /** Null when the present can't be joined: after an undo, or at the start. */
   lastEdit: DraftEditMark | null;
 }
 
@@ -66,7 +66,7 @@ export function createDraftHistory(snapshot: DraftSnapshot): DraftHistory {
  * whether it was put in or taken out.
  *
  * Found by matching from both ends, which is all the information a textarea
- * gives us — it reports the text after the change, not the change itself.
+ * gives us: it reports the text after the change, not the change itself.
  */
 function describeEdit(before: string, after: string): { kind: DraftEditKind; text: string } {
   let start = 0;
@@ -89,7 +89,7 @@ function describeEdit(before: string, after: string): { kind: DraftEditKind; tex
 /**
  * Whether this edit belongs to the step already in progress.
  *
- * Typing a word is one step, not one step per letter — walking back through a
+ * Typing a word is one step, not one step per letter. Walking back through a
  * sentence a character at a time is nobody's idea of undo. A step ends at a
  * pause, at a space, when typing turns into deleting, and when more than one
  * character arrives at once, because that didn't come from the keyboard: a
@@ -110,8 +110,8 @@ function joinsCurrentStep(last: DraftEditMark | null, kind: DraftEditKind, text:
  * writer has carried on from here, so the branch they left is gone.
  */
 export function recordDraftEdit(history: DraftHistory, next: DraftSnapshot, now: number): DraftHistory {
-  // The caret moved and nothing else. Worth keeping — an undo lands the caret
-  // where it last was — but it isn't a step.
+  // The caret moved and nothing else. Worth keeping, because an undo lands
+  // the caret where it last was, but it isn't a step.
   if (next.text === history.present.text) {
     return { ...history, present: next };
   }

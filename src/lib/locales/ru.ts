@@ -1,7 +1,7 @@
 import type { Strings } from "./en";
 
 /**
- * Russian counting: 1 слово, 2 слова, 5 слов — and 11–14 follow the "many"
+ * Russian counting: 1 слово, 2 слова, 5 слов, and 11–14 follow the "many"
  * form even though they end in 1–4. Every count the writer sees goes through
  * this, so nothing reads like a machine wrote it.
  */

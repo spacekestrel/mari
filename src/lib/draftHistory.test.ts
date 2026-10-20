@@ -141,7 +141,7 @@ describe("going forward again", () => {
   });
 
   it("does not join the step that was just undone", () => {
-    // Undo, then type immediately — close enough in time to have joined, and
+    // Undo, then type immediately: close enough in time to have joined, and
     // it must not, or the step just recovered would be overwritten.
     const typed = type(start(""), "cold");
     const back = undoDraft(typed)!;

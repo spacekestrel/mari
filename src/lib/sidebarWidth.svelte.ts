@@ -17,7 +17,7 @@ function initial(): number {
 class SidebarWidthStore {
   current = $state<number>(initial());
 
-  /** Live update while dragging — deliberately not persisted on every pixel. */
+  /** Live update while dragging; deliberately not persisted on every pixel. */
   set(value: number) {
     this.current = clamp(value);
   }

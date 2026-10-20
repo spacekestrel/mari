@@ -74,7 +74,7 @@
     to: number;
     stateId: string;
     // Stable across state changes and document edits (survives the diff-based
-    // remap) — lets chunk draft/version history stay attached to "this passage"
+    // remap), so chunk draft/version history stays attached to "this passage"
     // rather than "whatever's at this position," even as the mark or the
     // surrounding text changes.
     id: string;
@@ -84,16 +84,16 @@
     value: string;
     onChange: (text: string) => void;
     onHighlightsChange?: (highlights: HighlightRange[]) => void;
-    // Seeds the highlight decorations at construction time — the only way to
+    // Seeds the highlight decorations at construction time: the only way to
     // get highlights into a *freshly built* view, as opposed to pendingHighlights
     // below (which only applies to an already-mounted instance swapping files).
     // Without this, any time this component gets torn down and rebuilt while a
-    // file is open — which normally only happens on a real file switch, but also
-    // happens on every dev-mode HMR reload of this file — the new view starts
+    // file is open (which normally only happens on a real file switch, but also
+    // happens on every dev-mode HMR reload of this file), the new view starts
     // with zero highlights even though the file's saved ones were never touched,
     // and the next Save/close would then persist that empty state over them.
     initialHighlights?: HighlightRange[];
-    // Same rationale as initialHighlights — read once at construction so a
+    // Same rationale as initialHighlights: read once at construction so a
     // rebuilt instance (file switch or HMR) starts correctly seeded.
     initialChunkHistory?: Record<string, ChunkVersion[]>;
     // Fired whenever a new version is created (a Replace, or a Reposition
@@ -103,7 +103,7 @@
     // Same seeding rationale as initialHighlights: read once at construction
     // so a rebuilt instance (file switch or HMR) starts with the right notes.
     initialChunkNotes?: Record<string, string>;
-    // Where the brackets in the margin go — the passages already reworked.
+    // Where the brackets in the margin go: the passages already reworked.
     // Seeded once at construction, like the highlights above.
     initialWorked?: StoredWorked[];
     // Fired when a passage earns a bracket, or loses one, so the caller can
@@ -117,7 +117,7 @@
     focusMode?: boolean;
     /**
      * True for `.md` / `.txt` documents. Marks, notes, drafts and the minimap
-     * belong to `.mari` files, so a plain document doesn't offer them at all —
+     * belong to `.mari` files, so a plain document doesn't offer them at all:
      * showing the tools on a file that can't save their output just invites
      * work that gets thrown away on close.
      */
@@ -181,7 +181,7 @@
 
   // The header stays pinned in the document's top-left corner while the prose
   // scrolls past it. It's overlaid rather than in flow because CodeMirror owns
-  // the scroller's children — the prose is held clear of it by the side gutter
+  // the scroller's children. The prose is held clear of it by the side gutter
   // below, which is why the two can share the top of the page.
   /** The prose's own breathing room at the edges, in px (CodeMirror's `0 1rem`). */
   const PROSE_GUTTER_MIN = 16;
@@ -200,7 +200,7 @@
 
     // The header sits in its own column down the left, pinned while the prose
     // scrolls. Keeping a gutter wide enough for the three words is what holds
-    // the prose clear of it — measured off the labels themselves, not the
+    // the prose clear of it, measured off the labels themselves, not the
     // whole header, so opening one doesn't shove the prose sideways. The same
     // gutter goes on the right, which leaves the column centred; at
     // comfortable window widths the column is narrower than the space
@@ -324,8 +324,8 @@
       ? []
       : [
           // Markdown lets a line of dashes under a paragraph turn it into a
-          // heading. A novelist types dashes constantly — starting a list, a
-          // line of dialogue, a scene break — and watching the paragraph above
+          // heading. A novelist types dashes constantly (starting a list, a
+          // line of dialogue, a scene break), and watching the paragraph above
           // silently go bold is astonishing. `#` headings still work.
           markdown({
             // Strikethrough is GFM, not commonmark, so the parser needs it
@@ -335,7 +335,7 @@
             // spaces at the start of a line is Markdown's way of writing a
             // code block, and a writer indenting a paragraph by hand has no
             // idea they have done it: the whole line turns to code, and every
-            // marker in it — the asterisks around an italic word included —
+            // marker in it, the asterisks around an italic word included,
             // stops being formatting and appears in the prose. Fenced blocks,
             // which you have to ask for with ```, still work.
             extensions: [{ remove: ["SetextHeading", "IndentedCode"] }, Strikethrough],
@@ -347,7 +347,7 @@
           }),
           syntaxHighlighting(proseHighlightStyle),
           // Only in a `.mari` chapter. A `.md` file is Markdown the writer
-          // opened as Markdown, so its syntax stays visible — and where the
+          // opened as Markdown, so its syntax stays visible, and where the
           // markers can be seen, a space typed against one is deliberate.
           ...(plain ? [] : [hideMarkers(), keepEmphasisWhole()]),
         ];
@@ -377,7 +377,7 @@
 
   // Highlight colours live in their own compartment so focus mode can drop
   // them without rebuilding the editor. The decorations themselves stay in
-  // place — only their styling goes — so nothing is lost on the way out.
+  // place and only their styling goes, so nothing is lost on the way out.
   const highlightThemeCompartment = new Compartment();
 
   // Focus mode wants nothing but the prose, so the brackets come out of the
@@ -398,8 +398,9 @@
   // never blocks on it, and `lastEmitted` lets the sync-effect below skip a second
   // redundant serialization by comparing strings instead of re-deriving one.
   let syncTimeout: ReturnType<typeof setTimeout> | undefined;
-  // Deliberately a one-time snapshot of the initial prop, not a reactive binding —
-  // every later update goes through explicit assignment, not prop tracking.
+  // Deliberately a one-time snapshot of the initial prop, not a reactive
+  // binding: every later update goes through explicit assignment, not prop
+  // tracking.
   let lastEmitted: string = untrack(() => value);
 
   function scheduleSync() {
@@ -414,7 +415,7 @@
   }
 
   // For callers (e.g. Save) that need the true current content right now rather
-  // than whatever's landed after the debounce — also flushes the pending timer so
+  // than whatever's landed after the debounce. Also flushes the pending timer so
   // it can't fire later with stale content and incorrectly flip `dirty` back on.
   export function getValue(): string {
     if (syncTimeout) {
@@ -485,7 +486,7 @@
 
   // Set by the caller just before it changes `value` to a different file's
   // content; consumed inside the value-sync effect below so the freshly-loaded
-  // document and its restored highlights land in the same transaction — no
+  // document and its restored highlights land in the same transaction: no
   // window where the doc exists without its highlights or vice versa.
   let pendingHighlights: HighlightRange[] | null = null;
   export function setPendingHighlights(highlights: HighlightRange[]) {
@@ -521,7 +522,7 @@
     // where the first attempt has nothing to aim at yet.
     const goThere = () => {
       if (!view) return;
-      // The line that was at the top goes back to the top — not the caret,
+      // The line that was at the top goes back to the top, not the caret,
       // which may be nowhere near where they were reading.
       const target = Math.min(place.top ?? place.cursor, view.state.doc.length);
       view.dispatch({ effects: EditorView.scrollIntoView(target, { y: "start" }) });
@@ -532,7 +533,7 @@
 
   /**
    * Where the writer was in this chapter: the caret, and the first line they
-   * could see. Both, because they aren't the same thing — you can scroll to
+   * could see. Both, because they aren't the same thing: you can scroll to
    * the end of a chapter without moving the caret from the first paragraph,
    * and it's the reading position that matters for putting you back.
    */
@@ -563,8 +564,8 @@
     if (!view || !highlightMenu) return;
     const { from, to } = highlightMenu;
 
-    // Preserve the chunk's id — and therefore any draft/version history
-    // attached to it — when the marked range is unchanged; a genuinely new
+    // Preserve the chunk's id, and therefore any draft/version history
+    // attached to it, when the marked range is unchanged; a genuinely new
     // selection gets a fresh id. Exact-range match is a deliberate
     // simplification: re-marking a chunk almost always means re-selecting the
     // same text, not a partial overlap.
@@ -581,7 +582,7 @@
 
   // --- Chunk drafting/versioning: draft an alternative for a highlighted
   // passage, compare it against the original, and either keep tweaking or
-  // replace — with the replaced text kept forever as browsable history. See
+  // replace, with the replaced text kept forever as browsable history. See
   // HighlightState.chunkAction for which states allow starting a new draft.
   let chunkHistoryMap = $state<Record<string, ChunkVersion[]>>(untrack(() => initialChunkHistory));
 
@@ -625,7 +626,7 @@
   }
 
   // While the popover is open, a click anywhere outside it or a scroll of the
-  // document closes it (saving first — there's no explicit Save any more).
+  // document closes it, saving first since there's no explicit Save any more.
   // Scrolling counts because the popover is anchored to a fixed screen spot,
   // so once the passage moves the popover no longer points at anything.
   $effect(() => {
@@ -643,7 +644,7 @@
     };
   });
 
-  /** Drops a note outright — used when a Reposition move retires its chunk. */
+  /** Drops a note outright: used when a Reposition move retires its chunk. */
   function deleteNoteFor(chunkId: string) {
     if (!(chunkId in chunkNotes)) return;
     const next = { ...chunkNotes };
@@ -668,7 +669,7 @@
 
   // A decided state with nothing recorded against it (Good / Cut / OK for
   // now, before any history exists) has no action worth offering, so its row
-  // is just the state's name — no buttons.
+  // is just the state's name, with no buttons.
   const activeChunkNameOnly = $derived(
     !!activeChunk && activeChunk.action === "terminal" && !chunkHistoryMap[activeChunk.id]?.length,
   );
@@ -695,7 +696,7 @@
 
     /**
      * No highlight here, but perhaps a bracket. A reworked passage has no
-     * verdict left on it — it was settled by being rewritten — so it is
+     * verdict left on it, having been settled by being rewritten, so it is
      * offered as "decided", which is exactly the row that shows the way back
      * to its earlier versions and nothing else.
      *
@@ -727,7 +728,7 @@
     // Deliberately uses the layout-tracked line blocks rather than
     // coordsAtPos: coordsAtPos returns null for any position CodeMirror
     // hasn't rendered, which is exactly what happens once you scroll into a
-    // chunk taller than the viewport — its start scrolls out of the rendered
+    // chunk taller than the viewport: its start scrolls out of the rendered
     // range and the icon vanished mid-passage. Block layout is always known.
     const startTop = view.documentTop + view.lineBlockAt(activeChunk.from).top;
     const endBottom = view.documentTop + view.lineBlockAt(activeChunk.to).bottom;
@@ -776,7 +777,7 @@
     }
     activeChunk = chunk;
     /**
-     * The cursor's passage, not the hovered one — unlike the row above, which
+     * The cursor's passage, not the hovered one, unlike the row above, which
      * follows the pointer.
      *
      * A lit bracket means "the passage you are working in". Letting hover set
@@ -801,7 +802,7 @@
   }
 
   // Reaching for the icon takes the pointer out of the text, which would
-  // otherwise clear the hover and yank the icon away mid-reach — so hover-off
+  // otherwise clear the hover and yank the icon away mid-reach, so hover-off
   // only lands after a short grace period the icon itself can cancel.
   function scheduleHoverClear() {
     cancelHoverClear();
@@ -833,7 +834,7 @@
   }
 
   /**
-   * Alt+Enter opens the passage the cursor is sitting in — the same thing its
+   * Alt+Enter opens the passage the cursor is sitting in: the same thing its
    * button does, without reaching for the mouse. Alt because that is already
    * the family for marking a passage, so acting on one belongs with it.
    *
@@ -868,7 +869,7 @@
 
   /**
    * Replacing is the writer saying the rewrite is done, so the mark that asked
-   * for it goes with it — leaving it would put a to-do on work already
+   * for it goes with it, since leaving it would put a to-do on work already
    * finished. `keepState` overrides that: a state id re-marks the new wording,
    * and "keep" leaves the existing mark alone (restoring an old version isn't
    * finishing anything).
@@ -879,7 +880,7 @@
 
     /**
      * Whether this passage earns a bracket in the margin. Judged on the
-     * passage as it was marked, before the replacement — that is the portion
+     * passage as it was marked, before the replacement: that is the portion
      * the writer picked out and will be looking for again, however long or
      * short the new wording turns out to be.
      */
@@ -913,7 +914,7 @@
 
     if (keepState && keepState !== "keep") {
       // The old mark is gone, so this is a fresh one over exactly the new
-      // wording — same id, so the passage keeps its draft history.
+      // wording, with the same id, so the passage keeps its draft history.
       const to = chunk.from + newText.length;
       view.dispatch({ effects: setHighlight.of({ from: chunk.from, to, stateId: keepState, id: chunk.id }) });
     }
@@ -962,10 +963,10 @@
    * line can only have been aimed at the bracket.
    *
    * Handled rather than left to the editor because the editor would read it as
-   * a click on the nearest text and drop the cursor at the start of that line
-   * — which is not necessarily inside the passage, and so would open nothing.
-   * This puts the cursor at the start of the passage itself, and everything
-   * else follows from that as if the writer had clicked the prose.
+   * a click on the nearest text and drop the cursor at the start of that
+   * line, which is not necessarily inside the passage, and so would open
+   * nothing. This puts the cursor at the start of the passage itself, and
+   * everything else follows from that as if the writer had clicked the prose.
    */
   function clickedBracket(event: MouseEvent, editorView: EditorView): boolean {
     if (plain || focusMode) return false;
@@ -986,7 +987,7 @@
     event.preventDefault();
     editorView.dispatch({ selection: { anchor: passage.from } });
     // The row and the lit bracket both hang off the cursor's chunk, and the
-    // dispatch above has already moved it — so this only has to make sure the
+    // dispatch above has already moved it, so this only has to make sure the
     // editor has the focus the writer just aimed at.
     editorView.focus();
     return true;
@@ -1009,7 +1010,7 @@
     // A click landing outside the editor (toolbar, sidebar, the banner
     // itself), or Escape pressed while the editor isn't focused, has to be
     // able to cancel too. Without this, placement mode could stay armed
-    // invisibly — and because the chunk icon hides whenever it's set, *no*
+    // invisibly, and because the chunk icon hides whenever it's set, *no*
     // chunk would show its icon again for the rest of the session.
     const onMouseDown = (event: MouseEvent) => {
       if (view && !view.dom.contains(event.target as Node)) abandonPlacementMode();
@@ -1054,7 +1055,7 @@
     if (!placementMode || placementTargetPos == null) return;
     const { chunkId, from, to, text, stateId } = placementMode;
     const target = placementTargetPos;
-    // Clear before dispatching — the updateListener's auto-cancel-on-typing
+    // Clear before dispatching: the updateListener's auto-cancel-on-typing
     // check then sees placementMode already null for this transaction, so it
     // doesn't (redundantly, harmlessly) re-cancel what just completed.
     cancelPlacementMode();
@@ -1072,23 +1073,23 @@
       kind: "moved",
       stateId,
     });
-    // The move retires the mark, so the note goes with it — otherwise it would
+    // The move retires the mark, so the note goes with it. Otherwise it would
     // linger in storage attached to a chunk nothing can reach any more.
     deleteNoteFor(chunkId);
     updateActiveChunk();
     drawMinimap();
   }
 
-  // --- Minimap: a canvas rendering of the document, VS Code style — bars per
-  // real text (muted color for plain, solid highlight color where marked),
+  // --- Minimap: a canvas rendering of the document, VS Code style, with bars
+  // per real text (muted color for plain, solid highlight color where marked),
   // rendered small-but-legible to an offscreen canvas and then scaled *down*
-  // in one drawImage call — the same trick VS Code's real minimap uses,
+  // in one drawImage call. That is the same trick VS Code's real minimap uses,
   // letting the browser's own image-downscaling blur/anti-alias it into
   // something that reads as smoothed text instead of a grid of blocks (which
   // hand-drawn per-character marks looked like no matter how they were sized).
   // A prior version used a second CodeMirror instance shrunk via CSS transform
   // (see src/lib/components/_archive/); it looked authentic but had no
-  // scrollable container of its own, so CodeMirror couldn't virtualize it —
+  // scrollable container of its own, so CodeMirror couldn't virtualize it:
   // every line became a real DOM node at once, which pegged the CPU on large
   // documents. This has no such ceiling: cost scales with pixels drawn, not
   // document length, whether hand-drawing marks or rendering real text.
@@ -1102,16 +1103,16 @@
   const MINIMAP_SOURCE_FONT_SIZE = 9;
   const MINIMAP_SOURCE_ROW_HEIGHT = 11;
   const MINIMAP_MAX_SOURCE_HEIGHT = 16_000; // stays safely under browser canvas-size limits
-  // Higher than the real editor's own highlight opacity (0.15-0.22) — a bar
-  // only a few pixels tall needs more contrast than a full line-height block
-  // does to still read clearly after the downscale blur.
+  // Higher than the real editor's own highlight opacity (0.15-0.22), since a
+  // bar only a few pixels tall needs more contrast than a full line-height
+  // block does to still read clearly after the downscale blur.
   const MINIMAP_HIGHLIGHT_ALPHA = 0.55;
 
   let minimapBoxLeftPx = $state(0);
   let minimapBoxTopPx = $state(0);
   // The viewport indicator is positioned imperatively rather than through a
   // reactive style binding. It moves on every scroll event, and rewriting
-  // `top`/`height` invalidates layout — which, with wrapped proportional text
+  // `top`/`height` invalidates layout, which, with wrapped proportional text
   // in the editor, means the browser re-lays-out prose on every scroll frame.
   // A `transform` moves it on the compositor instead, touching no layout, and
   // going straight to the DOM skips a Svelte scheduler pass per scroll event.
@@ -1122,7 +1123,7 @@
   // proportions are relative to it, so scroll updates alone (no full redraw)
   // can still position it correctly between redraws.
   let minimapCanvasHeightCss = 0;
-  // Not reactive — read back only inside handleMinimapClick, immediately after
+  // Not reactive: read back only inside handleMinimapClick, immediately after
   // the draw that produced them; no template binds to these.
   let minimapPixelsPerRow = 1;
   let minimapLineStartRows: number[] = []; // cumulative visual-row offset of each logical line
@@ -1178,13 +1179,13 @@
 
   // Greedily packs words onto each row until the next word would overflow
   // maxWidth, mirroring how the real editor wraps by pixel width rather than
-  // by character count — a fixed character count doesn't work here because
+  // by character count. A fixed character count doesn't work here because
   // the minimap draws in the real proportional prose font, where a 66-char
   // chunk's actual rendered width varies with its content, leaving a
   // different (wrong) amount of empty space on the right of every row.
   // Token width is estimated from an average character width rather than
   // measured per token. Measuring was costing ~75ms of every redraw on a
-  // novel-length document (~60k measureText calls) — and since the result is
+  // novel-length document (~60k measureText calls), and since the result is
   // downscaled to a 120px-wide blur, the difference in wrap points is
   // invisible. The estimate is what keeps redraws off the main thread budget.
   function drawMinimap() {
@@ -1199,7 +1200,7 @@
     const lineCount = doc.lines;
 
     // Rough char-count estimate, only to pick a compression/font-size ratio
-    // before we know the real font metrics — precision doesn't matter here,
+    // before we know the real font metrics. Precision doesn't matter here,
     // it just needs to be in the right ballpark.
     let estimatedRows = 0;
     for (let i = 1; i <= lineCount; i++) {
@@ -1211,12 +1212,12 @@
     minimapBoxTopPx = MINIMAP_MARGIN_PX;
 
     // Render real text at a small-but-legible size onto an offscreen canvas,
-    // then downscale the whole thing in one drawImage call at the end — the
+    // then downscale the whole thing in one drawImage call at the end. The
     // browser's own image interpolation does the blur/anti-alias that makes
     // this read as smoothed text rather than the hard-edged blocks that
     // hand-drawn per-character rectangles produced regardless of sizing.
     // Once a document needs more rows than fit under the height cap, the font
-    // size has to shrink right along with the row spacing — shrinking only the
+    // size has to shrink right along with the row spacing. Shrinking only the
     // spacing while still drawing at full font size is what was causing
     // adjacent lines to overlap and garble in longer documents.
     const compression = Math.min(1, MINIMAP_MAX_SOURCE_HEIGHT / (estimatedRows * MINIMAP_SOURCE_ROW_HEIGHT));
@@ -1234,8 +1235,8 @@
     // Wrap on word boundaries at the real column width, so every non-final
     // row fills its width the way the editor's own word-wrap does. Width per
     // token is estimated from one measurement of a representative sample
-    // rather than measured token by token — see wrapLineIntoRows.
-    // Sample the document's own text rather than a synthetic alphabet — a
+    // rather than measured token by token (see wrapLineIntoRows).
+    // Sample the document's own text rather than a synthetic alphabet: a
     // made-up sample skews wide (real prose is mostly lowercase), which
     // shrinks the character budget and wraps every row short of the column.
     const sampleStart = Math.min(doc.length, 2000);
@@ -1279,7 +1280,7 @@
 
         // Split the chunk into highlighted/plain runs. Highlights are drawn as
         // a solid background bar behind the (still muted-color) text rather
-        // than as colored glyphs — at this size, colored text is just a few
+        // than as colored glyphs. At this size, colored text is just a few
         // pixels of anti-aliased stroke that the downscale blur washes out
         // almost completely, whereas a filled rectangle survives it fine.
         const runs: { from: number; to: number; bg: string | null }[] = [];
@@ -1358,7 +1359,7 @@
     if (!el) return;
     el.style.transform = `translateY(${minimapViewportTopPx}px)`;
     // Height barely moves while scrolling (it tracks the viewport/document
-    // ratio), so only write it when it actually changes — that keeps the
+    // ratio), so only write it when it actually changes. That keeps the
     // layout-invalidating property off the scroll path.
     const nextHeight = `${Math.round(minimapViewportHeightPx)}px`;
     if (el.style.height !== nextHeight) el.style.height = nextHeight;
@@ -1368,7 +1369,7 @@
     if (!view || !minimapCanvas || minimapPixelsPerRow <= 0) return;
     const rect = minimapCanvas.getBoundingClientRect();
     const clickedRow = (event.clientY - rect.top) / minimapPixelsPerRow;
-    // minimapLineStartRows is ascending — find the last line starting at or
+    // minimapLineStartRows is ascending, so find the last line starting at or
     // before the clicked row (binary search; this can be a few thousand
     // entries for a long document, and it runs on every click).
     let lo = 1;
@@ -1385,8 +1386,8 @@
 
   /**
    * Cutting to the panel and putting back are filing actions, not text edits,
-   * and they're each other's undo. Ctrl+Z can only revert the document half —
-   * it knows nothing about the panel — which would leave the passage either
+   * and they're each other's undo. Ctrl+Z can only revert the document half,
+   * knowing nothing about the panel, which would leave the passage either
    * duplicated (in the prose *and* the panel) or, undoing a Put back, gone
    * from both. Keeping these out of the history means the only way to reverse
    * one is the other, and the two halves can't drift apart.
@@ -1397,8 +1398,8 @@
   let drawerEl = $state<HTMLDivElement | undefined>();
 
   // Clicking anywhere else shuts the drawer, like the other two header panels.
-  // The header is excluded because the word that opens this also closes it —
-  // otherwise the two would fight and it would never shut.
+  // The header is excluded because the word that opens this also closes it.
+  // Otherwise the two would fight and it would never shut.
   $effect(() => {
     if (!drawerOpen) return;
     const onPointerDown = (event: PointerEvent) => {
@@ -1484,7 +1485,7 @@
 
   /**
    * Puts a passage back where it came from. The remembered context is only
-   * trusted when it appears exactly once — otherwise there's no telling which
+   * trusted when it appears exactly once. Otherwise there's no telling which
    * copy is the right one, and dropping it at the cursor is honest about that.
    */
   function putBackCut(cut: MariCut) {
@@ -1521,7 +1522,7 @@
    *
    * CodeMirror matches its own bindings against the character, falling back to
    * the legacy `keyCode` when that character isn't Latin. But `keyCode` is
-   * deprecated and some webviews leave it at zero — and then undo simply stops
+   * deprecated and some webviews leave it at zero, and then undo simply stops
    * working the moment the writer switches to a Cyrillic layout.
    *
    * This runs after CodeMirror's keymap, so on layouts where its own matching
@@ -1556,7 +1557,7 @@
 
   /**
    * Alt+1..8 marks, Alt+0 clears. Alt rather than Ctrl because Ctrl+1..8 is
-   * tab switching in browsers and is reserved — the page never reliably gets
+   * tab switching in browsers and is reserved: the page never reliably gets
    * it, which would leave the web build without these.
    *
    * With no selection the whole paragraph is marked: most marks are
@@ -1578,7 +1579,7 @@
     // Same rule the right-click follows, against the line the cursor is on.
     const sel = view.state.selection.main;
     const target = highlightTarget(sel, view.state.doc.lineAt(sel.head));
-    if (!target) return false; // blank line — nothing to mark
+    if (!target) return false; // blank line, nothing to mark
     const { from, to } = target;
 
     const stateId = slot === 0 ? null : HIGHLIGHT_STATES[slot - 1].id;
@@ -1656,13 +1657,14 @@
                 editorView.state.selection.main,
                 at === null ? null : editorView.state.doc.lineAt(at),
               );
-              // Nothing to mark — a blank line, or past the end of the text.
+              // Nothing to mark: a blank line, or past the end of the text.
               // Leave the system's own menu alone there.
               if (!target) return false;
               event.preventDefault();
-              // Without this, the event keeps bubbling to window after preventDefault()
-              // — and since ContextMenu listens on window for contextmenu-to-dismiss, it
-              // would catch this same event and close the menu instantly.
+              // Without this, the event keeps bubbling to window after
+              // preventDefault(), and since ContextMenu listens on window for
+              // contextmenu-to-dismiss, it would catch this same event and
+              // close the menu instantly.
               event.stopPropagation();
               highlightMenu = { x: event.clientX, y: event.clientY, from: target.from, to: target.to };
               return true;
@@ -1706,7 +1708,7 @@
               if (!placementMode && clickedBracket(event, editorView)) return true;
               if (!placementMode) return false;
               // Resolve the target from this click's own coordinates rather
-              // than trusting a previous mousemove — a click arriving without
+              // than trusting a previous mousemove. A click arriving without
               // one used to fall through silently and leave placement mode
               // armed forever, hiding every chunk's icon from then on.
               const target = placementTargetAt(editorView, event.clientX, event.clientY);
@@ -1747,7 +1749,7 @@
             if (update.docChanged || update.geometryChanged) updateCopyDocPos();
             if (!update.docChanged) return;
             // A real edit while placement mode is armed reads as "the user moved
-            // on" — the move's own transaction already clears placementMode
+            // on". The move's own transaction already clears placementMode
             // before dispatch, so this is a no-op for that one specific update.
             if (placementMode) cancelPlacementMode();
             scheduleSync();
@@ -1866,7 +1868,7 @@
   });
 
   // Keep the editor in sync when `value` is replaced from outside (e.g. opening a
-  // file) — but not when `value` just changed because we ourselves emitted it via
+  // file), but not when `value` just changed because we ourselves emitted it via
   // scheduleSync/getValue, which is why this compares against `lastEmitted` instead
   // of re-deriving the doc string (that comparison alone was the second O(n) cost
   // stacking on every keystroke, on top of the one in scheduleSync).
@@ -1909,7 +1911,7 @@
           // chapter that was open a moment ago.
           historyCompartment.reconfigure(history()),
           // Highlight ranges are plain offsets with no notion of "which file" they
-          // belong to — without this they'd silently reapply to whatever text now
+          // belong to. Without this they'd silently reapply to whatever text now
           // occupies those same offsets in the newly-loaded document. Restoring
           // (if the caller set pendingHighlights) happens in this same transaction
           // so the document and its highlights are never out of sync for a tick.
@@ -1939,7 +1941,7 @@
   });
 
   // Re-reserve the prose's top padding whenever the header appears, disappears,
-  // or changes size — expanding, collapsing, wrapping to another line, or the
+  // or changes size: expanding, collapsing, wrapping to another line, or the
   // reader dragging the textarea's resize handle.
   let headerResizeObserver: ResizeObserver | undefined;
   $effect(() => {
@@ -2116,7 +2118,7 @@
         <Icon name="archive" size={13} />
       </button>
     {/if}
-    <!-- Notes are offered on every state, including the decided ones — "keep,
+    <!-- Notes are offered on every state, including the decided ones: "keep,
          but check the timeline here" is as worth recording as a rewrite. -->
     <button
       class="chunk-icon"
@@ -2215,7 +2217,7 @@
     box-shadow: 0 0 0 1px var(--color-border);
   }
 
-  /* The "currently visible" indicator, VS Code style — sits on top of the
+  /* The "currently visible" indicator, VS Code style. Sits on top of the
      minimap and tracks editor scroll. pointer-events: none so clicks (and
      the existing click-to-jump behavior) still reach the canvas underneath. */
   .minimap-viewport {
@@ -2228,7 +2230,7 @@
   }
 
   /* Anchored to the chunk's top-right corner (see updateChunkIconPos) via
-     view.coordsAtPos/getBoundingClientRect, both viewport coordinates —
+     view.coordsAtPos/getBoundingClientRect, both viewport coordinates, and
      fixed positioning matches that directly, same as ContextMenu's raw
      clientX/clientY. */
   /* The state name plus its actions, as one strip in the margin. */

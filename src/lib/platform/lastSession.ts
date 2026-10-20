@@ -5,7 +5,7 @@ export interface LastSession {
   filePath?: string;
 }
 
-/** Restoring across restarts only makes sense for real filesystem paths (Tauri) — see restoreSession in +page.svelte. */
+/** Restoring across restarts only makes sense for real filesystem paths (Tauri); see restoreSession in +page.svelte. */
 export function getLastSession(): LastSession | undefined {
   const raw = localStorage.getItem(KEY);
   if (!raw) return undefined;

@@ -29,9 +29,9 @@ export function joinPath(dir: string, name: string): string {
  * Whether dragging `source` onto `target` should do anything.
  *
  * Refuses the four cases that are either impossible or pointless: dropping
- * onto a file, onto itself, back where it already was, and — the one that
- * would actually destroy work — a folder into its own descendant, which would
- * leave it nowhere.
+ * onto a file, onto itself, back where it already was, and the one that would
+ * actually destroy work: a folder into its own descendant, which would leave
+ * it nowhere.
  */
 export function canDrop(
   source: { path: string; kind: string },

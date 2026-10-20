@@ -301,8 +301,8 @@ describe("marks survive undo", () => {
     }).state;
     const typed = marked.update({ changes: { from: 0, insert: "New. " } }).state;
 
-    // One undo takes back the typing. The mark stays — it is not an edit, and
-    // pressing the same key again is how it is cleared.
+    // One undo takes back the typing. The mark stays, since it is not an edit,
+    // and pressing the same key again is how it is cleared.
     const back = run(typed, undo);
     expect(back.doc.toString()).toBe(DOC);
     expect(readHighlights(back.field(field), back.doc.length).map((h) => h.id)).toEqual(["m9"]);

@@ -41,7 +41,7 @@
   import { docxToMarkdown, markdownToDocx, isDocxFile, DOCX_EXTENSION } from "$lib/docx";
 
   let file = $state<OpenedFile | null>(null);
-  // $state because the editor is now conditionally rendered — this reference
+  // $state because the editor is now conditionally rendered: this reference
   // comes and goes with it, and callers need to see that.
   let editorRef = $state<Editor | undefined>();
   let text = $state("");
@@ -58,11 +58,11 @@
   let treeContextMenu = $state<{ entry: FsEntry; parent: FsEntry; x: number; y: number } | null>(null);
   /** The sidebar row currently showing a box with its own name in it. */
   let renamingPath = $state<string | null>(null);
-  // Seeds a freshly-(re)constructed Editor instance's initial decorations — see
+  // Seeds a freshly-(re)constructed Editor instance's initial decorations; see
   // the comment on Editor's `initialHighlights` prop for why this exists.
   let currentHighlights = $state<HighlightRange[]>([]);
   // Seeds a freshly-(re)constructed Editor instance's chunk draft/version
-  // history — same rationale as currentHighlights above.
+  // history, same rationale as currentHighlights above.
   let currentChunkHistory = $state<Record<string, ChunkVersion[]>>({});
   // Seeds a freshly-(re)constructed Editor instance's per-chunk notes.
   let currentChunkNotes = $state<Record<string, string>>({});
@@ -74,8 +74,8 @@
   let currentSynopsis = $state<MariSynopsis>(emptySynopsis());
   /**
    * False until a document is actually opened or started. On a first run there
-   * is nothing to edit yet, and showing a blank page that isn't a file — no
-   * name, nowhere on disk — invites writing into something that can't be saved.
+   * is nothing to edit yet, and showing a blank page that isn't a file (no
+   * name, nowhere on disk) invites writing into something that can't be saved.
    */
   let documentOpen = $state(false);
   // Passages cut out of the prose but kept against the file.
@@ -86,10 +86,10 @@
 
   const runningInTauri = isTauriDesktop();
 
-  // Focus mode goes real fullscreen — Tauri's setFullscreen on desktop, the
+  // Focus mode goes real fullscreen: Tauri's setFullscreen on desktop, the
   // browser's own Fullscreen API on the web build (like pressing F11). Must be
-  // called synchronously from the triggering click/keydown, not from a $effect —
-  // the Fullscreen API only grants requests made within the original user
+  // called synchronously from the triggering click/keydown, not from a $effect.
+  // The Fullscreen API only grants requests made within the original user
   // gesture's call stack, and effects run a tick after the DOM update.
   function setFocusMode(value: boolean) {
     distractionFree = value;
@@ -121,11 +121,11 @@
 
   /**
    * Keeps unsaved work on the way out rather than asking about it. The window
-   * closes either way — everything not yet saved is put by, and comes back
+   * closes either way: everything not yet saved is put by, and comes back
    * next launch exactly as it was.
    *
-   * Registering this listener makes Tauri route every close through JS —
-   * including the titlebar's X, which calls `close()` — and the wrapper then
+   * Registering this listener makes Tauri route every close through JS,
+   * including the titlebar's X, which calls `close()`, and the wrapper then
    * calls `destroy()` itself when the event isn't prevented, which is why the
    * window needs `core:window:allow-destroy`.
    */
@@ -156,7 +156,7 @@
   /**
    * True if anything would be lost by closing now. `dirty` alone isn't enough:
    * the editor debounces its content sync, and a synopsis or plan still being
-   * typed hasn't been handed over yet — so settle both before deciding.
+   * typed hasn't been handed over yet, so settle both before deciding.
    */
   function hasUnsavedWork(): boolean {
     editorRef?.flushChapterHeader();
@@ -165,13 +165,13 @@
       text = latest;
       dirty = true;
     }
-    // Chapters you moved away from without saving count too — they only exist
-    // in memory, so closing would take them with it.
+    // Chapters you moved away from without saving count too, since they only
+    // exist in memory, so closing would take them with it.
     return dirty || setAside.size > 0;
   }
 
   /**
-   * Plain `.md` / `.txt` files carry no marks, notes or history — those live
+   * Plain `.md` / `.txt` files carry no marks, notes or history; those live
    * inside `.mari` files. Opening one therefore clears whatever the previous
    * document had rather than loading anything.
    */
@@ -203,7 +203,7 @@
       const { bytes, restored, dropped } = resolveSetAside(disk, waiting);
       activeBase = fingerprint(disk);
       if (dropped) {
-        // The file moved on under the unsaved copy — pulled from another
+        // The file moved on under the unsaved copy, pulled from another
         // machine, most likely. Say so: the alternative is the writer saving
         // an old chapter over a newer one without ever being told.
         setAside.delete(entry.path);
@@ -315,7 +315,7 @@
    * How far right the prose sits in focus mode.
    *
    * Focus mode drops the chapter list, so the text is suddenly centred in the
-   * whole window rather than in the space beside the sidebar — and it visibly
+   * whole window rather than in the space beside the sidebar, and it visibly
    * jumps left by half the sidebar's width on the way in. Shifting it back by
    * exactly that much means entering focus mode takes the chrome away and
    * leaves the writing where it was.
@@ -328,7 +328,7 @@
       : 0,
   );
   // Preview renders Markdown as formatted text. That's a Markdown editor's
-  // feature, not a writing one — a `.mari` chapter is prose, so it doesn't
+  // feature, not a writing one: a `.mari` chapter is prose, so it doesn't
   // offer it even though its content is stored as Markdown.
   const canPreview = $derived(/\.(md|markdown)$/i.test(displayName));
   const baseName = $derived(displayName.replace(/\.(mari|md|markdown|txt)$/i, ""));
@@ -346,7 +346,7 @@
 
   /**
    * Says what went wrong and why. Every filesystem call here can fail for
-   * reasons only the OS knows — no permission, no disk, file held open — and
+   * reasons only the OS knows (no permission, no disk, file held open), and
    * "Couldn't save" on its own leaves the writer with nowhere to go.
    */
   function reportFailure(what: string, error: unknown) {
@@ -372,8 +372,8 @@
 
   /**
    * Unsaved chapters, as the bytes their file would have had. Written to the
-   * app's own storage as well as held here, so closing the window — or losing
-   * it to a crash — doesn't take them with it. They come back on next launch
+   * app's own storage as well as held here, so closing the window (or losing
+   * it to a crash) doesn't take them with it. They come back on next launch
    * exactly as they were, still unsaved, and the file on disk is never touched.
    */
   const SET_ASIDE_KEY = "mari-unsaved-chapters";
@@ -427,7 +427,7 @@
 
   /**
    * Kept as the writer moves rather than only on the way out: the app doesn't
-   * always get a tidy shutdown — a crash, or being killed — and a reading
+   * always get a tidy shutdown (a crash, or being killed), and a reading
    * place that only survives a polite close isn't much use.
    */
   let rememberTimer: ReturnType<typeof setTimeout> | undefined;
@@ -547,7 +547,7 @@
   /**
    * Opens any file Mari understands. Everything is read as bytes and decided
    * by extension: `.mari` and `.docx` are zips, the rest is text. One picker
-   * rather than one per format — the writer knows which file they want, not
+   * rather than one per format: the writer knows which file they want, not
    * which of Mari's internal shapes it happens to be.
    */
   async function handleOpen() {
@@ -613,7 +613,7 @@
     try {
       created = await adapter.createFile(dir, name);
       // A zero-byte file isn't a readable zip, so a new `.mari` gets an empty
-      // but valid bundle written into it straight away — otherwise it would
+      // but valid bundle written into it straight away. Otherwise it would
       // fail to open the first time it was clicked.
       if (isMariFile(name)) {
         const empty = packMariBundle({ text: "", highlights: [], notes: {}, history: {} });
@@ -797,13 +797,13 @@
     performDelete(entry, parent);
   }
 
-  /** Guards against a save triggering itself — see saveThrough. */
+  /** Guards against a save triggering itself; see saveThrough. */
   let savingThrough = false;
 
   /**
    * Writes the file now rather than waiting for Ctrl+S. Everything in the
    * chapter header behaves this way: cutting a passage takes it out of the
-   * prose, and a synopsis or plan is a decision, not a draft — none of it
+   * prose, and a synopsis or plan is a decision, not a draft. None of it
    * should be sitting only in memory when the app closes.
    */
   async function saveThrough() {
@@ -812,14 +812,14 @@
     if (!file || !isMariFile(file.name)) return;
 
     // Saving flushes the header's open box, which reports the change, which
-    // lands back here. The save already in flight will pick it up — it flushes
-    // before it packs — so the nested call has nothing left to do.
+    // lands back here. The save already in flight will pick it up, since it
+    // flushes before it packs, so the nested call has nothing left to do.
     if (savingThrough) return;
 
     savingThrough = true;
     try {
       // handleSave reports its own failure and leaves the document dirty when
-      // it fails — so a cut that didn't reach disk still shows as unsaved.
+      // it fails, so a cut that didn't reach disk still shows as unsaved.
       await handleSave();
     } finally {
       savingThrough = false;
@@ -874,8 +874,8 @@
     currentCuts = bundle.cuts;
     /**
      * A chapter saved before brackets existed carries none. Where the file
-     * still says enough to place one — a highlight left on a passage that has
-     * earlier wordings under the same id — the bracket is worked out on
+     * still says enough to place one (a highlight left on a passage that has
+     * earlier wordings under the same id), the bracket is worked out on
      * opening, so an old chapter isn't left blank for work that was done.
      *
      * Only when the file has no brackets of its own. Once it has been saved
@@ -913,7 +913,7 @@
   /** True if the document reached disk. Reports its own failure either way. */
   async function handleSave(): Promise<boolean> {
     // Editor debounces its content sync for typing performance, so `text` can lag
-    // behind by up to ~200ms — pull the true current content directly for saving.
+    // behind by up to ~200ms; pull the true current content directly for saving.
     text = editorRef?.getValue() ?? text;
 
     // New documents are `.mari`, so an unsaved one goes straight to the bundle
@@ -953,8 +953,8 @@
         return true;
       }
 
-      // Plain text file: the prose is saved, the extras aren't — say so rather
-      // than letting marks quietly vanish when the document is reopened.
+      // Plain text file: the prose is saved, the extras aren't, so say so
+      // rather than letting marks quietly vanish when the document is reopened.
       const marks = editorRef?.flushHighlights() ?? [];
       await adapter.save(file, text);
       file = { ...file, content: text };
@@ -972,7 +972,7 @@
   /** Plain-text export; the marks and notes stay behind. */
   /**
    * Writes a copy in whichever format was chosen in the dialog. The open
-   * document is left alone — this is a copy going somewhere, not a move.
+   * document is left alone: this is a copy going somewhere, not a move.
    *
    * Only `.mari` carries the highlights, notes, plan and drawer, so exporting
    * to anything else says what stayed behind rather than losing it quietly.
@@ -1022,7 +1022,7 @@
 
     // Matched on the physical key rather than the character it produces. A
     // non-Latin layout reports Ctrl+S as "ы", and even on a Latin one holding
-    // Shift reports "S" rather than "s" — so Ctrl+Shift+S and Ctrl+Shift+O
+    // Shift reports "S" rather than "s", so Ctrl+Shift+S and Ctrl+Shift+O
     // matched nothing at all. `code` names the key by where it sits.
     switch (e.code) {
       case "KeyS":
@@ -1409,7 +1409,7 @@
   }
 
   /* Focus mode is meant to read like the browser's own F11: real fullscreen,
-     nothing on screen but the prose. The focus button goes too — Esc is the
+     nothing on screen but the prose. The focus button goes too; Esc is the
      way back out, same as F11 fullscreen anywhere else. */
   /* Padding rather than a transform: CodeMirror works out where a click
      landed from real layout, and moving the content with a transform would

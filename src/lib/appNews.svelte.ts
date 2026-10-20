@@ -3,8 +3,8 @@
  *
  * Once at launch the app asks Mari's website for a small file of messages. If
  * one of them is worth this person's attention, it appears at the foot of the
- * sidebar until they close it. If the fetch fails — no network, website down,
- * file half-written — nothing is said and nothing is broken: the app has
+ * sidebar until they close it. If the fetch fails (no network, website down,
+ * file half-written), nothing is said and nothing is broken: the app has
  * never needed this file to work, and it already has the last one it saw.
  *
  * This is the only moment Mari talks to the network. It sends nothing: no
@@ -74,7 +74,7 @@ class AppNews {
   /**
    * Asks the website what's new. Called once, at launch.
    *
-   * Every failure is the same failure — there is no news — so they are all
+   * Every failure is the same failure: there is no news. So they are all
    * swallowed together. Nothing here is allowed to delay or break a launch.
    */
   async refresh() {

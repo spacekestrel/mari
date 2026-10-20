@@ -25,7 +25,7 @@ describe.each(LOCALES)("sample chapter (%s)", (locale) => {
 
   it("lets paragraphs run on, rather than breaking them by hand", () => {
     // The source was hard-wrapped at about seventy characters. Those breaks
-    // are real characters, and they stop every line short of the column —
+    // are real characters, and they stop every line short of the column,
     // which reads as a chapter set too narrow, with a centred heading pushed
     // off to one side.
     const hardWrapped = sample.text.split("\n\n").filter((p) => p.includes("\n"));

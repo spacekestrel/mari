@@ -3,7 +3,7 @@
  *
  * Anything the writer can read lives here rather than inline in a component,
  * so a translator can see the whole of Mari's voice in one place. Strings that
- * need a name or a number are functions, not templates with placeholders —
+ * need a name or a number are functions, not templates with placeholders:
  * word order differs between languages, and a function lets each translation
  * put the pieces where its own grammar wants them.
  */

@@ -7,8 +7,8 @@ import type { ChunkVersion } from "./chunkHistory";
  * The chapter Mari opens when there is nothing else to open.
  *
  * Mari's screen is empty until you have written something and marked it up,
- * which means the things it exists for — highlights, notes, the drawer, drafts
- * kept beside the prose — are invisible to anyone seeing it for the first
+ * which means the things it exists for (highlights, notes, the drawer, drafts
+ * kept beside the prose) are invisible to anyone seeing it for the first
  * time. So a first run lands in a real chapter, already part-revised.
  *
  * The prose is the first chapter of Alice's Adventures in Wonderland, which is
@@ -18,13 +18,13 @@ import type { ChunkVersion } from "./chunkHistory";
  *
  * The prose stays in English in both languages. It is an English novel, and
  * the Russian translations that are any good are still in copyright. What does
- * change with the language is everything the writer wrote *about* it — the
- * synopsis, the plan, and the notes — which is the part being demonstrated.
+ * change with the language is everything the writer wrote *about* it: the
+ * synopsis, the plan, and the notes, which is the part being demonstrated.
  */
 
 /**
  * The chapter itself. The marks below are offsets into this, before the
- * heading is put in front of it — that is added per language, and everything
+ * heading is put in front of it. That is added per language, and everything
  * shifts by however long it turns out to be.
  *
  * Paragraphs run on one line each. The source this came from was hard-wrapped
