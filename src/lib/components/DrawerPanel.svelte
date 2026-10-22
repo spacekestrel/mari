@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from "./Icon.svelte";
   import type { MariCut } from "$lib/mariBundle";
-  import { copyText } from "$lib/clipboard";
+  import { copyRichText } from "$lib/richCopy";
   import { i18n } from "$lib/i18n.svelte";
 
   /**
@@ -27,7 +27,7 @@
   let copiedTimer: ReturnType<typeof setTimeout> | undefined;
 
   async function copy(cut: MariCut) {
-    await copyText(cut.text);
+    await copyRichText(cut.text);
     copiedId = cut.id;
     clearTimeout(copiedTimer);
     copiedTimer = setTimeout(() => (copiedId = null), 1500);

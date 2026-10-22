@@ -15,7 +15,7 @@
   import { hideMarkers } from "$lib/hideMarkers";
   import { highlightTarget } from "$lib/highlightTarget";
   import { keepEmphasisWhole } from "$lib/emphasisGuard";
-  import { richCopy } from "$lib/richCopy";
+  import { copyRichText, richCopy } from "$lib/richCopy";
   import { bookParagraphs } from "$lib/paragraphLayout";
   import { findInChapter } from "$lib/searchPanel";
   import { paragraphStyle } from "$lib/paragraphStyle.svelte";
@@ -1482,7 +1482,7 @@
 
   async function copyWholeDocument() {
     if (!view) return;
-    await copyText(view.state.doc.toString());
+    await copyRichText(view.state.doc.toString());
     copiedDocument = true;
     clearTimeout(copiedDocumentTimer);
     copiedDocumentTimer = setTimeout(() => (copiedDocument = false), 1500);

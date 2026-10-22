@@ -1,4 +1,5 @@
 import { renderMarkdown } from "./markdownHtml";
+import { copyText } from "./clipboard";
 import { htmlToMarkdown } from "./htmlToMarkdown";
 import { EditorView } from "@codemirror/view";
 import type { Extension } from "@codemirror/state";
@@ -66,6 +67,77 @@ function pasteAsMarkdown(event: ClipboardEvent, view: EditorView): boolean {
   event.preventDefault();
   view.dispatch(view.state.replaceSelection(insert));
   return true;
+}
+
+/**
+ * Puts a passage on the clipboard in both flavours, for the copy buttons.
+ *
+ * The editor's own Ctrl+C goes through the handlers above, which can write
+ * straight into the copy event. A button has no event to write into, so it has
+ * to ask the clipboard directly — and the plain-text call every button used
+ * before wrote only the Markdown. Pasting a chapter into anywhere that shows
+ * formatted text put literal asterisks on the page.
+ */
+export async function copyRichText(markdown: string): Promise<void> {
+  const html = renderMarkdown(markdown);
+  if (!html) {
+    await copyText(markdown);
+    return;
+  }
+
+  try {
+    if (navigator.clipboard?.write && typeof ClipboardItem !== "undefined") {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/plain": new Blob([markdown], { type: "text/plain" }),
+          "text/html": new Blob([html], { type: "text/html" }),
+        }),
+      ]);
+      return;
+    }
+  } catch {
+    // Falls through. WebKitGTK, which is what the app runs on, refuses this
+    // call outside a few narrow conditions — the same reason copyText has a
+    // fallback of its own.
+  }
+
+  await copyBothViaEvent(markdown, html);
+}
+
+/**
+ * The old way, which still carries both flavours.
+ *
+ * A copy event is the one place both can be set without asking permission, so
+ * one is provoked: an off-screen box is selected to give the command something
+ * to act on, and the event it fires is answered with the real pair. The box's
+ * own contents never reach the clipboard.
+ */
+function copyBothViaEvent(markdown: string, html: string): Promise<void> {
+  return new Promise((resolve) => {
+    const onCopy = (event: ClipboardEvent) => {
+      event.clipboardData?.setData("text/plain", markdown);
+      event.clipboardData?.setData("text/html", html);
+      event.preventDefault();
+    };
+
+    const scratch = document.createElement("textarea");
+    scratch.value = markdown;
+    scratch.style.position = "fixed";
+    scratch.style.top = "-9999px";
+    scratch.style.opacity = "0";
+    scratch.setAttribute("readonly", "");
+    document.body.appendChild(scratch);
+    scratch.select();
+
+    document.addEventListener("copy", onCopy, true);
+    try {
+      document.execCommand("copy");
+    } finally {
+      document.removeEventListener("copy", onCopy, true);
+      scratch.remove();
+      resolve();
+    }
+  });
 }
 
 export function richCopy(): Extension {
