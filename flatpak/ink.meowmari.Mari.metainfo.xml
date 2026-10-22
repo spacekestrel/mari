@@ -93,6 +93,13 @@
   </requires>
 
   <releases>
+    <release version="0.6.3" date="2026-10-21">
+      <description>
+        <ul>
+          <li>Copying a whole chapter, or a passage from the drawer, now pastes as formatted text instead of asterisks</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.6.2" date="2026-10-20">
       <description>
         <ul>
