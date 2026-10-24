@@ -242,7 +242,7 @@ npm run tauri build     # installer for your OS, in src-tauri/target/release/bun
 | `Ctrl+Shift+S` | Export a copy |
 | `Ctrl+Shift+V` | Reading view |
 | `F11` | Focus mode, on and off |
-| `Esc` | Leave focus mode |
+| `Esc` | Close the rewrite panel, or leave focus mode |
 
 ---
 

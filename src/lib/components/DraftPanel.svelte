@@ -316,6 +316,20 @@
    * thing and the trail holding another.
    */
   function handlePanelKeydown(event: KeyboardEvent) {
+    /**
+     * Escape shuts the panel, in whichever mode it is open — the same thing
+     * the X does, and the same key that backs out of everything else in Mari.
+     *
+     * Stopped here so it goes no further: Escape also leaves focus mode, and
+     * one press should do one thing.
+     */
+    if (event.key === "Escape" && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      event.preventDefault();
+      event.stopPropagation();
+      onClose();
+      return;
+    }
+
     if (mode !== "write") return;
     if (!(event.ctrlKey || event.metaKey) || event.altKey) return;
 
